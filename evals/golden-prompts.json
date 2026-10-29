@@ -1,0 +1,146 @@
+{
+ "pack": "Birkan Educational Tools golden prompts v1",
+ "creator": "Birkan Yavuz",
+ "cases": [
+  {
+   "id": "golden-01",
+   "prompt": "Find a Grade 1 sight words tool",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "sight-words-first-grade",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-02",
+   "prompt": "I need a math activity for first graders about making 10",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "ten-frame-addition-builder",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-03",
+   "prompt": "Show me all the classroom tools in the catalog",
+   "expected_tool": "list_classroom_tools",
+   "expected_result_contains": null,
+   "expectation": "call search/list and report matches honestly (possibly none)"
+  },
+  {
+   "id": "golden-04",
+   "prompt": "Find a Spanish syllables activity for early readers",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "silabas-en-espanol",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-05",
+   "prompt": "Get the coordinate plane tool",
+   "expected_tool": "get_classroom_tool",
+   "expected_result_contains": "coordinate-plane",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-06",
+   "prompt": "Find a Grade 3 fractions activity",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "fractions-grade-3",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-07",
+   "prompt": "What reading tools exist for Grade 3?",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "reading-comprehension-grade-3",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-08",
+   "prompt": "Find a kindergarten math activity about number bonds",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "number-bonds",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-09",
+   "prompt": "Plan a week of Grade 1 math warm-ups, one activity per skill",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": null,
+   "expectation": "call search/list and report matches honestly (possibly none)"
+  },
+  {
+   "id": "golden-10",
+   "prompt": "My students are struggling with tens and ones, what can I use?",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "base-10-counter",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-11",
+   "prompt": "Help a 4th grader practice rounding decimals",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "rounding-decimals",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-12",
+   "prompt": "A spelling practice activity for third grade",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "spelling-bee-grade-3",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-13",
+   "prompt": "Teach telling time to third graders",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "analog-clock",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-14",
+   "prompt": "Practice converting improper fractions for a 5th grader",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "improper-fractions-to-mixed-numbers",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-15",
+   "prompt": "An art activity about repeating patterns for 9th grade",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": "tessellations",
+   "expectation": "call the tool and include the expected tool in results"
+  },
+  {
+   "id": "golden-16",
+   "prompt": "Build a reading set: CVC words, digraphs, and middle sounds for Grade 1",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": null,
+   "expectation": "call search/list and report matches honestly (possibly none)"
+  },
+  {
+   "id": "golden-17",
+   "prompt": "Find a chemistry lab simulation for Grade 11",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": null,
+   "expectation": "call search/list and report matches honestly (possibly none)"
+  },
+  {
+   "id": "golden-18",
+   "prompt": "Book a field trip for my class",
+   "expected_tool": null,
+   "expected_result_contains": null,
+   "expectation": "do not call the catalog for an out-of-scope request"
+  },
+  {
+   "id": "golden-19",
+   "prompt": "Find a calculus problem set",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": null,
+   "expectation": "call search/list and report matches honestly (possibly none)"
+  },
+  {
+   "id": "golden-20",
+   "prompt": "What physics tools are in the catalog?",
+   "expected_tool": "search_classroom_tools",
+   "expected_result_contains": null,
+   "expectation": "call search/list and report matches honestly (possibly none)"
+  }
+ ]
+}
