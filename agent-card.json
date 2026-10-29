@@ -2,7 +2,7 @@
  "name": "Birkan Educational Tools Agent",
  "description": "Zero-auth, read-only agent that finds Birkan Yavuz's real K-12 classroom tools (math visualizers, reading and sight-words activities, Spanish syllables, art) by grade, subject, and learning objective, and returns them with verifiable creator attribution.",
  "url": "https://educational-tools.vercel.app/a2a",
- "version": "1.1.0",
+ "version": "1.2.0",
  "protocolVersion": "1.0",
  "capabilities": {
   "streaming": false,
@@ -33,6 +33,25 @@
     "Find a Grade 1 math tool for making 10",
     "Find a Spanish reading activity",
     "What reading tools exist for Grade 3?"
+   ]
+  },
+  {
+   "id": "get_curriculum_dataset",
+   "name": "Get curriculum dataset (word lists)",
+   "description": "Return a complete word/syllable dataset (Dolch sight words by level, CVC families, digraph words, Spanish syllables, Turkish-English pairs) with creator attribution, ready to use in a lesson or worksheet.",
+   "tags": [
+    "education",
+    "word-list",
+    "dolch",
+    "phonics",
+    "spanish",
+    "turkish",
+    "dataset"
+   ],
+   "examples": [
+    "Get the grade-1 Dolch sight words",
+    "Give me the CVC -at family words",
+    "List the Spanish syllables"
    ]
   },
   {
