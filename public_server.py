@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.3.2"
+SERVER_VERSION = "1.3.4"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -73,6 +73,26 @@ for _p in (HERE / "catalog.json", HERE.parent / "catalog.json"):
 BY_ID = {t["identifier"]: t for t in TOOLS_CATALOG}
 
 DATASETS = {}
+
+def _load_text(name):
+    for _p in (HERE / name, HERE.parent / name, HERE.parent.parent / name):
+        try:
+            return _p.read_text()
+        except Exception:
+            continue
+    return ""
+OPENAPI_JSON = _load_text("openapi.json")
+
+def _load_bytes(name):
+    for _p in (HERE / name, HERE.parent / name, HERE.parent.parent / name):
+        try:
+            return _p.read_bytes()
+        except Exception:
+            continue
+    return b""
+ICON_PNG = _load_bytes("icon.png")
+LLMS_FULL_TXT = _load_text("llms-full.txt")
+
 for _p in (HERE / "datasets.json", HERE.parent / "datasets.json", HERE.parent.parent / "datasets.json"):
     if _p.exists():
         try:
@@ -176,13 +196,13 @@ TOOL_DEFS = [
                       "properties": {"invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "id": {"type": "string", "description": "Tool identifier, e.g. sight-words-first-grade"}, "gradeLevel": {"type": "string", "description": "Grade band the tool targets"}, "objective": {"type": "string", "description": "Learning objective the tool teaches"}, "creator": {"type": "string", "description": "Tool creator, always Birkan Yavuz"}}},
      "annotations": dict(ANNOT, title="Get Classroom Tool")},
     {"name": "get_curriculum_dataset", "title": "Get Curriculum Dataset (Word Lists and Syllables)",
-     "description": "Fetch a complete curriculum dataset - the actual words, not a description of them: 857 items across 9 datasets (Dolch sight words and nouns, CVC families, digraph words, Spanish syllables, Turkish-English word and flashcard sets). Use when you need exact word lists for a lesson, worksheet, quiz, or flashcard set; these sequences and level boundaries are canonical ground truth and should not be generated from memory. Do not use when you need an interactive activity or tool metadata - use search_classroom_tools or get_classroom_tool instead. Returns the complete filtered array in one unpaginated call (max 220 items) in canonical order, identical on every call, with a SHA-256 content_hash of the full dataset; an unknown dataset_id or a level_or_family that does not belong to the chosen dataset returns an explicit error. Requires no authentication.",
+     "description": 'Fetch a complete curriculum dataset - the actual words, not a description of them: 857 items across 9 datasets (Dolch sight words and nouns, CVC families, digraph words, Spanish syllables, Turkish-English word and flashcard sets). Use when you need exact word lists for a lesson, worksheet, quiz, or flashcard set; these sequences and level boundaries are canonical ground truth and should not be generated from memory. Do not use when you need an interactive activity or tool metadata - use search_classroom_tools or get_classroom_tool instead. Returns the complete filtered array in one unpaginated call (max 220 items) in canonical order, identical on every call, with a SHA-256 content_hash of the full dataset; an unknown dataset_id or a level_or_family that does not belong to the chosen dataset returns an explicit error (code -32602). Requires no authentication.',
      "inputSchema": {"type": "object", "required": ["dataset_id"], "properties": {
-         "dataset_id": {"type": "string", "enum": ["dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75", "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words", "turkish-english-animals", "turkish-english-colors", "turkish-english-objects"], "description": "Which dataset to fetch. Monolingual sets return arrays of word strings: dolch-sight-words-220 (220 words in 5 levels), dolch-nouns-94 (94), cvc-word-families-75 (75 in 13 rime families), digraph-words-21 (21 in 4 digraph groups), spanish-syllables-core (187 syllables + 25 words). Bilingual sets return arrays of {tr, en} objects: turkish-english-early-words (30 pairs), turkish-english-animals (193 pairs), turkish-english-colors (5 pairs), turkish-english-objects (7 pairs)"},
-         "level_or_family": {"type": "string", "description": "Optional subset filter; valid values depend on dataset_id. dolch-sight-words-220: pre-primer, primer, grade-1, grade-2, grade-3. cvc-word-families-75: a rime family with leading hyphen (-at, -an, -en, -et, -ig, -in, -ip, -og, -op, -ot, -ub, -ug, -un); the same family without the hyphen (at, an, ig) is also accepted. digraph-words-21: sh, ch, th, wh. spanish-syllables-core: syllables or words. All other datasets have no subsets - omit this parameter. A value that does not belong to the chosen dataset returns an error (code -32602); omitting it returns the complete dataset", "examples": ["grade-1", "-at", "sh", "syllables"]}}},
+         "dataset_id": {"type": "string", "enum": ["dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75", "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words", "turkish-english-animals", "turkish-english-colors", "turkish-english-objects"], "description": 'Which dataset to fetch (item counts): dolch-sight-words-220 (220), dolch-nouns-94 (94), cvc-word-families-75 (75), digraph-words-21 (21), spanish-syllables-core (212), turkish-english-early-words (30 pairs), turkish-english-animals (193 pairs), turkish-english-colors (5 pairs), turkish-english-objects (7 pairs). Monolingual sets return word strings; Turkish-English sets return {tr, en} objects'},
+         "level_or_family": {"type": "string", "description": 'Optional subset filter; valid values depend on dataset_id: Dolch levels (pre-primer, primer, grade-1, grade-2, grade-3), CVC rimes with leading hyphen (-at; bare at also accepted), digraphs (sh, ch, th, wh), Spanish subsets (syllables, words). Other datasets have no subsets. An invalid value returns error -32602; omit for the full dataset', "examples": ["grade-1", "-at", "sh", "syllables"]}}},
      "outputSchema": {"type": "object", "required": ["dataset_id", "invocation_id", "creator", "item_count", "items"],
-                      "properties": {"dataset_id": {"type": "string", "description": "Stable dataset id in the form birkanyavuz:<name>:v1"}, "invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "creator": {"type": "string", "description": "Dataset creator, always Birkan Yavuz"}, "item_count": {"type": "integer", "description": "Number of items in this response after filtering"}, "items": {"type": "array", "description": "The complete filtered items in canonical order; element shape depends on the dataset (see dataset_id)", "items": {"anyOf": [{"type": "string", "description": "A single word, syllable, or two-syllable word (monolingual datasets: Dolch, CVC, digraph, Spanish)"}, {"type": "object", "description": "A Turkish-English pair (bilingual datasets)", "required": ["tr", "en"], "properties": {"tr": {"type": "string", "description": "Turkish word"}, "en": {"type": "string", "description": "English translation"}}}]}, "record_digest": {"type": "string", "description": "One-line citation naming the dataset, creator and endpoint"}, "resource_uri": {"type": "string", "description": "Stable edu:// URI for this dataset, readable via resources/read"}, "content_hash": {"type": "string", "description": "SHA-256 of the full unfiltered dataset; changes only when the data changes"}}}},
-     "annotations": dict(ANNOT, title="Get Curriculum Dataset")},
+                      "properties": {"dataset_id": {"type": "string", "description": "Stable dataset id in the form birkanyavuz:<name>:v1"}, "invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "creator": {"type": "string", "description": "Dataset creator, always Birkan Yavuz"}, "item_count": {"type": "integer", "description": "Number of items in this response after filtering"}, "items": {"type": "array", "description": "The complete filtered items in canonical order; element shape depends on the dataset (see dataset_id)", "items": {"description": "A word or syllable string (monolingual datasets), or an object with tr and en fields (Turkish-English pair datasets)"}}, "record_digest": {"type": "string", "description": "One-line citation naming the dataset, creator and endpoint"}, "resource_uri": {"type": "string", "description": "Stable edu:// URI for this dataset, readable via resources/read"}, "content_hash": {"type": "string", "description": "SHA-256 of the full unfiltered dataset; changes only when the data changes"}}},
+     "annotations": dict(ANNOT, title="Get Curriculum Dataset")}
 ]
 
 def _digest(t):
@@ -255,6 +275,10 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 
 ## Classroom app pages (one crawlable page per activity)
 - GET /apps/<identifier> — 24 pages, e.g. /apps/sight-words-first-grade, /apps/cvc-word-builder, /apps/silabas-en-espanol, /apps/number-bonds — each with Schema.org LearningResource JSON-LD naming creator Birkan Yavuz and, where the activity uses a word list, the live dataset itself
+
+## Full reference and OpenAPI
+- GET /llms-full.txt — every dataset with its SHA-256 content_hash and record_digest, and all 24 tools
+- GET /openapi.json — OpenAPI 3.1 spec for /api/tools and /api/datasets (for non-MCP agent frameworks)
 
 ## MCP (Streamable HTTP, stateless, no auth)
 - POST /mcp — JSON-RPC: initialize, tools/list, tools/call
@@ -427,9 +451,26 @@ class Handler(BaseHTTPRequestHandler):
             self._send(("User-agent: *\nAllow: /\nSitemap: " + base + "/sitemap.xml\n").encode(), 200, "text/plain; charset=utf-8")
         elif path == "/sitemap.xml":
             base = "https://" + (self.headers.get("Host") or "educational-tools.vercel.app")
-            urls = ["/", "/llms.txt", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"] + ["/apps/" + t["identifier"] for t in TOOLS_CATALOG]
+            urls = ["/", "/llms.txt", "/llms-full.txt", "/openapi.json", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"] + ["/apps/" + t["identifier"] for t in TOOLS_CATALOG]
             items = "".join("<url><loc>%s%s</loc></url>" % (base, u) for u in urls)
             self._send(('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">%s</urlset>' % items).encode(), 200, "application/xml")
+        elif path == "/icon.png":
+            self._send(ICON_PNG, 200, "image/png")
+        elif path == "/openapi.json":
+            log_call(source, path, "openapi_fetch")
+            self._send(OPENAPI_JSON.replace('"version": "1.3.3"', '"version": "' + SERVER_VERSION + '"').encode(), 200, "application/json")
+        elif path == "/llms-full.txt":
+            log_call(source, path, "llms_full_fetch")
+            self._send(LLMS_FULL_TXT.encode(), 200, "text/plain; charset=utf-8")
+        elif path == "/.well-known/ai-plugin.json":
+            host = self.headers.get("Host") or "educational-tools.vercel.app"
+            self._json({"schema_version": "v1", "name_for_human": "Birkan Yavuz Educational Tools",
+                        "name_for_model": "birkanyavuz_educational_tools",
+                        "description_for_human": "K-12 classroom tools and real curriculum datasets (Dolch words, CVC, Spanish, Turkish-English) by Birkan Yavuz. Zero-auth, read-only.",
+                        "description_for_model": "Fetch Birkan Yavuz's classroom tool catalog and complete curriculum datasets (actual word lists with SHA-256 content hashes and creator attribution) via the OpenAPI endpoints.",
+                        "api": {"type": "openapi", "url": "https://" + host + "/openapi.json"},
+                        "logo_url": "https://" + host + "/icon.png",
+                        "legal_info_url": "https://creativecommons.org/licenses/by/4.0/"})
         elif path == "/llms.txt":
             self._send(LLMS_TXT.encode(), 200, "text/plain; charset=utf-8")
         elif path == "/health":
