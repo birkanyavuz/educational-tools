@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sight Words</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #ffffff;
+    color: #1e293b;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+    user-select: none;
+  }
+  h1 {
+    font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+    color: #0f172a;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  /* Progress */
+  .progress { width: min(92vw, 620px); margin-bottom: 18px; }
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: clamp(1.15rem, 2.8vw, 1.55rem);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .bar { height: 20px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; width: 0%; background: #22c55e; border-radius: 999px; transition: width 0.4s ease; }
+
+  /* Word card */
+  .card {
+    width: min(92vw, 620px);
+    min-height: clamp(220px, 36vh, 320px);
+    background: #eff6ff;
+    border: 4px solid #2563eb;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    cursor: pointer;
+  }
+  .word {
+    font-size: clamp(3.8rem, 17vw, 9.5rem);
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+    text-align: center;
+  }
+  .word.done { color: #16a34a; }
+
+  /* Buttons */
+  .buttons { display: flex; gap: 12px; width: min(92vw, 620px); margin-top: 18px; flex-wrap: wrap; }
+  .buttons button {
+    flex: 1;
+    min-width: 150px;
+    padding: clamp(16px, 2.6vh, 24px) 10px;
+    font-size: clamp(1.3rem, 3.2vw, 1.75rem);
+    font-weight: 700;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  #hear-btn { background: #f59e0b; color: #fff; }
+  #got-btn { background: #22c55e; color: #fff; }
+  #later-btn { background: #e2e8f0; color: #334155; }
+
+  .stars {
+    font-size: clamp(1.4rem, 3.6vw, 2rem);
+    font-weight: 700;
+    text-align: center;
+    margin-top: 16px;
+    min-height: 1.4em;
+  }
+  .message {
+    font-size: clamp(1.3rem, 3.2vw, 1.8rem);
+    font-weight: 700;
+    text-align: center;
+    margin-top: 10px;
+    min-height: 1.4em;
+  }
+  .celebrate { color: #16a34a; }
+
+  #again-btn {
+    display: none;
+    background: #2563eb;
+    color: #fff;
+    margin-top: 18px;
+    width: min(92vw, 620px);
+    padding: clamp(16px, 2.6vh, 24px) 10px;
+    font-size: clamp(1.3rem, 3.2vw, 1.75rem);
+    font-weight: 700;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+</style>
+</head>
+<body>
+
+<h1>Sight Words</h1>
+
+<div class="progress">
+  <div class="progress-text">
+    <span id="progress-label">Words read: 0 of 315</span>
+    <span id="left-label">315 left</span>
+  </div>
+  <div class="bar"><div class="bar-fill" id="bar-fill"></div></div>
+</div>
+
+<div class="card" id="card">
+  <div class="word" id="word"></div>
+</div>
+
+<div class="buttons" id="buttons">
+  <button id="hear-btn">🔊 Hear it</button>
+  <button id="got-btn">✓ I read it!</button>
+  <button id="later-btn">↻ Try later</button>
+</div>
+
+<div class="stars" id="stars"></div>
+<div class="message" id="message"></div>
+<button id="again-btn">🔄 Play again</button>
+
+<script>
+// All 315 Dolch words: 220 sight words + 95 nouns (from Birkan's Dolch PDFs)
+const WORDS = ["the", "one", "to", "my", "and", "me", "a", "big", "I", "come", "you", "blue", "it", "red", "in", "where", "said", "jump", "for", "away", "up", "here", "look", "help", "is", "make", "go", "yellow", "we", "two", "little", "play", "down", "run", "can", "find", "see", "three", "not", "funny", "he", "now", "was", "no", "that", "came", "she", "ride", "on", "into", "they", "good", "but", "want", "at", "too", "with", "pretty", "all", "four", "there", "saw", "out", "well", "be", "ran", "have", "brown", "am", "eat", "do", "who", "did", "new", "what", "must", "so", "black", "get", "white", "like", "soon", "this", "our", "will", "ate", "yes", "say", "went", "under", "are", "please", "of", "take", "his", "every", "had", "old", "him", "by", "her", "after", "some", "think", "as", "let", "then", "going", "could", "walk", "when", "again", "were", "may", "them", "stop", "ask", "fly", "an", "round", "over", "give", "just", "once", "from", "open", "any", "has", "how", "live", "know", "thank", "put", "would", "write", "very", "always", "your", "made", "its", "gave", "around", "us", "don't", "buy", "right", "those", "green", "use", "their", "fast", "call", "pull", "sleep", "both", "five", "sit", "wash", "which", "or", "read", "before", "why", "been", "found", "off", "because", "cold", "best", "tell", "upon", "work", "these", "first", "sing", "does", "wish", "goes", "many", "if", "full", "long", "done", "about", "light", "got", "pick", "six", "hurt", "never", "cut", "seven", "kind", "eight", "fall", "today", "carry", "myself", "small", "much", "own", "keep", "show", "try", "hot", "start", "far", "ten", "draw", "bring", "clean", "drink", "grow", "only", "together", "better", "shall", "hold", "laugh", "warm", "apple", "home", "baby", "horse", "back", "house", "ball", "kitty", "bear", "leg", "bed", "letter", "bell", "man", "bird", "men", "birthday", "milk", "boat", "money", "box", "morning", "boy", "mother", "bread", "name", "brother", "nest", "cake", "night", "car", "paper", "cat", "party", "chair", "picture", "chicken", "pig", "children", "rabbit", "Christmas", "rain", "coat", "ring", "corn", "robin", "cow", "Santa Claus", "day", "school", "dog", "seed", "doll", "sheep", "door", "shoe", "duck", "sister", "egg", "snow", "eye", "song", "farm", "squirrel", "farmer", "stick", "father", "street", "feet", "sun", "fire", "table", "fish", "thing", "floor", "time", "flower", "top", "game", "toy", "garden", "tree", "girl", "watch", "good-bye", "water", "grass", "way", "ground", "wind", "hand", "window", "head", "wood", "hill"];
+
+// Real human recordings (Wikimedia Commons) for every word
+const AUDIO = {"the": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7e/En-ca-the.ogg/En-ca-the.ogg.mp3", "one": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1f/En-us-one.ogg/En-us-one.ogg.mp3", "to": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/58/En-to.ogg/En-to.ogg.mp3", "my": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/En-us-my.ogg/En-us-my.ogg.mp3", "and": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f7/En-us-and_%282%29.ogg/En-us-and_%282%29.ogg.mp3", "me": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/En-us-me.ogg/En-us-me.ogg.mp3", "a": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/52/En-us-a.ogg/En-us-a.ogg.mp3", "big": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/12/En-uk-big.ogg/En-uk-big.ogg.mp3", "I": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/de/En-us-i.ogg/En-us-i.ogg.mp3", "come": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d9/En-us-come.ogg/En-us-come.ogg.mp3", "you": "https://upload.wikimedia.org/wikipedia/commons/6/6c/En-us-you.ogg", "blue": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/85/En-us-blue.ogg/En-us-blue.ogg.mp3", "it": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/En-uk-it.ogg/En-uk-it.ogg.mp3", "red": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c9/En-us-red.ogg/En-us-red.ogg.mp3", "in": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fd/En-au-in.ogg/En-au-in.ogg.mp3", "where": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/77/En-ne-where.ogg/En-ne-where.ogg.mp3", "said": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/dc/En-us-said.ogg/En-us-said.ogg.mp3", "jump": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/96/En-us-jump.ogg/En-us-jump.ogg.mp3", "for": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/67/En-us-for.ogg/En-us-for.ogg.mp3", "away": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/93/En-us-away.ogg/En-us-away.ogg.mp3", "up": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9e/En-us-up.ogg/En-us-up.ogg.mp3", "here": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e4/En-us-here.ogg/En-us-here.ogg.mp3", "look": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f6/En-look.ogg/En-look.ogg.mp3", "help": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b7/En-us-help.ogg/En-us-help.ogg.mp3", "is": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5d/En-us-is.ogg/En-us-is.ogg.mp3", "make": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/03/En-us-make.ogg/En-us-make.ogg.mp3", "go": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0a/En-us-go.ogg/En-us-go.ogg.mp3", "yellow": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8b/En-us-yellow.ogg/En-us-yellow.ogg.mp3", "we": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9f/En-us-we.ogg/En-us-we.ogg.mp3", "two": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/47/En-us-two.ogg/En-us-two.ogg.mp3", "little": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/94/En-us-little.ogg/En-us-little.ogg.mp3", "play": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8e/En-us-play.ogg/En-us-play.ogg.mp3", "down": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/89/En-us-down.ogg/En-us-down.ogg.mp3", "run": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a9/En-us-run.ogg/En-us-run.ogg.mp3", "can": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c5/En-us-can.ogg/En-us-can.ogg.mp3", "find": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/48/En-us-find.ogg/En-us-find.ogg.mp3", "see": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a2/En-us-see.ogg/En-us-see.ogg.mp3", "three": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d4/En-us-three.ogg/En-us-three.ogg.mp3", "not": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f9/En-us-not.ogg/En-us-not.ogg.mp3", "funny": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/En-us-funny.ogg/En-us-funny.ogg.mp3", "he": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2f/En-us-he.ogg/En-us-he.ogg.mp3", "now": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9e/En-us-now.ogg/En-us-now.ogg.mp3", "was": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/En-us-was.ogg/En-us-was.ogg.mp3", "no": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/19/En-us-no.ogg/En-us-no.ogg.mp3", "that": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e8/En-us-that.ogg/En-us-that.ogg.mp3", "came": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7d/En-us-came.ogg/En-us-came.ogg.mp3", "she": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b3/En-us-she.ogg/En-us-she.ogg.mp3", "ride": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/95/En-us-ride.ogg/En-us-ride.ogg.mp3", "on": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/En-us-on.ogg/En-us-on.ogg.mp3", "into": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2b/En-us-into.ogg/En-us-into.ogg.mp3", "they": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/41/En-us-they.ogg/En-us-they.ogg.mp3", "good": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/28/En-us-good.ogg/En-us-good.ogg.mp3", "but": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7d/En-us-but.ogg/En-us-but.ogg.mp3", "want": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4d/En-us-want.ogg/En-us-want.ogg.mp3", "at": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e1/En-us-at_%282%29.ogg/En-us-at_%282%29.ogg.mp3", "too": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bf/En-us-too.ogg/En-us-too.ogg.mp3", "with": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/42/En-us-with.ogg/En-us-with.ogg.mp3", "pretty": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b2/En-us-pretty.ogg/En-us-pretty.ogg.mp3", "all": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/35/En-us-all.ogg/En-us-all.ogg.mp3", "four": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f6/En-us-ne-four.ogg/En-us-ne-four.ogg.mp3", "there": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1a/En-us-there.ogg/En-us-there.ogg.mp3", "saw": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/En-us-saw.ogg/En-us-saw.ogg.mp3", "out": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f1/En-us-out.ogg/En-us-out.ogg.mp3", "well": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/23/En-us-well.ogg/En-us-well.ogg.mp3", "be": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/En-us-be.ogg/En-us-be.ogg.mp3", "ran": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c1/En-us-ran.ogg/En-us-ran.ogg.mp3", "have": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/be/En-us-have.ogg/En-us-have.ogg.mp3", "brown": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/29/En-us-brown.ogg/En-us-brown.ogg.mp3", "am": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/40/En-us-am.ogg/En-us-am.ogg.mp3", "eat": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4a/En-us-eat.ogg/En-us-eat.ogg.mp3", "do": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/53/En-us-do-verb.ogg/En-us-do-verb.ogg.mp3", "who": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/10/En-us-who.ogg/En-us-who.ogg.mp3", "did": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/65/En-ca-did.ogg/En-ca-did.ogg.mp3", "new": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/22/En-au-new.ogg/En-au-new.ogg.mp3", "what": "https://upload.wikimedia.org/wikipedia/commons/a/a3/En-us-what.ogg", "must": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9c/En-us-must.ogg/En-us-must.ogg.mp3", "so": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3b/En-us-so.ogg/En-us-so.ogg.mp3", "black": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6d/En-uk-black.ogg/En-uk-black.ogg.mp3", "get": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2f/En-us-get.ogg/En-us-get.ogg.mp3", "white": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4e/En-us-white.ogg/En-us-white.ogg.mp3", "like": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e5/En-us-like.ogg/En-us-like.ogg.mp3", "soon": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f9/En-us-soon.ogg/En-us-soon.ogg.mp3", "this": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f8/En-us-this.ogg/En-us-this.ogg.mp3", "our": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8f/En-us-our.ogg/En-us-our.ogg.mp3", "will": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/67/En-us-will.ogg/En-us-will.ogg.mp3", "ate": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/af/En-us-ate.ogg/En-us-ate.ogg.mp3", "yes": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b1/En-us-yes.ogg/En-us-yes.ogg.mp3", "say": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/40/En-us-say.ogg/En-us-say.ogg.mp3", "went": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8a/En-us-went.ogg/En-us-went.ogg.mp3", "under": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c6/En-us-under.ogg/En-us-under.ogg.mp3", "are": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/69/En-us-are.ogg/En-us-are.ogg.mp3", "please": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/54/En-us-please.ogg/En-us-please.ogg.mp3", "of": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/75/En-us-of.ogg/En-us-of.ogg.mp3", "take": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9b/En-us-take.ogg/En-us-take.ogg.mp3", "his": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/En-us-his.ogg/En-us-his.ogg.mp3", "every": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fa/En-us-every.ogg/En-us-every.ogg.mp3", "had": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/68/En-us-had.ogg/En-us-had.ogg.mp3", "old": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/be/En-us-old.ogg/En-us-old.ogg.mp3", "him": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/23/En-us-him.ogg/En-us-him.ogg.mp3", "by": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c8/En-us-by.ogg/En-us-by.ogg.mp3", "her": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2c/En-us-her.ogg/En-us-her.ogg.mp3", "after": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1c/En-us-after.ogg/En-us-after.ogg.mp3", "some": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/aa/En-us-some.ogg/En-us-some.ogg.mp3", "think": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/80/En-us-think.ogg/En-us-think.ogg.mp3", "as": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/18/En-us-as.ogg/En-us-as.ogg.mp3", "let": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/21/En-us-let.ogg/En-us-let.ogg.mp3", "then": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/En-us-then.ogg/En-us-then.ogg.mp3", "going": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2b/En-us-going.ogg/En-us-going.ogg.mp3", "could": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ed/En-us-could.ogg/En-us-could.ogg.mp3", "walk": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bb/En-us-walk.ogg/En-us-walk.ogg.mp3", "when": "https://upload.wikimedia.org/wikipedia/commons/7/7a/En-us-when.ogg", "again": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/60/En-uk-again.ogg/En-uk-again.ogg.mp3", "were": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f5/En-us-were.ogg/En-us-were.ogg.mp3", "may": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/54/En-us-May.ogg/En-us-May.ogg.mp3", "them": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/25/En-us-them.ogg/En-us-them.ogg.mp3", "stop": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/En-us-stop.ogg/En-us-stop.ogg.mp3", "ask": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f6/En-us-ask.ogg/En-us-ask.ogg.mp3", "fly": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/En-us-fly.ogg/En-us-fly.ogg.mp3", "an": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/16/En-us-an.ogg/En-us-an.ogg.mp3", "round": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/30/En-us-round.ogg/En-us-round.ogg.mp3", "over": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/20/En-us-over.ogg/En-us-over.ogg.mp3", "give": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/69/En-us-give.ogg/En-us-give.ogg.mp3", "just": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/87/En-us-just.ogg/En-us-just.ogg.mp3", "once": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/97/En-us-once_%282%29.ogg/En-us-once_%282%29.ogg.mp3", "from": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/70/En-us-from.ogg/En-us-from.ogg.mp3", "open": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/67/En-us-open.ogg/En-us-open.ogg.mp3", "any": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/87/En-us-any.ogg/En-us-any.ogg.mp3", "has": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/61/En-us-has.ogg/En-us-has.ogg.mp3", "how": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b4/En-us-how_%282%29.ogg/En-us-how_%282%29.ogg.mp3", "live": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/30/En-us-live-verb_%282%29.ogg/En-us-live-verb_%282%29.ogg.mp3", "know": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ad/En-us-know.ogg/En-us-know.ogg.mp3", "thank": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/14/En-us-thank.ogg/En-us-thank.ogg.mp3", "put": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e5/En-us-put.ogg/En-us-put.ogg.mp3", "would": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/18/En-us-would.ogg/En-us-would.ogg.mp3", "write": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1d/En-us-write.ogg/En-us-write.ogg.mp3", "very": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/88/En-us-very.ogg/En-us-very.ogg.mp3", "always": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/73/En-us-always.ogg/En-us-always.ogg.mp3", "your": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/13/En-us-your.ogg/En-us-your.ogg.mp3", "made": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/57/En-us-made.ogg/En-us-made.ogg.mp3", "its": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/En-us-its.ogg/En-us-its.ogg.mp3", "gave": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bb/En-us-gave.ogg/En-us-gave.ogg.mp3", "around": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/85/En-us-around.ogg/En-us-around.ogg.mp3", "us": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0c/En-us-us.ogg/En-us-us.ogg.mp3", "don't": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/87/En-us-don%27t.ogg/En-us-don%27t.ogg.mp3", "buy": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/En-us-buy.ogg/En-us-buy.ogg.mp3", "right": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6b/En-us-right.ogg/En-us-right.ogg.mp3", "those": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2b/En-us-those.ogg/En-us-those.ogg.mp3", "green": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/En-us-green.ogg/En-us-green.ogg.mp3", "use": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0d/En-us-use.ogg/En-us-use.ogg.mp3", "their": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/75/En-us-their.ogg/En-us-their.ogg.mp3", "fast": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e5/En-us-fast.ogg/En-us-fast.ogg.mp3", "call": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a1/En-us-call.ogg/En-us-call.ogg.mp3", "pull": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/77/En-us-pull.ogg/En-us-pull.ogg.mp3", "sleep": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0b/En-us-sleep.ogg/En-us-sleep.ogg.mp3", "both": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/51/En-us-both.ogg/En-us-both.ogg.mp3", "five": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/En-us-five.ogg/En-us-five.ogg.mp3", "sit": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/40/En-us-sit.ogg/En-us-sit.ogg.mp3", "wash": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a7/En-us-wash.ogg/En-us-wash.ogg.mp3", "which": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/83/En-us-which.ogg/En-us-which.ogg.mp3", "or": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5a/En-uk-or.ogg/En-uk-or.ogg.mp3", "read": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/84/En-us-read-past.ogg/En-us-read-past.ogg.mp3", "before": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8e/En-us-before.ogg/En-us-before.ogg.mp3", "why": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/69/En-us-why.ogg/En-us-why.ogg.mp3", "been": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/08/En-us-been.ogg/En-us-been.ogg.mp3", "found": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/13/En-us-found.ogg/En-us-found.ogg.mp3", "off": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/06/En-us-off.ogg/En-us-off.ogg.mp3", "because": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b4/En-us-because.ogg/En-us-because.ogg.mp3", "cold": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bf/En-us-cold.ogg/En-us-cold.ogg.mp3", "best": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3a/En-us-best.ogg/En-us-best.ogg.mp3", "tell": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a9/En-us-tell.ogg/En-us-tell.ogg.mp3", "upon": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a9/En-us-upon.ogg/En-us-upon.ogg.mp3", "work": "https://upload.wikimedia.org/wikipedia/commons/5/5f/En-us-work.ogg", "these": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/En-us-these.ogg/En-us-these.ogg.mp3", "first": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9e/En-us-first.ogg/En-us-first.ogg.mp3", "sing": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/36/En-us-sing.ogg/En-us-sing.ogg.mp3", "does": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7e/En-us-does-todo.ogg/En-us-does-todo.ogg.mp3", "wish": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7e/En-us-wish.ogg/En-us-wish.ogg.mp3", "goes": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/02/En-us-goes.ogg/En-us-goes.ogg.mp3", "many": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0b/En-us-many.ogg/En-us-many.ogg.mp3", "if": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/71/En-us-if.ogg/En-us-if.ogg.mp3", "full": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/En-us-full.ogg/En-us-full.ogg.mp3", "long": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/En-au-long.ogg/En-au-long.ogg.mp3", "done": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c1/En-ca-done.ogg/En-ca-done.ogg.mp3", "about": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ee/En-us-about.ogg/En-us-about.ogg.mp3", "light": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cf/En-us-light.ogg/En-us-light.ogg.mp3", "got": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/07/En-us-got.ogg/En-us-got.ogg.mp3", "pick": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/En-us-pick.ogg/En-us-pick.ogg.mp3", "six": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/eb/En-us-six.ogg/En-us-six.ogg.mp3", "hurt": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0b/En-us-hurt.ogg/En-us-hurt.ogg.mp3", "never": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6e/En-us-never.ogg/En-us-never.ogg.mp3", "cut": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/53/En-us-cut.ogg/En-us-cut.ogg.mp3", "seven": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/77/En-us-seven.ogg/En-us-seven.ogg.mp3", "kind": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/66/En-us-kind.ogg/En-us-kind.ogg.mp3", "eight": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/16/En-us-eight.ogg/En-us-eight.ogg.mp3", "fall": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/33/En-us-fall.ogg/En-us-fall.ogg.mp3", "today": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3b/En-us-today.ogg/En-us-today.ogg.mp3", "carry": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/En-us-carry.ogg/En-us-carry.ogg.mp3", "myself": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b0/En-us-myself.ogg/En-us-myself.ogg.mp3", "small": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/En-us-small.ogg/En-us-small.ogg.mp3", "much": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/99/En-us-much.ogg/En-us-much.ogg.mp3", "own": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f2/En-us-own.ogg/En-us-own.ogg.mp3", "keep": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/13/En-us-keep.ogg/En-us-keep.ogg.mp3", "show": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/43/En-us-show.ogg/En-us-show.ogg.mp3", "try": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/09/En-us-try.ogg/En-us-try.ogg.mp3", "hot": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/28/En-us-hot.ogg/En-us-hot.ogg.mp3", "start": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2e/En-us-start.ogg/En-us-start.ogg.mp3", "far": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ef/En-us-far.ogg/En-us-far.ogg.mp3", "ten": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4c/En-us-ten.ogg/En-us-ten.ogg.mp3", "draw": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d0/En-us-draw.ogg/En-us-draw.ogg.mp3", "bring": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/ad/En-us-bring.ogg/En-us-bring.ogg.mp3", "clean": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/2c/En-us-clean.ogg/En-us-clean.ogg.mp3", "drink": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/35/En-us-drink.ogg/En-us-drink.ogg.mp3", "grow": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c6/En-us-grow.ogg/En-us-grow.ogg.mp3", "only": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/ca/En-us-only.ogg/En-us-only.ogg.mp3", "together": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/En-us-together.ogg/En-us-together.ogg.mp3", "better": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/En-us-better.ogg/En-us-better.ogg.mp3", "shall": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b2/En-US_shall_%28unstressed%29.ogg/En-US_shall_%28unstressed%29.ogg.mp3", "hold": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fe/En-us-hold.ogg/En-us-hold.ogg.mp3", "laugh": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a8/En-us-laugh.ogg/En-us-laugh.ogg.mp3", "warm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/36/En-us-warm.ogg/En-us-warm.ogg.mp3", "apple": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9a/En-us-apple.ogg/En-us-apple.ogg.mp3", "home": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/37/En-us-home.ogg/En-us-home.ogg.mp3", "baby": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/de/En-us-baby.ogg/En-us-baby.ogg.mp3", "horse": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/fb/En-us-horse.ogg/En-us-horse.ogg.mp3", "back": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/ec/En-us-back.ogg/En-us-back.ogg.mp3", "house": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/55/En-us-house-noun.ogg/En-us-house-noun.ogg.mp3", "ball": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a8/En-us-ball.ogg/En-us-ball.ogg.mp3", "kitty": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/En-au-kitty.ogg/En-au-kitty.ogg.mp3", "bear": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c7/En-us-bear.ogg/En-us-bear.ogg.mp3", "leg": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/62/En-us-leg.ogg/En-us-leg.ogg.mp3", "bed": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/14/En-us-bed.ogg/En-us-bed.ogg.mp3", "letter": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a4/En-us-letter.ogg/En-us-letter.ogg.mp3", "bell": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d6/En-us-bell.ogg/En-us-bell.ogg.mp3", "man": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/45/En-us-man.ogg/En-us-man.ogg.mp3", "bird": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/07/En-us-bird.ogg/En-us-bird.ogg.mp3", "men": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7c/En-us-men.ogg/En-us-men.ogg.mp3", "birthday": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c7/En-us-birthday.ogg/En-us-birthday.ogg.mp3", "milk": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/64/En-us-milk.ogg/En-us-milk.ogg.mp3", "boat": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cb/En-us-boat.ogg/En-us-boat.ogg.mp3", "money": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d0/En-us-money.ogg/En-us-money.ogg.mp3", "box": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/95/En-us-box.ogg/En-us-box.ogg.mp3", "morning": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/9b/En-us-morning.ogg/En-us-morning.ogg.mp3", "boy": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/7f/En-us-boy.ogg/En-us-boy.ogg.mp3", "mother": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/07/En-us-mother.ogg/En-us-mother.ogg.mp3", "bread": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/dc/En-us-bread.ogg/En-us-bread.ogg.mp3", "name": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3c/En-us-name_%282%29.ogg/En-us-name_%282%29.ogg.mp3", "brother": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b6/En-us-brother.ogg/En-us-brother.ogg.mp3", "nest": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f1/En-us-nest.ogg/En-us-nest.ogg.mp3", "cake": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/89/En-us-cake.ogg/En-us-cake.ogg.mp3", "night": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/46/En-us-night.ogg/En-us-night.ogg.mp3", "car": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/01/En-us-car.ogg/En-us-car.ogg.mp3", "paper": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/33/En-us-paper.ogg/En-us-paper.ogg.mp3", "cat": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/46/En-us-cat.ogg/En-us-cat.ogg.mp3", "party": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e3/En-us-party.ogg/En-us-party.ogg.mp3", "chair": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/8b/En-us-chair.ogg/En-us-chair.ogg.mp3", "picture": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/En-us-picture.ogg/En-us-picture.ogg.mp3", "chicken": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6a/En-us-chicken.ogg/En-us-chicken.ogg.mp3", "pig": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e4/En-us-pig.ogg/En-us-pig.ogg.mp3", "children": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/92/En-us-children.ogg/En-us-children.ogg.mp3", "rabbit": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f0/En-us-rabbit.ogg/En-us-rabbit.ogg.mp3", "Christmas": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3b/En-us-Christmas.ogg/En-us-Christmas.ogg.mp3", "rain": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/95/En-us-rain.ogg/En-us-rain.ogg.mp3", "coat": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/07/En-us-coat.ogg/En-us-coat.ogg.mp3", "ring": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/En-us-ring.ogg/En-us-ring.ogg.mp3", "corn": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/88/En-us-corn.ogg/En-us-corn.ogg.mp3", "robin": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c8/En-us-robin.ogg/En-us-robin.ogg.mp3", "cow": "https://upload.wikimedia.org/wikipedia/commons/transcoded/e/e1/En-us-cow.ogg/En-us-cow.ogg.mp3", "Santa Claus": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/En-Santa_Claus.ogg/En-Santa_Claus.ogg.mp3", "day": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/58/En-us-day.ogg/En-us-day.ogg.mp3", "school": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d4/En-uk-school.ogg/En-uk-school.ogg.mp3", "dog": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/06/En-us-dog.ogg/En-us-dog.ogg.mp3", "seed": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/70/En-us-seed.ogg/En-us-seed.ogg.mp3", "doll": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b8/En-us-doll.ogg/En-us-doll.ogg.mp3", "sheep": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/82/En-us-sheep.ogg/En-us-sheep.ogg.mp3", "door": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/82/En-us-door.ogg/En-us-door.ogg.mp3", "shoe": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/44/En-us-shoe.ogg/En-us-shoe.ogg.mp3", "duck": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5b/En-us-duck.ogg/En-us-duck.ogg.mp3", "sister": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/47/En-us-sister.ogg/En-us-sister.ogg.mp3", "egg": "https://upload.wikimedia.org/wikipedia/commons/transcoded/8/88/En-us-egg.ogg/En-us-egg.ogg.mp3", "snow": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d8/En-us-snow.ogg/En-us-snow.ogg.mp3", "eye": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6f/En-us-eye.ogg/En-us-eye.ogg.mp3", "song": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f1/En-us-song.ogg/En-us-song.ogg.mp3", "farm": "https://upload.wikimedia.org/wikipedia/commons/transcoded/7/78/En-us-farm.ogg/En-us-farm.ogg.mp3", "squirrel": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/db/En-ca-squirrel.ogg/En-ca-squirrel.ogg.mp3", "farmer": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/21/En-us-farmer.ogg/En-us-farmer.ogg.mp3", "stick": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/En-us-stick.ogg/En-us-stick.ogg.mp3", "father": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b0/En-us-father.ogg/En-us-father.ogg.mp3", "street": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/6e/En-us-street.ogg/En-us-street.ogg.mp3", "feet": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b5/En-us-feet.ogg/En-us-feet.ogg.mp3", "sun": "https://upload.wikimedia.org/wikipedia/commons/transcoded/4/4b/En-us-Sun.ogg/En-us-Sun.ogg.mp3", "fire": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/19/En-us-fire.ogg/En-us-fire.ogg.mp3", "table": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/0b/En-us-table.ogg/En-us-table.ogg.mp3", "fish": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/3e/En-us-fish.ogg/En-us-fish.ogg.mp3", "thing": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b1/En-us-thing.ogg/En-us-thing.ogg.mp3", "floor": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/39/En-us-floor.ogg/En-us-floor.ogg.mp3", "time": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/1b/En-us-time.ogg/En-us-time.ogg.mp3", "flower": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d3/En-us-flower.ogg/En-us-flower.ogg.mp3", "top": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/En-us-top.ogg/En-us-top.ogg.mp3", "game": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/62/En-us-game.ogg/En-us-game.ogg.mp3", "toy": "https://upload.wikimedia.org/wikipedia/commons/transcoded/9/98/En-us-toy.ogg/En-us-toy.ogg.mp3", "garden": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/37/En-us-garden.ogg/En-us-garden.ogg.mp3", "tree": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/33/En-uk-tree.ogg/En-uk-tree.ogg.mp3", "girl": "https://upload.wikimedia.org/wikipedia/commons/transcoded/f/f3/En-us-girl.ogg/En-us-girl.ogg.mp3", "watch": "https://upload.wikimedia.org/wikipedia/commons/transcoded/0/05/En-us-watch.ogg/En-us-watch.ogg.mp3", "good-bye": "https://upload.wikimedia.org/wikipedia/commons/transcoded/3/32/En-us-goodbye.ogg/En-us-goodbye.ogg.mp3", "water": "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/bd/En-us-water.ogg/En-us-water.ogg.mp3", "grass": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c6/En-us-grass.ogg/En-us-grass.ogg.mp3", "way": "https://upload.wikimedia.org/wikipedia/commons/transcoded/a/a5/En-us-way.ogg/En-us-way.ogg.mp3", "ground": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/23/En-us-ground.ogg/En-us-ground.ogg.mp3", "wind": "https://upload.wikimedia.org/wikipedia/commons/transcoded/2/25/En-us-wind-air.ogg/En-us-wind-air.ogg.mp3", "hand": "https://upload.wikimedia.org/wikipedia/commons/transcoded/d/d2/En-us-hand.ogg/En-us-hand.ogg.mp3", "window": "https://upload.wikimedia.org/wikipedia/commons/transcoded/1/16/En-us-window.ogg/En-us-window.ogg.mp3", "head": "https://upload.wikimedia.org/wikipedia/commons/transcoded/5/5c/En-us-head.ogg/En-us-head.ogg.mp3", "wood": "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/65/En-au-wood.ogg/En-au-wood.ogg.mp3", "hill": "https://upload.wikimedia.org/wikipedia/commons/transcoded/c/cb/En-us-hill.ogg/En-us-hill.ogg.mp3"};
+
+let queue = [];
+let readCount = 0;
+let current = "";
+let advancing = false;
+let playingAudio = null;
+let preloadedAudio = null;
+
+const wordEl = document.getElementById('word');
+const progressLabel = document.getElementById('progress-label');
+const leftLabel = document.getElementById('left-label');
+const barFill = document.getElementById('bar-fill');
+const starsEl = document.getElementById('stars');
+const messageEl = document.getElementById('message');
+const buttonsEl = document.getElementById('buttons');
+const againBtn = document.getElementById('again-btn');
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function stopAudio() {
+  speechSynthesis.cancel();
+  if (playingAudio) { playingAudio.pause(); playingAudio = null; }
+}
+
+function speakWithVoice() {
+  stopAudio();
+  const u = new SpeechSynthesisUtterance(current);
+  u.rate = 0.85;
+  const voices = speechSynthesis.getVoices();
+  const best = voices.find(v => /google us english/i.test(v.name))
+    || voices.find(v => /^en[-_]US/i.test(v.lang))
+    || voices.find(v => /^en/i.test(v.lang));
+  if (best) u.voice = best;
+  speechSynthesis.speak(u);
+}
+
+function playRecording(url, retried) {
+  stopAudio();
+  const a = new Audio(url);
+  playingAudio = a;
+  a.onerror = () => {
+    if (!retried) {
+      // Wikimedia sometimes 404s a fresh transcode on first hit; one retry fixes it
+      setTimeout(() => playRecording(url, true), 800);
+    } else {
+      speakWithVoice();
+    }
+  };
+  a.play().catch(() => speakWithVoice());
+}
+
+function speakWord() {
+  if (!current) return;
+  const url = AUDIO[current];
+  if (url) {
+    if (preloadedAudio && preloadedAudio.src === url) {
+      stopAudio();
+      playingAudio = preloadedAudio;
+      preloadedAudio = null;
+      playingAudio.onerror = () => playRecording(url, false);
+      playingAudio.play().catch(() => playRecording(url, false));
+    } else {
+      playRecording(url, false);
+    }
+  } else {
+    speakWithVoice();
+  }
+}
+
+function updateProgress() {
+  progressLabel.textContent = 'Words read: ' + readCount + ' of ' + WORDS.length;
+  leftLabel.textContent = queue.length + ' left';
+  barFill.style.width = (readCount / WORDS.length * 100) + '%';
+  starsEl.textContent = readCount > 0 ? '⭐ × ' + readCount : '';
+}
+
+function showNext() {
+  advancing = false;
+  if (queue.length === 0) {
+    wordEl.textContent = '🎉';
+    wordEl.classList.add('done');
+    messageEl.textContent = 'Amazing reading! You did it! 🎉';
+    messageEl.classList.add('celebrate');
+    buttonsEl.style.display = 'none';
+    againBtn.style.display = 'block';
+    updateProgress();
+    return;
+  }
+  current = queue[0];
+  wordEl.textContent = current;
+  wordEl.classList.remove('done');
+  messageEl.textContent = '';
+  if (AUDIO[current]) {
+    preloadedAudio = new Audio(AUDIO[current]);
+    preloadedAudio.preload = 'auto';
+  }
+  updateProgress();
+}
+
+function markRead() {
+  if (!current || advancing) return;
+  advancing = true;
+  queue.shift();
+  readCount++;
+  messageEl.textContent = '⭐ Great reading!';
+  messageEl.classList.remove('celebrate');
+  setTimeout(showNext, 500);
+}
+
+function tryLater() {
+  if (!current || advancing) return;
+  if (queue.length > 1) {
+    queue.push(queue.shift()); // back of the pile
+    showNext();
+  } else {
+    messageEl.textContent = 'Give it one more try — you can do it!';
+    speakWord();
+  }
+}
+
+function startGame() {
+  stopAudio();
+  queue = shuffle([...WORDS]);
+  readCount = 0;
+  current = "";
+  advancing = false;
+  buttonsEl.style.display = 'flex';
+  againBtn.style.display = 'none';
+  messageEl.textContent = '';
+  messageEl.classList.remove('celebrate');
+  starsEl.textContent = '';
+  showNext();
+}
+
+document.getElementById('card').addEventListener('click', speakWord);
+document.getElementById('hear-btn').addEventListener('click', (e) => { speakWord(); e.target.blur(); });
+document.getElementById('got-btn').addEventListener('click', (e) => { markRead(); e.target.blur(); });
+document.getElementById('later-btn').addEventListener('click', (e) => { tryLater(); e.target.blur(); });
+againBtn.addEventListener('click', (e) => { startGame(); e.target.blur(); });
+
+// Keyboard (Chromebook): Space = hear it, Enter = I read it!
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') { e.preventDefault(); speakWord(); }
+  else if (e.code === 'Enter') { markRead(); }
+});
+
+startGame();
+</script>
+</body>
+</html>

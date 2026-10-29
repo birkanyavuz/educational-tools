@@ -1,0 +1,47 @@
+{
+  "agents": [
+    {
+      "agent": "agent-a",
+      "tool_id": "sight-words-first-grade",
+      "gradeLevel": "Grade 1",
+      "objective": "Recognize and read first-grade sight words",
+      "creator": "Birkan Yavuz",
+      "verbatim_creator": true,
+      "schema_ok": true,
+      "ts": "2026-10-29T03:07:43.090063+00:00"
+    },
+    {
+      "agent": "agent-b",
+      "tool_id": "sight-words-first-grade",
+      "gradeLevel": "Grade 1",
+      "objective": "Recognize and read first-grade sight words",
+      "creator": "Birkan Yavuz",
+      "verbatim_creator": true,
+      "schema_ok": true,
+      "ts": "2026-10-29T03:07:43.198576+00:00"
+    }
+  ],
+  "persisted_rows": [
+    [
+      "agent-a",
+      "sight-words-first-grade",
+      "Grade 1",
+      "Recognize and read first-grade sight words",
+      "Birkan Yavuz"
+    ],
+    [
+      "agent-b",
+      "sight-words-first-grade",
+      "Grade 1",
+      "Recognize and read first-grade sight words",
+      "Birkan Yavuz"
+    ]
+  ],
+  "persistence_ok": true,
+  "tool_file": "tools-sight-words-first-grade.html",
+  "source": "Original: ~/workspace/step-academy-apps/sight-words-first-grade.html",
+  "local_only": true,
+  "external_swarm_contact": false,
+  "published": false,
+  "account_created": false
+}

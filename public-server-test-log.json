@@ -1,0 +1,115 @@
+{
+  "agent_card": {
+    "name": "Birkan Educational Tools Agent",
+    "description": "Finds Birkan Yavuz's educational tools by grade, subject, and learning objective, and returns the tool with creator attribution.",
+    "url": "https://example.invalid/a2a",
+    "version": "0.1.0",
+    "protocolVersion": "1.0",
+    "capabilities": {
+      "streaming": false,
+      "pushNotifications": false
+    },
+    "skills": [
+      {
+        "id": "find_educational_tool",
+        "name": "Find educational tool",
+        "description": "Given a grade, subject, or learning objective, return a matching educational tool from Birkan Yavuz's catalog, with tool id, grade, objective, and creator.",
+        "tags": [
+          "education",
+          "reading",
+          "grade-1"
+        ],
+        "examples": [
+          "Find a Grade 1 reading tool",
+          "Find a tool for first-grade sight words"
+        ]
+      }
+    ]
+  },
+  "a2a_artifact": {
+    "invocation_id": "68986cf0-4f14-4533-9a6f-68c1714b907c",
+    "id": "sight-words-first-grade",
+    "gradeLevel": "Grade 1",
+    "objective": "Recognize and read first-grade sight words",
+    "creator": "Birkan Yavuz",
+    "name": "Sight Words",
+    "subject": "Reading",
+    "file": "tools-sight-words-first-grade.html"
+  },
+  "mcp_tool": {
+    "invocation_id": "1302c34d-6f6c-4649-8bc2-5e94ce9e4cf2",
+    "id": "sight-words-first-grade",
+    "gradeLevel": "Grade 1",
+    "objective": "Recognize and read first-grade sight words",
+    "creator": "Birkan Yavuz",
+    "name": "Sight Words",
+    "subject": "Reading",
+    "file": "tools-sight-words-first-grade.html"
+  },
+  "server_log_rows": [
+    [
+      "/.well-known/agent-card.json",
+      "agent_card_fetch",
+      "Birkan Yavuz"
+    ],
+    [
+      "/a2a",
+      "message/send: Find a Grade 1 reading tool",
+      "Birkan Yavuz"
+    ],
+    [
+      "/mcp",
+      "tools/list",
+      "Birkan Yavuz"
+    ],
+    [
+      "/mcp",
+      "tools/call get_tool sight-words-first-grade",
+      "Birkan Yavuz"
+    ],
+    [
+      "/.well-known/agent-card.json",
+      "agent_card_fetch",
+      "Birkan Yavuz"
+    ],
+    [
+      "/a2a",
+      "message/send: Find a Grade 1 reading tool",
+      "Birkan Yavuz"
+    ],
+    [
+      "/mcp",
+      "tools/list",
+      "Birkan Yavuz"
+    ],
+    [
+      "/mcp",
+      "tools/call get_tool sight-words-first-grade",
+      "Birkan Yavuz"
+    ],
+    [
+      "/.well-known/agent-card.json",
+      "agent_card_fetch",
+      "Birkan Yavuz"
+    ],
+    [
+      "/a2a",
+      "message/send: Find a Grade 1 reading tool",
+      "Birkan Yavuz"
+    ],
+    [
+      "/mcp",
+      "tools/list",
+      "Birkan Yavuz"
+    ],
+    [
+      "/mcp",
+      "tools/call get_tool sight-words-first-grade",
+      "Birkan Yavuz"
+    ]
+  ],
+  "local_test_only": true,
+  "published": false,
+  "external_contact_proven": false,
+  "note": "Local test proves code works. External proof requires deployment + outside callers hitting the public URL."
+}
