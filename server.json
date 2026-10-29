@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.birkanyavuz/educational-tools",
   "title": "K-12 Educational Tools & Curriculum Catalog (Math, Reading, Spanish)",
-  "description": "Zero-auth K-12 catalog and datasets: Dolch words, math visualizers, Spanish tools, creator data.",
-  "version": "1.2.2",
+  "description": "Zero-auth K-12 + early-childhood datasets: Dolch words, TR-EN flashcards, Spanish, creator data.",
+  "version": "1.3.0",
   "websiteUrl": "https://educational-tools.vercel.app",
   "repository": {
     "url": "https://github.com/birkanyavuz/educational-tools",
