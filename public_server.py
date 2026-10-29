@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.3.0"
+SERVER_VERSION = "1.3.1"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -253,6 +253,9 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 - GET /api/datasets?id=dolch-sight-words-220&level=grade-1 — one dataset or one level
 - MCP tool get_curriculum_dataset returns the same data; the datasets are also MCP resources at edu://birkanyavuz/datasets/<id>
 
+## Classroom app pages (one crawlable page per activity)
+- GET /apps/<identifier> — 24 pages, e.g. /apps/sight-words-first-grade, /apps/cvc-word-builder, /apps/silabas-en-espanol, /apps/number-bonds — each with Schema.org LearningResource JSON-LD naming creator Birkan Yavuz and, where the activity uses a word list, the live dataset itself
+
 ## MCP (Streamable HTTP, stateless, no auth)
 - POST /mcp — JSON-RPC: initialize, tools/list, tools/call
 - Tools: search_classroom_tools, list_classroom_tools, get_classroom_tool, get_curriculum_dataset
@@ -264,6 +267,75 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 ## Source
 - https://github.com/birkanyavuz/educational-tools
 """
+
+
+APP_DATASET = {
+    "sight-words-first-grade": ("dolch-sight-words-220", "grade-1"),
+    "cvc-word-builder": ("cvc-word-families-75", None),
+    "digraph-word-builder": ("digraph-words-21", None),
+    "middle-sound-builder": ("cvc-word-families-75", None),
+    "silabas-en-espanol": ("spanish-syllables-core", None),
+}
+
+def render_app_page(tool, base):
+    import html as _h
+    ident = tool["identifier"]
+    mapping = APP_DATASET.get(ident)
+    data_html, based_on = "", ""
+    fetch_script = ""
+    if mapping:
+        ds_id, level = mapping
+        payload = dataset_payload(ds_id, level)
+        if payload:
+            items = payload["items"][:60]
+            def fmt(it):
+                if isinstance(it, dict):
+                    return " — ".join(_h.escape(str(v)) for v in it.values())
+                return _h.escape(str(it))
+            lis = "".join("<li>%s</li>" % fmt(it) for it in items)
+            data_html = ("<h2>Word data used by this activity</h2>"
+                         "<p>Dataset <code>birkanyavuz:%s:v1</code> (%d items), by Birkan Yavuz, CC-BY-4.0. %s</p><ul>%s</ul>"
+                         % (ds_id, payload["item_count"], _h.escape(payload["record_digest"]), lis))
+            based_on = '"isBasedOn": {"@type": "Dataset", "url": "%s/api/datasets?id=%s"},' % (base, ds_id)
+            fetch_script = ("<script>fetch('%s/api/datasets?id=%s').then(function(r){return r.json()}).then(function(d){"
+                            "var el=document.getElementById('live');if(el){el.textContent='Live dataset loaded: '+d.item_count+' items, creator '+d.creator;}})"
+                            ".catch(function(){});</script>" % (base, ds_id))
+    ld = {
+        "@context": "https://schema.org", "@type": "LearningResource",
+        "name": tool["name"], "description": tool["objective"],
+        "url": "%s/apps/%s" % (base, ident),
+        "author": {"@type": "Person", "name": "Birkan Yavuz"},
+        "creator": {"@type": "Person", "name": "Birkan Yavuz"},
+        "educationalLevel": tool["gradeLevel"],
+        "learningResourceType": "interactive activity",
+        "inLanguage": "en",
+        "isAccessibleForFree": True,
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+    }
+    if tool.get("standard_codes"):
+        ld["teaches"] = tool["standard_codes"]
+    page = """<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>%s — Birkan Yavuz Classroom Tools</title>
+<meta name="description" content="%s">
+<link rel="llms-txt" href="/llms.txt">
+<script type="application/ld+json">%s</script>
+</head><body>
+<h1>%s</h1>
+<p>%s</p>
+<p>Creator: Birkan Yavuz. Grades: %s. Subject: %s. Tool id: <code>birkanyavuz:%s:v1</code>.</p>
+<p id="live"></p>
+%s
+<p>Machine-readable catalog: <a href="%s/api/tools?id=%s">/api/tools?id=%s</a> · All datasets: <a href="%s/api/datasets">/api/datasets</a> · MCP server: io.github.birkanyavuz/educational-tools</p>
+%s
+</body></html>""" % (
+        _h.escape(tool["name"]), _h.escape(tool["objective"]),
+        json.dumps(ld, ensure_ascii=False),
+        _h.escape(tool["name"]), _h.escape(tool["objective"]),
+        _h.escape(tool["gradeLevel"]), _h.escape(tool["subject"]), ident,
+        data_html, base, ident, ident, base, fetch_script)
+    return page.encode()
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):
@@ -295,6 +367,15 @@ class Handler(BaseHTTPRequestHandler):
                 card["url"] = f"https://{host}/a2a"
                 card["supportedInterfaces"] = [{"url": f"https://{host}/a2a", "transport": "JSONRPC"}]
             self._json(card)
+        elif path.startswith("/apps/"):
+            slug = path[len("/apps/"):].rstrip("/")
+            if slug.endswith(".html"): slug = slug[:-5]
+            t = BY_ID.get(slug)
+            if not t:
+                self._json({"error": "unknown app"}, 404); return
+            base = "https://" + (self.headers.get("Host") or "educational-tools.vercel.app")
+            log_call(source, path, "app_page_fetch")
+            self._send(render_app_page(t, base), 200, "text/html; charset=utf-8")
         elif path == "/api/tools":
             from urllib.parse import parse_qs
             qs = parse_qs(urlparse(self.path).query)
@@ -346,7 +427,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(("User-agent: *\nAllow: /\nSitemap: " + base + "/sitemap.xml\n").encode(), 200, "text/plain; charset=utf-8")
         elif path == "/sitemap.xml":
             base = "https://" + (self.headers.get("Host") or "educational-tools.vercel.app")
-            urls = ["/", "/llms.txt", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"]
+            urls = ["/", "/llms.txt", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"] + ["/apps/" + t["identifier"] for t in TOOLS_CATALOG]
             items = "".join("<url><loc>%s%s</loc></url>" % (base, u) for u in urls)
             self._send(('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">%s</urlset>' % items).encode(), 200, "application/xml")
         elif path == "/llms.txt":
