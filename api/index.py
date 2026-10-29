@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.3.2"
+SERVER_VERSION = "1.3.3"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -73,6 +73,26 @@ for _p in (HERE / "catalog.json", HERE.parent / "catalog.json"):
 BY_ID = {t["identifier"]: t for t in TOOLS_CATALOG}
 
 DATASETS = {}
+
+def _load_text(name):
+    for _p in (HERE / name, HERE.parent / name, HERE.parent.parent / name):
+        try:
+            return _p.read_text()
+        except Exception:
+            continue
+    return ""
+OPENAPI_JSON = _load_text("openapi.json")
+
+def _load_bytes(name):
+    for _p in (HERE / name, HERE.parent / name, HERE.parent.parent / name):
+        try:
+            return _p.read_bytes()
+        except Exception:
+            continue
+    return b""
+ICON_PNG = _load_bytes("icon.png")
+LLMS_FULL_TXT = _load_text("llms-full.txt")
+
 for _p in (HERE / "datasets.json", HERE.parent / "datasets.json", HERE.parent.parent / "datasets.json"):
     if _p.exists():
         try:
@@ -256,6 +276,10 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 ## Classroom app pages (one crawlable page per activity)
 - GET /apps/<identifier> — 24 pages, e.g. /apps/sight-words-first-grade, /apps/cvc-word-builder, /apps/silabas-en-espanol, /apps/number-bonds — each with Schema.org LearningResource JSON-LD naming creator Birkan Yavuz and, where the activity uses a word list, the live dataset itself
 
+## Full reference and OpenAPI
+- GET /llms-full.txt — every dataset with its SHA-256 content_hash and record_digest, and all 24 tools
+- GET /openapi.json — OpenAPI 3.1 spec for /api/tools and /api/datasets (for non-MCP agent frameworks)
+
 ## MCP (Streamable HTTP, stateless, no auth)
 - POST /mcp — JSON-RPC: initialize, tools/list, tools/call
 - Tools: search_classroom_tools, list_classroom_tools, get_classroom_tool, get_curriculum_dataset
@@ -427,9 +451,26 @@ class Handler(BaseHTTPRequestHandler):
             self._send(("User-agent: *\nAllow: /\nSitemap: " + base + "/sitemap.xml\n").encode(), 200, "text/plain; charset=utf-8")
         elif path == "/sitemap.xml":
             base = "https://" + (self.headers.get("Host") or "educational-tools.vercel.app")
-            urls = ["/", "/llms.txt", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"] + ["/apps/" + t["identifier"] for t in TOOLS_CATALOG]
+            urls = ["/", "/llms.txt", "/llms-full.txt", "/openapi.json", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"] + ["/apps/" + t["identifier"] for t in TOOLS_CATALOG]
             items = "".join("<url><loc>%s%s</loc></url>" % (base, u) for u in urls)
             self._send(('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">%s</urlset>' % items).encode(), 200, "application/xml")
+        elif path == "/icon.png":
+            self._send(ICON_PNG, 200, "image/png")
+        elif path == "/openapi.json":
+            log_call(source, path, "openapi_fetch")
+            self._send(OPENAPI_JSON.replace('"version": "1.3.3"', '"version": "' + SERVER_VERSION + '"').encode(), 200, "application/json")
+        elif path == "/llms-full.txt":
+            log_call(source, path, "llms_full_fetch")
+            self._send(LLMS_FULL_TXT.encode(), 200, "text/plain; charset=utf-8")
+        elif path == "/.well-known/ai-plugin.json":
+            host = self.headers.get("Host") or "educational-tools.vercel.app"
+            self._json({"schema_version": "v1", "name_for_human": "Birkan Yavuz Educational Tools",
+                        "name_for_model": "birkanyavuz_educational_tools",
+                        "description_for_human": "K-12 classroom tools and real curriculum datasets (Dolch words, CVC, Spanish, Turkish-English) by Birkan Yavuz. Zero-auth, read-only.",
+                        "description_for_model": "Fetch Birkan Yavuz's classroom tool catalog and complete curriculum datasets (actual word lists with SHA-256 content hashes and creator attribution) via the OpenAPI endpoints.",
+                        "api": {"type": "openapi", "url": "https://" + host + "/openapi.json"},
+                        "logo_url": "https://" + host + "/icon.png",
+                        "legal_info_url": "https://creativecommons.org/licenses/by/4.0/"})
         elif path == "/llms.txt":
             self._send(LLMS_TXT.encode(), 200, "text/plain; charset=utf-8")
         elif path == "/health":
