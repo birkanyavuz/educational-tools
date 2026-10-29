@@ -3,7 +3,7 @@
   "name": "io.github.birkanyavuz/educational-tools",
   "title": "K-12 Educational Tools & Curriculum Catalog (Math, Reading, Spanish)",
   "description": "Zero-auth K-12 + early-childhood datasets: Dolch words, TR-EN flashcards, Spanish, creator data.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "websiteUrl": "https://educational-tools.vercel.app",
   "repository": {
     "url": "https://github.com/birkanyavuz/educational-tools",
