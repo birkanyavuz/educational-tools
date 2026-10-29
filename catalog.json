@@ -9,7 +9,13 @@
    "gradeLevel": "Kindergarten-Grade 1",
    "objective": "Understand the parts that make a whole number (number bonds)",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.K.OA.A.3",
+    "CCSS.Math.Content.1.OA.C.6",
+    "K.OA.A.3",
+    "1.OA.C.6"
+   ]
   },
   {
    "identifier": "bag-of-cubes",
@@ -20,7 +26,13 @@
    "gradeLevel": "Grade 1",
    "objective": "Counting and making numbers with cubes",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.K.CC.B.4",
+    "CCSS.Math.Content.1.NBT.A.1",
+    "K.CC.B.4",
+    "1.NBT.A.1"
+   ]
   },
   {
    "identifier": "base-10-counter",
@@ -31,7 +43,11 @@
    "gradeLevel": "Grade 1",
    "objective": "Place value: tens and ones with base-10 blocks",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.1.NBT.B.2",
+    "1.NBT.B.2"
+   ]
   },
   {
    "identifier": "math-mountains",
@@ -42,7 +58,13 @@
    "gradeLevel": "Grade 1",
    "objective": "Addition and subtraction partners on a math mountain",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.1.OA.A.1",
+    "CCSS.Math.Content.1.OA.C.6",
+    "1.OA.A.1",
+    "1.OA.C.6"
+   ]
   },
   {
    "identifier": "ten-frame-addition-builder",
@@ -53,7 +75,13 @@
    "gradeLevel": "Grade 1",
    "objective": "Add with a ten-frame and make 10",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.1.OA.C.6",
+    "CCSS.Math.Content.K.OA.A.4",
+    "1.OA.C.6",
+    "K.OA.A.4"
+   ]
   },
   {
    "identifier": "count-on-missing-addends",
@@ -64,7 +92,11 @@
    "gradeLevel": "Grade 1",
    "objective": "Count on to find the missing addend",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.1.OA.D.8",
+    "1.OA.D.8"
+   ]
   },
   {
    "identifier": "perimeter-and-area",
@@ -75,7 +107,13 @@
    "gradeLevel": "Grade 3",
    "objective": "Find the perimeter and area of rectangles",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.3.MD.D.8",
+    "CCSS.Math.Content.3.MD.C.7",
+    "3.MD.D.8",
+    "3.MD.C.7"
+   ]
   },
   {
    "identifier": "fractions-grade-3",
@@ -86,7 +124,11 @@
    "gradeLevel": "Grade 3",
    "objective": "Understand fractions as parts of a whole",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.3.NF.A.1",
+    "3.NF.A.1"
+   ]
   },
   {
    "identifier": "coins-and-money",
@@ -97,7 +139,11 @@
    "gradeLevel": "Grade 3",
    "objective": "Identify coins and count money",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.2.MD.C.8",
+    "2.MD.C.8"
+   ]
   },
   {
    "identifier": "analog-clock",
@@ -108,7 +154,13 @@
    "gradeLevel": "Grade 3",
    "objective": "Read time on an analog clock",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.1.MD.B.3",
+    "CCSS.Math.Content.3.MD.A.1",
+    "1.MD.B.3",
+    "3.MD.A.1"
+   ]
   },
   {
    "identifier": "math-word-problems",
@@ -119,7 +171,11 @@
    "gradeLevel": "Grade 3",
    "objective": "Solve grade-3 math word problems",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.3.OA.D.8",
+    "3.OA.D.8"
+   ]
   },
   {
    "identifier": "improper-fractions-to-mixed-numbers",
@@ -131,7 +187,11 @@
    "objective": "Convert improper fractions to mixed numbers",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
-   "file": "improper-to-mixed.html"
+   "file": "improper-to-mixed.html",
+   "standard_codes": [
+    "CCSS.Math.Content.4.NF.B.3",
+    "4.NF.B.3"
+   ]
   },
   {
    "identifier": "decimal-numbers",
@@ -142,7 +202,13 @@
    "gradeLevel": "Grade 4",
    "objective": "Understand and compare decimal numbers",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.4.NF.C.6",
+    "CCSS.Math.Content.4.NF.C.7",
+    "4.NF.C.6",
+    "4.NF.C.7"
+   ]
   },
   {
    "identifier": "rounding-decimals",
@@ -154,7 +220,11 @@
    "objective": "Round decimal numbers to a given place",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
-   "file": "rounding-decimals.html"
+   "file": "rounding-decimals.html",
+   "standard_codes": [
+    "CCSS.Math.Content.5.NBT.A.4",
+    "5.NBT.A.4"
+   ]
   },
   {
    "identifier": "coordinate-plane",
@@ -165,7 +235,13 @@
    "gradeLevel": "Grades 5-6",
    "objective": "Plot and read points on the coordinate plane",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.Math.Content.5.G.A.1",
+    "CCSS.Math.Content.6.NS.C.6",
+    "5.G.A.1",
+    "6.NS.C.6"
+   ]
   },
   {
    "identifier": "sight-words-first-grade",
@@ -177,7 +253,13 @@
    "objective": "Recognize and read first-grade sight words (41 Dolch words)",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
-   "file": "tools-sight-words-first-grade.html"
+   "file": "tools-sight-words-first-grade.html",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.RF.1.3",
+    "CCSS.ELA-Literacy.RF.1.3g",
+    "RF.1.3",
+    "RF.1.3g"
+   ]
   },
   {
    "identifier": "cvc-word-builder",
@@ -189,7 +271,13 @@
    "objective": "Build consonant-vowel-consonant (CVC) words by word family",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
-   "file": "cvc-word-builder.html"
+   "file": "cvc-word-builder.html",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.RF.1.3",
+    "CCSS.ELA-Literacy.RF.1.3b",
+    "RF.1.3",
+    "RF.1.3b"
+   ]
   },
   {
    "identifier": "digraph-word-builder",
@@ -201,7 +289,13 @@
    "objective": "Build words with digraphs sh, ch, th, wh",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
-   "file": "digraph-word-builder.html"
+   "file": "digraph-word-builder.html",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.RF.1.3",
+    "CCSS.ELA-Literacy.RF.1.3a",
+    "RF.1.3",
+    "RF.1.3a"
+   ]
   },
   {
    "identifier": "middle-sound-builder",
@@ -213,7 +307,13 @@
    "objective": "Identify the middle vowel sound in CVC words",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
-   "file": "middle-sound-builder.html"
+   "file": "middle-sound-builder.html",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.RF.1.2",
+    "CCSS.ELA-Literacy.RF.1.2c",
+    "RF.1.2",
+    "RF.1.2c"
+   ]
   },
   {
    "identifier": "reading-comprehension-grade-3",
@@ -224,7 +324,13 @@
    "gradeLevel": "Grade 3",
    "objective": "Read passages and answer comprehension questions",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.RL.3.1",
+    "CCSS.ELA-Literacy.RI.3.1",
+    "RL.3.1",
+    "RI.3.1"
+   ]
   },
   {
    "identifier": "grammar-grade-3",
@@ -235,7 +341,11 @@
    "gradeLevel": "Grade 3",
    "objective": "Practice grade-3 grammar and language skills",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.L.3.1",
+    "L.3.1"
+   ]
   },
   {
    "identifier": "spelling-bee-grade-3",
@@ -246,7 +356,11 @@
    "gradeLevel": "Grade 3",
    "objective": "Practice spelling grade-3 words",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.L.3.2",
+    "L.3.2"
+   ]
   },
   {
    "identifier": "silabas-en-espanol",
@@ -258,7 +372,8 @@
    "objective": "Read and practice Spanish syllables (silabas) for early Spanish reading",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
-   "file": "silabas-en-espanol.html"
+   "file": "silabas-en-espanol.html",
+   "standard_codes": []
   },
   {
    "identifier": "tessellations",
@@ -269,7 +384,11 @@
    "gradeLevel": "Grade 9",
    "objective": "Create and explore tessellation art patterns",
    "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity"
+   "kind": "interactive classroom activity",
+   "standard_codes": [
+    "CCSS.ELA-Literacy.8.G.A.3",
+    "8.G.A.3"
+   ]
   }
  ]
 }
