@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.birkanyavuz/educational-tools",
+  "title": "Birkan Educational Tools",
+  "description": "Educational tools by Birkan Yavuz: find classroom tools by grade, subject, and objective.",
+  "version": "1.0.0",
+  "websiteUrl": "https://educational-tools.vercel.app",
+  "repository": {
+    "url": "https://github.com/birkanyavuz/educational-tools",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://educational-tools.vercel.app/mcp"
+    }
+  ]
+}

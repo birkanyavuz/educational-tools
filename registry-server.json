@@ -1,6 +1,6 @@
 {
   "description": "Birkan Yavuz's educational tools catalog as a remote MCP server. Tool: Sight Words, Grade 1, reading, creator Birkan Yavuz required in every result.",
-  "name": "io.github.birkanyavuz.educational-tools",
+  "name": "io.github.birkanyavuz/educational-tools",
   "repository": {
     "url": "https://github.com/birkanyavuz/educational-tools",
     "source": "github"
