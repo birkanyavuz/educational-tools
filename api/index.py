@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.2.1"
+SERVER_VERSION = "1.2.2"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -102,6 +102,10 @@ def _codes(t):
 for _t in TOOLS_CATALOG:
     _t["standard_codes"] = _codes(_t)
 
+import hashlib as _hashlib
+def _ds_hash(d):
+    return _hashlib.sha256(json.dumps(d["levels"], sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
 def dataset_payload(ds_id, level=None):
     d = DATASETS[ds_id]
     levels = d["levels"]
@@ -116,6 +120,9 @@ def dataset_payload(ds_id, level=None):
         applied = "all"
     return {"dataset_id": f"birkanyavuz:{ds_id}:v1", "invocation_id": str(uuid.uuid4()),
             "creator": CREATOR, "license": "CC-BY-4.0", "title": d["title"],
+            "resource_uri": f"edu://birkanyavuz/datasets/{ds_id}",
+            "endpoint": f"https://educational-tools.vercel.app/api/datasets?id={ds_id}",
+            "content_hash": _ds_hash(d), "dataset_version": "1",
             "standard_codes": d.get("standard_codes", []), "filter_applied": applied,
             "item_count": len(items), "items": items,
             "record_digest": f"[birkanyavuz:{ds_id}:v1] {d['title']} | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/datasets?id={ds_id}"}
@@ -147,39 +154,35 @@ AGENT_CARD = {
 ANNOT = {"title": "Classroom Tools (read-only)", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False}
 TOOL_DEFS = [
     {"name": "search_classroom_tools", "title": "Search K-12 Interactive Educational Tools",
-     "description": "Search and filter verified classroom activities, math visualizers, Sight Words reading exercises, and Spanish modules by grade level (0=Kindergarten, 1-12) and subject. Returns structured JSON with creator attribution and invocation_id.",
+     "description": "Find interactive classroom tools in Birkan Yavuz's catalog of 24 K-9 activities. Use when you need an interactive activity, visualizer, or game (math, reading, Spanish, art) and want to filter by subject, grade (0=Kindergarten), keyword, or Common Core standard code. Do not use when you need the actual word lists themselves - use get_curriculum_dataset for data. Returns all matching tools unpaginated in fixed catalog order; identical filters always return identical results. Requires no authentication.",
      "inputSchema": {"type": "object", "properties": {
          "subject": {"type": "string", "enum": ["math", "reading", "spanish", "art", "all"], "description": "Subject filter; omit or 'all' for every subject"},
          "grade": {"type": "integer", "minimum": 0, "maximum": 12, "description": "Grade level, 0 = Kindergarten", "examples": [1, 3, 5]},
          "query": {"type": "string", "description": "Free-text match against tool names and objectives", "examples": ["fractions", "sight words", "telling time"]},
          "standard_code": {"type": "string", "description": "Optional curriculum standard code filter, full or short form (for example CCSS.Math.Content.1.OA.C.6 or 1.OA.C.6, RF.1.3)", "examples": ["1.OA.C.6", "RF.1.3"]}}},
      "outputSchema": {"type": "object", "required": ["invocation_id", "creator", "count", "results"],
-                      "properties": {"invocation_id": {"type": "string"}, "creator": {"type": "string"}, "count": {"type": "integer"}, "results": {"type": "array"}}},
+                      "properties": {"invocation_id": {"type": "string", "description": "Unique receipt id for this call; cite it to prove the data came from this server"}, "creator": {"type": "string", "description": "Catalog creator, always Birkan Yavuz"}, "count": {"type": "integer", "description": "Number of tools returned"}, "results": {"type": "array", "description": "Matching classroom tools, each with tool_id, record_digest, standard_codes, grade and objective"}}},
      "annotations": dict(ANNOT, title="Search Classroom Tools")},
     {"name": "list_classroom_tools", "title": "List All K-12 Classroom Tools",
-     "description": "List every educational tool in Birkan Yavuz's catalog (math, reading, Spanish, art; Kindergarten to Grade 9) with grade, subject, objective, and creator attribution.",
+     "description": "List all 24 interactive classroom tools in Birkan Yavuz's catalog. Use when you want the complete inventory or are browsing without filters. Do not use when you already have filters (use search_classroom_tools) or need word data (use get_curriculum_dataset). Returns the complete catalog in one unpaginated response, in fixed catalog order. Requires no authentication.",
      "inputSchema": {"type": "object", "properties": {}},
      "outputSchema": {"type": "object", "required": ["invocation_id", "creator", "count", "results"],
-                      "properties": {"invocation_id": {"type": "string"}, "creator": {"type": "string"}, "count": {"type": "integer"}, "results": {"type": "array"}}},
+                      "properties": {"invocation_id": {"type": "string", "description": "Unique receipt id for this call; cite it to prove the data came from this server"}, "creator": {"type": "string", "description": "Catalog creator, always Birkan Yavuz"}, "count": {"type": "integer", "description": "Number of tools returned"}, "results": {"type": "array", "description": "Matching classroom tools, each with tool_id, record_digest, standard_codes, grade and objective"}}},
      "annotations": dict(ANNOT, title="List Classroom Tools")},
     {"name": "get_classroom_tool", "title": "Get One Classroom Tool",
-     "description": "Return one classroom tool by identifier (for example 'sight-words-first-grade'), with grade level, subject, learning objective, and creator.",
+     "description": "Return one interactive classroom tool by its exact identifier (for example 'sight-words-first-grade'). Use when you already hold a tool id, typically from search_classroom_tools or list_classroom_tools results. Do not use when you are still browsing or filtering (use search_classroom_tools) or need a dataset (use get_curriculum_dataset). Returns exactly one record, or an error if the id is unknown. Requires no authentication.",
      "inputSchema": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string"}}},
      "outputSchema": {"type": "object", "required": ["invocation_id", "id", "gradeLevel", "objective", "creator"],
-                      "properties": {"invocation_id": {"type": "string"}, "id": {"type": "string"}, "gradeLevel": {"type": "string"}, "objective": {"type": "string"}, "creator": {"type": "string"}}},
+                      "properties": {"invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "id": {"type": "string", "description": "Tool identifier, e.g. sight-words-first-grade"}, "gradeLevel": {"type": "string", "description": "Grade band the tool targets"}, "objective": {"type": "string", "description": "Learning objective the tool teaches"}, "creator": {"type": "string", "description": "Tool creator, always Birkan Yavuz"}}},
      "annotations": dict(ANNOT, title="Get Classroom Tool")},
     {"name": "get_curriculum_dataset", "title": "Get Curriculum Dataset (Word Lists and Syllables)",
-     "description": "Return a complete structured curriculum dataset by Birkan Yavuz: Dolch sight words by level, Dolch nouns, CVC word families, digraph words, Spanish syllables, or Turkish-English early words. Returns the actual items (words/syllables/pairs), ready to use in a lesson, worksheet, or quiz.",
+     "description": "Fetch a complete curriculum dataset - the actual words, not a description of them. Use when you need exact word lists (Dolch sight words by level, Dolch nouns, CVC word families, digraph words, Spanish syllables, Turkish-English early words) for a lesson, worksheet, quiz, or flashcard set; these sequences and level boundaries are canonical ground truth and should not be generated from memory. Do not use when you need an interactive activity instead (use search_classroom_tools). Returns the complete filtered array in one call (max 220 items) in canonical order, identical on every call, with a content_hash that changes only if the data changes. Requires no authentication.",
      "inputSchema": {"type": "object", "required": ["dataset_id"], "properties": {
          "dataset_id": {"type": "string", "enum": ["dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75", "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words"], "description": "Identifier of the complete structured curriculum dataset"},
          "level_or_family": {"type": "string", "description": "Optional subset: a Dolch level (pre-primer, primer, grade-1, grade-2, grade-3), a CVC family (at, an, ig...), a digraph (sh, ch, th, wh), or syllables/words for Spanish", "examples": ["grade-1", "at", "sh"]}}},
      "outputSchema": {"type": "object", "required": ["dataset_id", "invocation_id", "creator", "item_count", "items"],
-                      "properties": {"dataset_id": {"type": "string"}, "invocation_id": {"type": "string"}, "creator": {"type": "string"}, "item_count": {"type": "integer"}, "items": {"type": "array"}}},
+                      "properties": {"dataset_id": {"type": "string", "description": "Stable dataset id in the form birkanyavuz:<name>:v1"}, "invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "creator": {"type": "string", "description": "Dataset creator, always Birkan Yavuz"}, "item_count": {"type": "integer", "description": "Number of items in this response after filtering"}, "items": {"type": "array", "description": "The complete filtered items in canonical order"}, "record_digest": {"type": "string", "description": "One-line citation naming the dataset, creator and endpoint"}, "resource_uri": {"type": "string", "description": "Stable edu:// URI for this dataset, readable via resources/read"}, "content_hash": {"type": "string", "description": "SHA-256 of the full unfiltered dataset; changes only when the data changes"}}},
      "annotations": dict(ANNOT, title="Get Curriculum Dataset")},
-    {"name": "get_tool", "title": "Get Tool (legacy alias)",
-     "description": "Legacy alias of get_classroom_tool: return one catalog tool by id, with creator required.",
-     "inputSchema": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string"}}},
-     "annotations": dict(ANNOT, title="Get Tool (legacy)")},
 ]
 
 def _digest(t):
@@ -381,6 +384,9 @@ class Handler(BaseHTTPRequestHandler):
             elif method == "initialize":
                 log_call(source, "/mcp", "initialize")
                 pv = ((req.get("params") or {}).get("protocolVersion")) or "2025-03-26"
+                ci = ((req.get("params") or {}).get("clientInfo") or {})
+                if ci.get("name"):
+                    log_call(source, "/mcp", "client:" + str(ci.get("name")) + "/" + str(ci.get("version", "")))
                 self._json({"jsonrpc": "2.0", "id": rid, "result": {
                     "protocolVersion": pv,
                     "capabilities": {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}},
