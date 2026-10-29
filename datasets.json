@@ -849,5 +849,849 @@
    ]
   },
   "standard_codes": []
+ },
+ "turkish-english-animals": {
+  "title": "Turkish-English Animals (Hazel's flashcards)",
+  "standard_codes": [],
+  "levels": {
+   "all": [
+    {
+     "tr": "Tavşan",
+     "en": "rabbit"
+    },
+    {
+     "tr": "Fil",
+     "en": "elephant"
+    },
+    {
+     "tr": "Kakadu",
+     "en": "cockatoo"
+    },
+    {
+     "tr": "Ahtapot",
+     "en": "octopus"
+    },
+    {
+     "tr": "Palyaço Balığı",
+     "en": "clownfish"
+    },
+    {
+     "tr": "Penguen",
+     "en": "penguin"
+    },
+    {
+     "tr": "Zürafa",
+     "en": "giraffe"
+    },
+    {
+     "tr": "Ördek",
+     "en": "duck"
+    },
+    {
+     "tr": "Kalamar",
+     "en": "squid"
+    },
+    {
+     "tr": "Timsah",
+     "en": "crocodile"
+    },
+    {
+     "tr": "Kaplan",
+     "en": "tiger"
+    },
+    {
+     "tr": "Balina",
+     "en": "whale"
+    },
+    {
+     "tr": "Yunus",
+     "en": "dolphin"
+    },
+    {
+     "tr": "Koala",
+     "en": "koala"
+    },
+    {
+     "tr": "Denizyıldızı",
+     "en": "starfish"
+    },
+    {
+     "tr": "Eşek",
+     "en": "donkey"
+    },
+    {
+     "tr": "Keçi",
+     "en": "goat"
+    },
+    {
+     "tr": "Horoz",
+     "en": "rooster"
+    },
+    {
+     "tr": "Civciv",
+     "en": "baby chick"
+    },
+    {
+     "tr": "Kaz",
+     "en": "goose"
+    },
+    {
+     "tr": "Hindi",
+     "en": "domestic turkey"
+    },
+    {
+     "tr": "Hamster",
+     "en": "hamster"
+    },
+    {
+     "tr": "Kuzu",
+     "en": "lamb"
+    },
+    {
+     "tr": "Boğa",
+     "en": "bull"
+    },
+    {
+     "tr": "Aslan",
+     "en": "lion"
+    },
+    {
+     "tr": "Ayı",
+     "en": "bear"
+    },
+    {
+     "tr": "Kurt",
+     "en": "wolf"
+    },
+    {
+     "tr": "Tilki",
+     "en": "fox"
+    },
+    {
+     "tr": "Maymun",
+     "en": "monkey"
+    },
+    {
+     "tr": "Zebra",
+     "en": "zebra"
+    },
+    {
+     "tr": "Su Aygırı",
+     "en": "hippopotamus"
+    },
+    {
+     "tr": "Gergedan",
+     "en": "white rhinoceros"
+    },
+    {
+     "tr": "Kanguru",
+     "en": "kangaroo"
+    },
+    {
+     "tr": "Panda",
+     "en": "giant panda"
+    },
+    {
+     "tr": "Kutup Ayısı",
+     "en": "polar bear"
+    },
+    {
+     "tr": "Geyik",
+     "en": "red deer"
+    },
+    {
+     "tr": "Sincap",
+     "en": "squirrel"
+    },
+    {
+     "tr": "Kirpi",
+     "en": "hedgehog"
+    },
+    {
+     "tr": "Rakun",
+     "en": "raccoon"
+    },
+    {
+     "tr": "Yılan",
+     "en": "snake"
+    },
+    {
+     "tr": "Kaplumbağa",
+     "en": "tortoise"
+    },
+    {
+     "tr": "Deve",
+     "en": "dromedary camel"
+    },
+    {
+     "tr": "Çita",
+     "en": "cheetah"
+    },
+    {
+     "tr": "Goril",
+     "en": "gorilla"
+    },
+    {
+     "tr": "Lama",
+     "en": "llama"
+    },
+    {
+     "tr": "Kokarca",
+     "en": "striped skunk"
+    },
+    {
+     "tr": "Papağan",
+     "en": "parrot"
+    },
+    {
+     "tr": "Baykuş",
+     "en": "owl"
+    },
+    {
+     "tr": "Kartal",
+     "en": "golden eagle"
+    },
+    {
+     "tr": "Şahin",
+     "en": "peregrine falcon"
+    },
+    {
+     "tr": "Güvercin",
+     "en": "pigeon"
+    },
+    {
+     "tr": "Serçe",
+     "en": "house sparrow"
+    },
+    {
+     "tr": "Karga",
+     "en": "crow"
+    },
+    {
+     "tr": "Leylek",
+     "en": "stork"
+    },
+    {
+     "tr": "Flamingo",
+     "en": "flamingo"
+    },
+    {
+     "tr": "Tavus Kuşu",
+     "en": "peacock"
+    },
+    {
+     "tr": "Pelikan",
+     "en": "pelican"
+    },
+    {
+     "tr": "Devekuşu",
+     "en": "ostrich"
+    },
+    {
+     "tr": "Ağaçkakan",
+     "en": "woodpecker"
+    },
+    {
+     "tr": "Kırlangıç",
+     "en": "swallow"
+    },
+    {
+     "tr": "Martı",
+     "en": "herring gull"
+    },
+    {
+     "tr": "Kanarya",
+     "en": "canary"
+    },
+    {
+     "tr": "Kuğu",
+     "en": "mute swan"
+    },
+    {
+     "tr": "Yelken Balığı",
+     "en": "sailfish"
+    },
+    {
+     "tr": "Köpekbalığı",
+     "en": "shark"
+    },
+    {
+     "tr": "Fok",
+     "en": "harbor seal"
+    },
+    {
+     "tr": "Mors",
+     "en": "walrus"
+    },
+    {
+     "tr": "Yengeç",
+     "en": "shore crab"
+    },
+    {
+     "tr": "Istakoz",
+     "en": "European lobster"
+    },
+    {
+     "tr": "Karides",
+     "en": "common shrimp"
+    },
+    {
+     "tr": "Denizanası",
+     "en": "jellyfish"
+    },
+    {
+     "tr": "Deniz Atı",
+     "en": "seahorse"
+    },
+    {
+     "tr": "Vatoz",
+     "en": "stingray"
+    },
+    {
+     "tr": "Deniz Kaplumbağası",
+     "en": "green sea turtle"
+    },
+    {
+     "tr": "Kelebek",
+     "en": "monarch butterfly"
+    },
+    {
+     "tr": "Arı",
+     "en": "honey bee"
+    },
+    {
+     "tr": "Karınca",
+     "en": "ant"
+    },
+    {
+     "tr": "Uğur Böceği",
+     "en": "ladybug"
+    },
+    {
+     "tr": "Örümcek",
+     "en": "spider"
+    },
+    {
+     "tr": "Solucan",
+     "en": "earthworm"
+    },
+    {
+     "tr": "Salyangoz",
+     "en": "garden snail"
+    },
+    {
+     "tr": "Çekirge",
+     "en": "grasshopper"
+    },
+    {
+     "tr": "Yusufçuk",
+     "en": "dragonfly"
+    },
+    {
+     "tr": "Ateş Böceği",
+     "en": "firefly"
+    },
+    {
+     "tr": "Tırtıl",
+     "en": "caterpillar"
+    },
+    {
+     "tr": "Kertenkele",
+     "en": "wall lizard"
+    },
+    {
+     "tr": "Bukalemun",
+     "en": "chameleon"
+    },
+    {
+     "tr": "Yarasa",
+     "en": "bat"
+    },
+    {
+     "tr": "Kunduz",
+     "en": "beaver"
+    },
+    {
+     "tr": "Su Samuru",
+     "en": "Eurasian otter"
+    },
+    {
+     "tr": "Mirket",
+     "en": "meerkat"
+    },
+    {
+     "tr": "Akbaba",
+     "en": "griffon vulture"
+    },
+    {
+     "tr": "Bıldırcın",
+     "en": "quail"
+    },
+    {
+     "tr": "Guguk Kuşu",
+     "en": "common cuckoo"
+    },
+    {
+     "tr": "Kızılgerdan",
+     "en": "European robin"
+    },
+    {
+     "tr": "Saksağan",
+     "en": "magpie"
+    },
+    {
+     "tr": "Saka",
+     "en": "European goldfinch"
+    },
+    {
+     "tr": "Turna",
+     "en": "crane"
+    },
+    {
+     "tr": "Balıkçıl",
+     "en": "grey heron"
+    },
+    {
+     "tr": "Muhabbet Kuşu",
+     "en": "budgerigar"
+    },
+    {
+     "tr": "Kivi",
+     "en": "kiwi"
+    },
+    {
+     "tr": "Sığırcık",
+     "en": "common starling"
+    },
+    {
+     "tr": "Tukan",
+     "en": "toco toucan"
+    },
+    {
+     "tr": "Sümsük Kuşu",
+     "en": "northern gannet"
+    },
+    {
+     "tr": "Orkinos",
+     "en": "Atlantic bluefin tuna"
+    },
+    {
+     "tr": "Somon",
+     "en": "Atlantic salmon"
+    },
+    {
+     "tr": "Hamsi",
+     "en": "European anchovy"
+    },
+    {
+     "tr": "Sardalya",
+     "en": "sardine"
+    },
+    {
+     "tr": "Kılıç Balığı",
+     "en": "swordfish"
+    },
+    {
+     "tr": "Müren",
+     "en": "moray eel"
+    },
+    {
+     "tr": "Uçan Balık",
+     "en": "flying fish"
+    },
+    {
+     "tr": "Güneş Balığı",
+     "en": "ocean sunfish"
+    },
+    {
+     "tr": "Balon Balığı",
+     "en": "pufferfish"
+    },
+    {
+     "tr": "Aslan Balığı",
+     "en": "lionfish"
+    },
+    {
+     "tr": "Mürekkep Balığı",
+     "en": "cuttlefish"
+    },
+    {
+     "tr": "Deniz İneği",
+     "en": "manatee"
+    },
+    {
+     "tr": "Deniz Gergedanı",
+     "en": "narwhal"
+    },
+    {
+     "tr": "Katil Balina",
+     "en": "orca"
+    },
+    {
+     "tr": "Zargana",
+     "en": "garfish"
+    },
+    {
+     "tr": "Fener Balığı",
+     "en": "anglerfish"
+    },
+    {
+     "tr": "Japon Balığı",
+     "en": "goldfish"
+    },
+    {
+     "tr": "Melek Balığı",
+     "en": "freshwater angelfish"
+    },
+    {
+     "tr": "Pirana",
+     "en": "red-bellied piranha"
+    },
+    {
+     "tr": "Bizon",
+     "en": "bison"
+    },
+    {
+     "tr": "Vaşak",
+     "en": "Eurasian lynx"
+    },
+    {
+     "tr": "Puma",
+     "en": "puma"
+    },
+    {
+     "tr": "Jaguar",
+     "en": "jaguar"
+    },
+    {
+     "tr": "Çakal",
+     "en": "golden jackal"
+    },
+    {
+     "tr": "Sırtlan",
+     "en": "spotted hyena"
+    },
+    {
+     "tr": "Babun",
+     "en": "baboon"
+    },
+    {
+     "tr": "Şempanze",
+     "en": "chimpanzee"
+    },
+    {
+     "tr": "Orangutan",
+     "en": "orangutan"
+    },
+    {
+     "tr": "Tembel Hayvan",
+     "en": "three-toed sloth"
+    },
+    {
+     "tr": "Armadillo",
+     "en": "armadillo"
+    },
+    {
+     "tr": "Karıncayiyen",
+     "en": "giant anteater"
+    },
+    {
+     "tr": "Ornitorenk",
+     "en": "platypus"
+    },
+    {
+     "tr": "Vombat",
+     "en": "wombat"
+    },
+    {
+     "tr": "Porsuk",
+     "en": "Eurasian badger"
+    },
+    {
+     "tr": "Sansar",
+     "en": "beech marten"
+    },
+    {
+     "tr": "Köstebek",
+     "en": "European mole"
+    },
+    {
+     "tr": "Lemur",
+     "en": "ring-tailed lemur"
+    },
+    {
+     "tr": "Ren Geyiği",
+     "en": "reindeer"
+    },
+    {
+     "tr": "Oklu Kirpi",
+     "en": "porcupine"
+    },
+    {
+     "tr": "Tapir",
+     "en": "tapir"
+    },
+    {
+     "tr": "Kapibara",
+     "en": "capybara"
+    },
+    {
+     "tr": "Fenek",
+     "en": "fennec fox"
+    },
+    {
+     "tr": "Kar Leoparı",
+     "en": "snow leopard"
+    },
+    {
+     "tr": "Kızıl Panda",
+     "en": "red panda"
+    },
+    {
+     "tr": "Yaban Domuzu",
+     "en": "wild boar"
+    },
+    {
+     "tr": "Loris",
+     "en": "slow loris"
+    },
+    {
+     "tr": "Kobra",
+     "en": "cobra"
+    },
+    {
+     "tr": "Komodo Ejderi",
+     "en": "Komodo dragon"
+    },
+    {
+     "tr": "İguana",
+     "en": "iguana"
+    },
+    {
+     "tr": "Geko",
+     "en": "gecko"
+    },
+    {
+     "tr": "Semender",
+     "en": "fire salamander"
+    },
+    {
+     "tr": "Kara Kurbağası",
+     "en": "common toad"
+    },
+    {
+     "tr": "Peygamberdevesi",
+     "en": "praying mantis"
+    },
+    {
+     "tr": "Güve",
+     "en": "atlas moth"
+    },
+    {
+     "tr": "Kırkayak",
+     "en": "millipede"
+    },
+    {
+     "tr": "Çıyan",
+     "en": "centipede"
+    },
+    {
+     "tr": "Akrep",
+     "en": "scorpion"
+    },
+    {
+     "tr": "Tarantula",
+     "en": "tarantula"
+    },
+    {
+     "tr": "Hamam Böceği",
+     "en": "German cockroach"
+    },
+    {
+     "tr": "Sığın",
+     "en": "moose"
+    },
+    {
+     "tr": "Beluga",
+     "en": "beluga whale"
+    },
+    {
+     "tr": "Deniz Kestanesi",
+     "en": "sea urchin"
+    },
+    {
+     "tr": "Midye",
+     "en": "blue mussel"
+    },
+    {
+     "tr": "Sinek Kuşu",
+     "en": "hummingbird"
+    },
+    {
+     "tr": "Alpaka",
+     "en": "alpaca"
+    },
+    {
+     "tr": "Gine Domuzu",
+     "en": "guinea pig"
+    },
+    {
+     "tr": "Manda",
+     "en": "water buffalo"
+    },
+    {
+     "tr": "Leopar",
+     "en": "leopard"
+    },
+    {
+     "tr": "Karakulak",
+     "en": "caracal"
+    },
+    {
+     "tr": "Çizgili Sincap",
+     "en": "chipmunk"
+    },
+    {
+     "tr": "Kutup Tilkisi",
+     "en": "arctic fox"
+    },
+    {
+     "tr": "Deniz Papağanı",
+     "en": "atlantic puffin"
+    },
+    {
+     "tr": "Emu",
+     "en": "emu"
+    },
+    {
+     "tr": "Kar Baykuşu",
+     "en": "snowy owl"
+    },
+    {
+     "tr": "Kumru",
+     "en": "laughing dove"
+    },
+    {
+     "tr": "Sultan Papağanı",
+     "en": "cockatiel"
+    },
+    {
+     "tr": "Deniz Aslanı",
+     "en": "california sea lion"
+    },
+    {
+     "tr": "İspermeçet Balinası",
+     "en": "sperm whale"
+    },
+    {
+     "tr": "Balina Köpekbalığı",
+     "en": "whale shark"
+    },
+    {
+     "tr": "Manta Vatozu",
+     "en": "manta ray"
+    },
+    {
+     "tr": "Mavi Cerrah Balığı",
+     "en": "regal blue tang"
+    },
+    {
+     "tr": "Deniz Ejderi",
+     "en": "leafy seadragon"
+    },
+    {
+     "tr": "Testere Balığı",
+     "en": "sawfish"
+    },
+    {
+     "tr": "Mercan",
+     "en": "coral"
+    },
+    {
+     "tr": "Münzevi Yengeç",
+     "en": "hermit crab"
+    },
+    {
+     "tr": "Deniz Süngeri",
+     "en": "sea sponge"
+    },
+    {
+     "tr": "Karasinek",
+     "en": "housefly"
+    },
+    {
+     "tr": "Sivrisinek",
+     "en": "mosquito"
+    },
+    {
+     "tr": "Çekiç Balığı",
+     "en": "hammerhead shark"
+    }
+   ]
+  }
+ },
+ "turkish-english-colors": {
+  "title": "Turkish-English Colors (Hazel's flashcards)",
+  "standard_codes": [],
+  "levels": {
+   "all": [
+    {
+     "tr": "Kırmızı",
+     "en": "red"
+    },
+    {
+     "tr": "Mavi",
+     "en": "blue"
+    },
+    {
+     "tr": "Yeşil",
+     "en": "green"
+    },
+    {
+     "tr": "Sarı",
+     "en": "yellow"
+    },
+    {
+     "tr": "Turuncu",
+     "en": "orange"
+    }
+   ]
+  }
+ },
+ "turkish-english-objects": {
+  "title": "Turkish-English Everyday Objects (Hazel's flashcards)",
+  "standard_codes": [],
+  "levels": {
+   "all": [
+    {
+     "tr": "Bardak",
+     "en": "cup"
+    },
+    {
+     "tr": "Top",
+     "en": "ball"
+    },
+    {
+     "tr": "Fare",
+     "en": "mouse"
+    },
+    {
+     "tr": "Kitap",
+     "en": "book"
+    },
+    {
+     "tr": "Şapka",
+     "en": "hat"
+    },
+    {
+     "tr": "Kaşık",
+     "en": "spoon"
+    },
+    {
+     "tr": "Ayakkabı",
+     "en": "shoe"
+    }
+   ]
+  }
  }
 }
