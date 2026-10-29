@@ -1,0 +1,8 @@
+{
+ "mcpServers": {
+  "educational-tools": {
+   "type": "http",
+   "url": "https://educational-tools.vercel.app/mcp"
+  }
+ }
+}
