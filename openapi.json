@@ -2,7 +2,7 @@
  "openapi": "3.1.0",
  "info": {
   "title": "Birkan Yavuz Educational Tools API",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Zero-auth, read-only REST API for Birkan Yavuz's K-12 classroom tools catalog and curriculum datasets (Dolch sight words, CVC families, digraphs, Spanish syllables, Turkish-English word and flashcard sets). Every response carries creator 'Birkan Yavuz', an invocation_id receipt, and a record_digest citation line.",
   "license": {
    "name": "CC-BY-4.0",
