@@ -13,7 +13,7 @@ from public_server import (DATASETS, TOOL_DEFS, BY_ID, CREATOR, SERVER_VERSION,
                            dataset_payload, search_tools, _single)
 
 INSTRUCTIONS = ("Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: "
-                "Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English "
+                "Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English flashcards (animals, colors, objects), Turkish-English "
                 "early words, plus 24 interactive math/reading/Spanish classroom tools with Common Core standard codes. "
                 "Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and "
                 "resources/list to pin datasets into a workspace.")
