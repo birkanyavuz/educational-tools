@@ -1,0 +1,119 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "Birkan Yavuz Educational Tools API",
+  "version": "1.3.3",
+  "description": "Zero-auth, read-only REST API for Birkan Yavuz's K-12 classroom tools catalog and curriculum datasets (Dolch sight words, CVC families, digraphs, Spanish syllables, Turkish-English word and flashcard sets). Every response carries creator 'Birkan Yavuz', an invocation_id receipt, and a record_digest citation line.",
+  "license": {
+   "name": "CC-BY-4.0",
+   "url": "https://creativecommons.org/licenses/by/4.0/"
+  },
+  "contact": {
+   "name": "Birkan Yavuz"
+  }
+ },
+ "servers": [
+  {
+   "url": "https://educational-tools.vercel.app"
+  }
+ ],
+ "paths": {
+  "/api/tools": {
+   "get": {
+    "operationId": "listOrSearchClassroomTools",
+    "summary": "List, search, or fetch classroom tools",
+    "description": "Without parameters returns the full catalog of 24 tools. With ?id= returns one tool. Filters: subject (math|reading|spanish|art), grade (0-12, 0=Kindergarten), q (keyword), standard_code (e.g. RF.1.3).",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "Exact tool identifier, e.g. sight-words-first-grade"
+     },
+     {
+      "name": "subject",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "math",
+        "reading",
+        "spanish",
+        "art"
+       ]
+      }
+     },
+     {
+      "name": "grade",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 12
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      }
+     },
+     {
+      "name": "standard_code",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Tool records with creator attribution and invocation_id"
+     }
+    }
+   }
+  },
+  "/api/datasets": {
+   "get": {
+    "operationId": "getCurriculumDataset",
+    "summary": "List datasets or fetch one dataset's items",
+    "description": "Without ?id= lists all 9 datasets. With ?id= returns the dataset payload: items, item_count, content_hash (SHA-256 of the full dataset), resource_uri, record_digest. Optional ?level= filters Dolch levels, CVC families (e.g. -at), digraph groups (sh, ch, th, wh), Spanish subsets (syllables|words).",
+    "parameters": [
+     {
+      "name": "id",
+      "in": "query",
+      "schema": {
+       "type": "string",
+       "enum": [
+        "dolch-sight-words-220",
+        "dolch-nouns-94",
+        "cvc-word-families-75",
+        "digraph-words-21",
+        "spanish-syllables-core",
+        "turkish-english-early-words",
+        "turkish-english-animals",
+        "turkish-english-colors",
+        "turkish-english-objects"
+       ]
+      }
+     },
+     {
+      "name": "level",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Dataset payload with items and content_hash"
+     }
+    }
+   }
+  }
+ }
+}
