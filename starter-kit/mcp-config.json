@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "birkan-educational-tools": {
+      "url": "https://educational-tools.vercel.app/mcp",
+      "transport": "streamable-http",
+      "note": "Zero-auth, read-only. Registry: io.github.birkanyavuz/educational-tools"
+    }
+  }
+}
