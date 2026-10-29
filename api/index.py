@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.1.1"
+SERVER_VERSION = "1.1.2"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -121,8 +121,11 @@ TOOL_DEFS = [
      "annotations": dict(ANNOT, title="Get Tool (legacy)")},
 ]
 
+def _digest(t):
+    return f"[birkanyavuz:{t['identifier']}:v1] {t['name']} ({t['gradeLevel']} {t['subject'].capitalize()}) | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/tools?id={t['identifier']}"
+
 def _single(t):
-    return {"invocation_id": str(uuid.uuid4()), "tool_id": f"birkanyavuz:{t['identifier']}:v1", "id": t["identifier"], "name": t["name"],
+    return {"invocation_id": str(uuid.uuid4()), "tool_id": f"birkanyavuz:{t['identifier']}:v1", "record_digest": _digest(t), "id": t["identifier"], "name": t["name"],
             "gradeLevel": t["gradeLevel"], "subject": t["subject"], "objective": t["objective"],
             "creator": CREATOR, **({"file": t["file"]} if t.get("file") else {})}
 
