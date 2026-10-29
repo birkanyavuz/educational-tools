@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.2.2"
+SERVER_VERSION = "1.3.0"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -176,9 +176,9 @@ TOOL_DEFS = [
                       "properties": {"invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "id": {"type": "string", "description": "Tool identifier, e.g. sight-words-first-grade"}, "gradeLevel": {"type": "string", "description": "Grade band the tool targets"}, "objective": {"type": "string", "description": "Learning objective the tool teaches"}, "creator": {"type": "string", "description": "Tool creator, always Birkan Yavuz"}}},
      "annotations": dict(ANNOT, title="Get Classroom Tool")},
     {"name": "get_curriculum_dataset", "title": "Get Curriculum Dataset (Word Lists and Syllables)",
-     "description": "Fetch a complete curriculum dataset - the actual words, not a description of them. Use when you need exact word lists (Dolch sight words by level, Dolch nouns, CVC word families, digraph words, Spanish syllables, Turkish-English early words) for a lesson, worksheet, quiz, or flashcard set; these sequences and level boundaries are canonical ground truth and should not be generated from memory. Do not use when you need an interactive activity instead (use search_classroom_tools). Returns the complete filtered array in one call (max 220 items) in canonical order, identical on every call, with a content_hash that changes only if the data changes. Requires no authentication.",
+     "description": "Fetch a complete curriculum dataset - the actual words, not a description of them. Use when you need exact word lists (Dolch sight words by level, Dolch nouns, CVC word families, digraph words, Spanish syllables, Turkish-English early words, plus Turkish-English early-childhood flashcard sets - animals (193), colors, everyday objects - from the creator's own decks) for a lesson, worksheet, quiz, or flashcard set; these sequences and level boundaries are canonical ground truth and should not be generated from memory. Do not use when you need an interactive activity instead (use search_classroom_tools). Returns the complete filtered array in one call (max 220 items) in canonical order, identical on every call, with a content_hash that changes only if the data changes. Requires no authentication.",
      "inputSchema": {"type": "object", "required": ["dataset_id"], "properties": {
-         "dataset_id": {"type": "string", "enum": ["dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75", "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words"], "description": "Identifier of the complete structured curriculum dataset"},
+         "dataset_id": {"type": "string", "enum": ["dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75", "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words", "turkish-english-animals", "turkish-english-colors", "turkish-english-objects"], "description": "Identifier of the complete structured curriculum dataset"},
          "level_or_family": {"type": "string", "description": "Optional subset: a Dolch level (pre-primer, primer, grade-1, grade-2, grade-3), a CVC family (at, an, ig...), a digraph (sh, ch, th, wh), or syllables/words for Spanish", "examples": ["grade-1", "at", "sh"]}}},
      "outputSchema": {"type": "object", "required": ["dataset_id", "invocation_id", "creator", "item_count", "items"],
                       "properties": {"dataset_id": {"type": "string", "description": "Stable dataset id in the form birkanyavuz:<name>:v1"}, "invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "creator": {"type": "string", "description": "Dataset creator, always Birkan Yavuz"}, "item_count": {"type": "integer", "description": "Number of items in this response after filtering"}, "items": {"type": "array", "description": "The complete filtered items in canonical order"}, "record_digest": {"type": "string", "description": "One-line citation naming the dataset, creator and endpoint"}, "resource_uri": {"type": "string", "description": "Stable edu:// URI for this dataset, readable via resources/read"}, "content_hash": {"type": "string", "description": "SHA-256 of the full unfiltered dataset; changes only when the data changes"}}},
@@ -249,13 +249,13 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 - GET /api/tools?id=sight-words-first-grade — one tool by identifier
 
 ## Curriculum datasets (actual word lists, not just a catalog)
-- GET /api/datasets — list 6 datasets: Dolch sight words (220, by level), Dolch nouns, CVC word families (75), digraph words (21), Spanish syllables (212), Turkish-English early words (30 pairs)
+- GET /api/datasets — list 9 datasets: Dolch sight words (220, by level), Dolch nouns, CVC word families (75), digraph words (21), Spanish syllables (212), Turkish-English early words (30 pairs), Turkish-English animals flashcards (193 pairs), Turkish-English colors flashcards, Turkish-English everyday objects flashcards
 - GET /api/datasets?id=dolch-sight-words-220&level=grade-1 — one dataset or one level
 - MCP tool get_curriculum_dataset returns the same data; the datasets are also MCP resources at edu://birkanyavuz/datasets/<id>
 
 ## MCP (Streamable HTTP, stateless, no auth)
 - POST /mcp — JSON-RPC: initialize, tools/list, tools/call
-- Tools: search_classroom_tools, list_classroom_tools, get_classroom_tool, get_tool (legacy alias)
+- Tools: search_classroom_tools, list_classroom_tools, get_classroom_tool, get_curriculum_dataset
 - Official MCP Registry: io.github.birkanyavuz/educational-tools
 
 ## A2A
@@ -391,7 +391,7 @@ class Handler(BaseHTTPRequestHandler):
                     "protocolVersion": pv,
                     "capabilities": {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}},
                     "serverInfo": {"name": "birkan-educational-tools-mcp", "version": SERVER_VERSION},
-                    "instructions": "Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English early words, plus 24 interactive math/reading/Spanish classroom tools with Common Core standard codes. Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and resources/list to pin datasets into a workspace."}},
+                    "instructions": "Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English early words and early-childhood flashcards (animals, colors, objects), plus 24 interactive math/reading/Spanish classroom tools with Common Core standard codes. Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and resources/list to pin datasets into a workspace."}},
                     extra={"Mcp-Session-Id": str(uuid.uuid4())})
             elif method == "resources/list":
                 log_call(source, "/mcp", "resources/list")
