@@ -22,11 +22,11 @@
       ]
     }
   ],
-  "url": "https://example.invalid/a2a",
-  "version": "0.2.0-argonaut-improved-local-only-not-published",
+  "url": "https://educational-tools.vercel.app/a2a",
+  "version": "1.0.0-live",
   "supportedInterfaces": [
     {
-      "url": "https://example.invalid/a2a",
+      "url": "https://educational-tools.vercel.app/a2a",
       "transport": "JSONRPC"
     }
   ],
