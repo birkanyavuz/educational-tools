@@ -32,7 +32,7 @@ CATALOG = json.loads((HERE / "catalog.json").read_text())
 AGENT_CARD = {
     "name": "Birkan Educational Tools Agent",
     "description": "Finds Birkan Yavuz's educational tools by grade, subject, and learning objective, and returns the tool with creator attribution.",
-    "url": "https://example.invalid/a2a",
+    "url": "https://educational-tools.vercel.app/a2a",
     "version": "0.1.0",
     "protocolVersion": "1.0",
     "capabilities": {"streaming": False, "pushNotifications": False},
