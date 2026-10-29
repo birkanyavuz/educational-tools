@@ -5,7 +5,7 @@
     "url": "https://github.com/birkanyavuz/educational-tools",
     "source": "github"
   },
-  "status": "draft-local-only-not-submitted",
+  "status": "deployed-live-not-yet-registry-listed",
   "tools": [
     {
       "description": "Return one catalog tool by id, with creator required",
@@ -46,5 +46,11 @@
       }
     }
   ],
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://educational-tools.vercel.app/mcp"
+    }
+  ]
 }
