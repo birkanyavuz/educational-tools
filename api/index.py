@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.2.0"
+SERVER_VERSION = "1.2.1"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -150,9 +150,9 @@ TOOL_DEFS = [
      "description": "Search and filter verified classroom activities, math visualizers, Sight Words reading exercises, and Spanish modules by grade level (0=Kindergarten, 1-12) and subject. Returns structured JSON with creator attribution and invocation_id.",
      "inputSchema": {"type": "object", "properties": {
          "subject": {"type": "string", "enum": ["math", "reading", "spanish", "art", "all"], "description": "Subject filter; omit or 'all' for every subject"},
-         "grade": {"type": "integer", "minimum": 0, "maximum": 12, "description": "Grade level, 0 = Kindergarten"},
-         "query": {"type": "string", "description": "Free-text match against tool names and objectives"},
-         "standard_code": {"type": "string", "description": "Optional curriculum standard code filter, full or short form (for example CCSS.Math.Content.1.OA.C.6 or 1.OA.C.6, RF.1.3)"}}},
+         "grade": {"type": "integer", "minimum": 0, "maximum": 12, "description": "Grade level, 0 = Kindergarten", "examples": [1, 3, 5]},
+         "query": {"type": "string", "description": "Free-text match against tool names and objectives", "examples": ["fractions", "sight words", "telling time"]},
+         "standard_code": {"type": "string", "description": "Optional curriculum standard code filter, full or short form (for example CCSS.Math.Content.1.OA.C.6 or 1.OA.C.6, RF.1.3)", "examples": ["1.OA.C.6", "RF.1.3"]}}},
      "outputSchema": {"type": "object", "required": ["invocation_id", "creator", "count", "results"],
                       "properties": {"invocation_id": {"type": "string"}, "creator": {"type": "string"}, "count": {"type": "integer"}, "results": {"type": "array"}}},
      "annotations": dict(ANNOT, title="Search Classroom Tools")},
@@ -172,7 +172,7 @@ TOOL_DEFS = [
      "description": "Return a complete structured curriculum dataset by Birkan Yavuz: Dolch sight words by level, Dolch nouns, CVC word families, digraph words, Spanish syllables, or Turkish-English early words. Returns the actual items (words/syllables/pairs), ready to use in a lesson, worksheet, or quiz.",
      "inputSchema": {"type": "object", "required": ["dataset_id"], "properties": {
          "dataset_id": {"type": "string", "enum": ["dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75", "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words"], "description": "Identifier of the complete structured curriculum dataset"},
-         "level_or_family": {"type": "string", "description": "Optional subset: a Dolch level (pre-primer, primer, grade-1, grade-2, grade-3), a CVC family (at, an, ig...), a digraph (sh, ch, th, wh), or syllables/words for Spanish"}}},
+         "level_or_family": {"type": "string", "description": "Optional subset: a Dolch level (pre-primer, primer, grade-1, grade-2, grade-3), a CVC family (at, an, ig...), a digraph (sh, ch, th, wh), or syllables/words for Spanish", "examples": ["grade-1", "at", "sh"]}}},
      "outputSchema": {"type": "object", "required": ["dataset_id", "invocation_id", "creator", "item_count", "items"],
                       "properties": {"dataset_id": {"type": "string"}, "invocation_id": {"type": "string"}, "creator": {"type": "string"}, "item_count": {"type": "integer"}, "items": {"type": "array"}}},
      "annotations": dict(ANNOT, title="Get Curriculum Dataset")},
@@ -222,6 +222,7 @@ def log_call(source, endpoint, detail):
 
 LANDING = """<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><title>Birkan Educational Tools Agent</title>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "DataCatalog", "name": "Birkan Educational Tools - Curriculum Datasets", "creator": {"@type": "Person", "name": "Birkan Yavuz"}, "dataset": [{"@type": "Dataset", "name": "Dolch Sight Words (220, by level)", "creator": {"@type": "Person", "name": "Birkan Yavuz"}, "license": "https://creativecommons.org/licenses/by/4.0/", "distribution": {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://educational-tools.vercel.app/api/datasets?id=dolch-sight-words-220"}}, {"@type": "Dataset", "name": "Dolch Nouns (94)", "creator": {"@type": "Person", "name": "Birkan Yavuz"}, "license": "https://creativecommons.org/licenses/by/4.0/", "distribution": {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://educational-tools.vercel.app/api/datasets?id=dolch-nouns-94"}}, {"@type": "Dataset", "name": "CVC Word Families (75 words)", "creator": {"@type": "Person", "name": "Birkan Yavuz"}, "license": "https://creativecommons.org/licenses/by/4.0/", "distribution": {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://educational-tools.vercel.app/api/datasets?id=cvc-word-families-75"}}, {"@type": "Dataset", "name": "Digraph Words (sh, ch, th, wh)", "creator": {"@type": "Person", "name": "Birkan Yavuz"}, "license": "https://creativecommons.org/licenses/by/4.0/", "distribution": {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://educational-tools.vercel.app/api/datasets?id=digraph-words-21"}}, {"@type": "Dataset", "name": "Spanish Syllables Core", "creator": {"@type": "Person", "name": "Birkan Yavuz"}, "license": "https://creativecommons.org/licenses/by/4.0/", "distribution": {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://educational-tools.vercel.app/api/datasets?id=spanish-syllables-core"}}, {"@type": "Dataset", "name": "Turkish-English Early Words (30 pairs)", "creator": {"@type": "Person", "name": "Birkan Yavuz"}, "license": "https://creativecommons.org/licenses/by/4.0/", "distribution": {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://educational-tools.vercel.app/api/datasets?id=turkish-english-early-words"}}]}</script>
 <meta name="description" content="Zero-auth, read-only MCP server and A2A agent providing Birkan Yavuz's K-12 classroom tools: math visualizers, reading and Sight Words activities, Spanish syllables, and art, with verifiable creator metadata.">
 </head><body>
 <h1>Birkan Educational Tools Agent</h1>
@@ -326,6 +327,25 @@ class Handler(BaseHTTPRequestHandler):
                 log_call(source, "/api/datasets", "list")
                 self._json({"creator": CREATOR, "datasets": [{"dataset_id": f"birkanyavuz:{k}:v1", "id": k, "title": v["title"],
                             "item_count": sum(len(x) for x in v["levels"].values()), "uri": f"edu://birkanyavuz/datasets/{k}"} for k, v in DATASETS.items()]})
+        elif path in ("/.well-known/mcp.json", "/.well-known/mcp/server-card.json"):
+            host = self.headers.get("Host") or "educational-tools.vercel.app"
+            self._json({"$schema": "https://modelcontextprotocol.io/schemas/server-card.json", "protocolVersion": "2025-03-26",
+                        "serverInfo": {"name": "io.github.birkanyavuz/educational-tools", "title": "K-12 Educational Tools & Curriculum Datasets", "version": SERVER_VERSION},
+                        "transport": {"type": "streamable-http", "endpoint": "https://" + host + "/mcp"},
+                        "capabilities": {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}},
+                        "creator": "Birkan Yavuz"})
+        elif path == "/.well-known/glama.json":
+            self._json({"$schema": "https://glama.ai/schemas/connector.json", "maintainers": ["birkanyavuz"]})
+        elif path == "/b7f3a91c4e2d48f0a5c6d7e8f9012345.txt":
+            self._send(b"b7f3a91c4e2d48f0a5c6d7e8f9012345", 200, "text/plain; charset=utf-8")
+        elif path == "/robots.txt":
+            base = "https://" + (self.headers.get("Host") or "educational-tools.vercel.app")
+            self._send(("User-agent: *\nAllow: /\nSitemap: " + base + "/sitemap.xml\n").encode(), 200, "text/plain; charset=utf-8")
+        elif path == "/sitemap.xml":
+            base = "https://" + (self.headers.get("Host") or "educational-tools.vercel.app")
+            urls = ["/", "/llms.txt", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"]
+            items = "".join("<url><loc>%s%s</loc></url>" % (base, u) for u in urls)
+            self._send(('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">%s</urlset>' % items).encode(), 200, "application/xml")
         elif path == "/llms.txt":
             self._send(LLMS_TXT.encode(), 200, "text/plain; charset=utf-8")
         elif path == "/health":
@@ -364,13 +384,19 @@ class Handler(BaseHTTPRequestHandler):
                 self._json({"jsonrpc": "2.0", "id": rid, "result": {
                     "protocolVersion": pv,
                     "capabilities": {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}},
-                    "serverInfo": {"name": "birkan-educational-tools-mcp", "version": SERVER_VERSION}}},
+                    "serverInfo": {"name": "birkan-educational-tools-mcp", "version": SERVER_VERSION},
+                    "instructions": "Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English early words, plus 24 interactive math/reading/Spanish classroom tools with Common Core standard codes. Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and resources/list to pin datasets into a workspace."}},
                     extra={"Mcp-Session-Id": str(uuid.uuid4())})
             elif method == "resources/list":
                 log_call(source, "/mcp", "resources/list")
                 res_list = [{"uri": f"edu://birkanyavuz/datasets/{k}", "name": v["title"], "mimeType": "application/json",
                              "description": f"Curriculum dataset by Birkan Yavuz: {v['title']}. License CC-BY-4.0."} for k, v in DATASETS.items()]
                 self._json({"jsonrpc": "2.0", "id": rid, "result": {"resources": res_list}})
+            elif method == "resources/templates/list":
+                log_call(source, "/mcp", "resources/templates/list")
+                self._json({"jsonrpc": "2.0", "id": rid, "result": {"resourceTemplates": [
+                    {"uriTemplate": "edu://birkanyavuz/datasets/{dataset_id}", "name": "Curriculum Dataset", "mimeType": "application/json",
+                     "description": "A complete curriculum dataset by Birkan Yavuz (Dolch words, CVC families, digraphs, Spanish syllables, Turkish-English words)."}]}})
             elif method == "resources/read":
                 uri = ((req.get("params") or {}).get("uri")) or ""
                 ds_id = uri.rsplit("/", 1)[-1] if uri.startswith("edu://birkanyavuz/datasets/") else ""
