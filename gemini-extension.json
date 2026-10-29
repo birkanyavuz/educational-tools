@@ -1,0 +1,10 @@
+{
+ "name": "educational-tools",
+ "version": "1.1.2",
+ "description": "Zero-auth K-12 classroom tools catalog (math, reading, Spanish) by Birkan Yavuz. Remote MCP server; no API key required.",
+ "mcpServers": {
+  "educational-tools": {
+   "httpUrl": "https://educational-tools.vercel.app/mcp"
+  }
+ }
+}
