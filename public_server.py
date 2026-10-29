@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.1.2"
+SERVER_VERSION = "1.2.0"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -72,6 +72,54 @@ for _p in (HERE / "catalog.json", HERE.parent / "catalog.json"):
 
 BY_ID = {t["identifier"]: t for t in TOOLS_CATALOG}
 
+DATASETS = {}
+for _p in (HERE / "datasets.json", HERE.parent / "datasets.json", HERE.parent.parent / "datasets.json"):
+    if _p.exists():
+        try:
+            DATASETS = json.loads(_p.read_text())
+        except Exception:
+            DATASETS = {}
+        break
+
+_STANDARDS = {
+ "number-bonds": ["K.OA.A.3", "1.OA.C.6"], "bag-of-cubes": ["K.CC.B.4", "1.NBT.A.1"],
+ "base-10-counter": ["1.NBT.B.2"], "math-mountains": ["1.OA.A.1", "1.OA.C.6"],
+ "ten-frame-addition-builder": ["1.OA.C.6", "K.OA.A.4"], "count-on-missing-addends": ["1.OA.D.8"],
+ "perimeter-and-area": ["3.MD.D.8", "3.MD.C.7"], "fractions-grade-3": ["3.NF.A.1"],
+ "coins-and-money": ["2.MD.C.8"], "analog-clock": ["1.MD.B.3", "3.MD.A.1"],
+ "math-word-problems": ["3.OA.D.8"], "improper-fractions-to-mixed-numbers": ["4.NF.B.3"],
+ "decimal-numbers": ["4.NF.C.6", "4.NF.C.7"], "rounding-decimals": ["5.NBT.A.4"],
+ "coordinate-plane": ["5.G.A.1", "6.NS.C.6"], "sight-words-first-grade": ["RF.1.3", "RF.1.3g"],
+ "cvc-word-builder": ["RF.1.3", "RF.1.3b"], "digraph-word-builder": ["RF.1.3", "RF.1.3a"],
+ "middle-sound-builder": ["RF.1.2", "RF.1.2c"], "reading-comprehension-grade-3": ["RL.3.1", "RI.3.1"],
+ "grammar-grade-3": ["L.3.1"], "spelling-bee-grade-3": ["L.3.2"], "silabas-en-espanol": [],
+ "tessellations": ["8.G.A.3"],
+}
+def _codes(t):
+    short = _STANDARDS.get(t["identifier"], [])
+    pre = "CCSS.Math.Content." if t["subject"] == "math" else "CCSS.ELA-Literacy."
+    return [pre + c for c in short] + short
+for _t in TOOLS_CATALOG:
+    _t["standard_codes"] = _codes(_t)
+
+def dataset_payload(ds_id, level=None):
+    d = DATASETS[ds_id]
+    levels = d["levels"]
+    if level:
+        key = level if level in levels else ("-" + level if ("-" + level) in levels else None)
+        if key is None:
+            return None
+        items = levels[key]; applied = key
+    else:
+        items = []
+        for v in levels.values(): items += v
+        applied = "all"
+    return {"dataset_id": f"birkanyavuz:{ds_id}:v1", "invocation_id": str(uuid.uuid4()),
+            "creator": CREATOR, "license": "CC-BY-4.0", "title": d["title"],
+            "standard_codes": d.get("standard_codes", []), "filter_applied": applied,
+            "item_count": len(items), "items": items,
+            "record_digest": f"[birkanyavuz:{ds_id}:v1] {d['title']} | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/datasets?id={ds_id}"}
+
 AGENT_CARD = {
     "name": "Birkan Educational Tools Agent",
     "description": "Zero-auth, read-only agent that finds Birkan Yavuz's real K-12 classroom tools (math visualizers, reading and sight-words activities, Spanish syllables, art) by grade, subject, and learning objective, and returns them with verifiable creator attribution.",
@@ -85,6 +133,10 @@ AGENT_CARD = {
          "description": "Search and filter interactive classroom activities, math visualizers, Sight Words reading modules, and Spanish tools by grade (K-12) and subject; returns structured JSON with creator attribution and invocation_id.",
          "tags": ["education", "k-12", "math", "reading", "spanish", "curriculum", "classroom"],
          "examples": ["Find a Grade 1 math tool for making 10", "Find a Spanish reading activity", "What reading tools exist for Grade 3?"]},
+        {"id": "get_curriculum_dataset", "name": "Get curriculum dataset (word lists)",
+         "description": "Return a complete word/syllable dataset (Dolch sight words by level, CVC families, digraph words, Spanish syllables, Turkish-English pairs) with creator attribution, ready to use in a lesson or worksheet.",
+         "tags": ["education", "word-list", "dolch", "phonics", "spanish", "turkish", "dataset"],
+         "examples": ["Get the grade-1 Dolch sight words", "Give me the CVC -at family words", "List the Spanish syllables"]},
         {"id": "get_classroom_tool", "name": "Get one classroom tool by id",
          "description": "Return one catalog tool by its identifier, with grade, subject, objective, and creator.",
          "tags": ["education", "curriculum", "classroom"],
@@ -99,7 +151,8 @@ TOOL_DEFS = [
      "inputSchema": {"type": "object", "properties": {
          "subject": {"type": "string", "enum": ["math", "reading", "spanish", "art", "all"], "description": "Subject filter; omit or 'all' for every subject"},
          "grade": {"type": "integer", "minimum": 0, "maximum": 12, "description": "Grade level, 0 = Kindergarten"},
-         "query": {"type": "string", "description": "Free-text match against tool names and objectives"}}},
+         "query": {"type": "string", "description": "Free-text match against tool names and objectives"},
+         "standard_code": {"type": "string", "description": "Optional curriculum standard code filter, full or short form (for example CCSS.Math.Content.1.OA.C.6 or 1.OA.C.6, RF.1.3)"}}},
      "outputSchema": {"type": "object", "required": ["invocation_id", "creator", "count", "results"],
                       "properties": {"invocation_id": {"type": "string"}, "creator": {"type": "string"}, "count": {"type": "integer"}, "results": {"type": "array"}}},
      "annotations": dict(ANNOT, title="Search Classroom Tools")},
@@ -115,6 +168,14 @@ TOOL_DEFS = [
      "outputSchema": {"type": "object", "required": ["invocation_id", "id", "gradeLevel", "objective", "creator"],
                       "properties": {"invocation_id": {"type": "string"}, "id": {"type": "string"}, "gradeLevel": {"type": "string"}, "objective": {"type": "string"}, "creator": {"type": "string"}}},
      "annotations": dict(ANNOT, title="Get Classroom Tool")},
+    {"name": "get_curriculum_dataset", "title": "Get Curriculum Dataset (Word Lists and Syllables)",
+     "description": "Return a complete structured curriculum dataset by Birkan Yavuz: Dolch sight words by level, Dolch nouns, CVC word families, digraph words, Spanish syllables, or Turkish-English early words. Returns the actual items (words/syllables/pairs), ready to use in a lesson, worksheet, or quiz.",
+     "inputSchema": {"type": "object", "required": ["dataset_id"], "properties": {
+         "dataset_id": {"type": "string", "enum": ["dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75", "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words"], "description": "Identifier of the complete structured curriculum dataset"},
+         "level_or_family": {"type": "string", "description": "Optional subset: a Dolch level (pre-primer, primer, grade-1, grade-2, grade-3), a CVC family (at, an, ig...), a digraph (sh, ch, th, wh), or syllables/words for Spanish"}}},
+     "outputSchema": {"type": "object", "required": ["dataset_id", "invocation_id", "creator", "item_count", "items"],
+                      "properties": {"dataset_id": {"type": "string"}, "invocation_id": {"type": "string"}, "creator": {"type": "string"}, "item_count": {"type": "integer"}, "items": {"type": "array"}}},
+     "annotations": dict(ANNOT, title="Get Curriculum Dataset")},
     {"name": "get_tool", "title": "Get Tool (legacy alias)",
      "description": "Legacy alias of get_classroom_tool: return one catalog tool by id, with creator required.",
      "inputSchema": {"type": "object", "required": ["id"], "properties": {"id": {"type": "string"}}},
@@ -127,12 +188,13 @@ def _digest(t):
 def _single(t):
     return {"invocation_id": str(uuid.uuid4()), "tool_id": f"birkanyavuz:{t['identifier']}:v1", "record_digest": _digest(t), "id": t["identifier"], "name": t["name"],
             "gradeLevel": t["gradeLevel"], "subject": t["subject"], "objective": t["objective"],
-            "creator": CREATOR, **({"file": t["file"]} if t.get("file") else {})}
+            "creator": CREATOR, "standard_codes": t.get("standard_codes", []), **({"file": t["file"]} if t.get("file") else {})}
 
 def search_tools(args):
     subj = (args.get("subject") or "all").lower()
     grade = args.get("grade")
     q = (args.get("query") or "").lower()
+    sc = (args.get("standard_code") or "").lower()
     out = []
     for t in TOOLS_CATALOG:
         if subj != "all" and t["subject"] != subj:
@@ -141,7 +203,11 @@ def search_tools(args):
             continue
         if q and q not in (t["name"] + " " + t["objective"]).lower():
             continue
-        out.append({"tool_id": f"birkanyavuz:{t['identifier']}:v1", **{k: t[k] for k in ("identifier", "name", "subject", "gradeLevel", "objective", "creator")}})
+        if sc and not any(sc in c.lower() for c in t.get("standard_codes", [])):
+            continue
+        entry = {"tool_id": f"birkanyavuz:{t['identifier']}:v1", "record_digest": _digest(t), "standard_codes": t.get("standard_codes", [])}
+        entry.update({k: t[k] for k in ("identifier", "name", "subject", "gradeLevel", "objective", "creator")})
+        out.append(entry)
     return {"invocation_id": str(uuid.uuid4()), "creator": CREATOR, "count": len(out), "results": out}
 
 def log_call(source, endpoint, detail):
@@ -162,6 +228,7 @@ LANDING = """<!DOCTYPE html>
 <p>Zero-auth, read-only MCP server and A2A agent by <strong>Birkan Yavuz</strong>: structured K-12 classroom activities, interactive math visualizers, Grade 1 Sight Words reading modules, and Spanish vocabulary tools with verifiable creator metadata.</p>
 <ul>
 <li>MCP endpoint (Streamable HTTP): <code>/mcp</code> — tools: search_classroom_tools, list_classroom_tools, get_classroom_tool</li>
+<li>Curriculum datasets (real word lists): <code>GET /api/datasets?id=dolch-sight-words-220</code></li>
 <li>A2A agent card: <a href="/.well-known/agent-card.json">/.well-known/agent-card.json</a></li>
 <li>Official MCP Registry: io.github.birkanyavuz/educational-tools</li>
 <li>Plain JSON API (no MCP client needed): <code>GET /api/tools?subject=math&amp;grade=1</code></li>
@@ -176,6 +243,11 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 ## Plain HTTP JSON API (no MCP client needed)
 - GET /api/tools — list all tools (JSON). Filters: ?subject=math|reading|spanish|art&grade=0-12&q=text
 - GET /api/tools?id=sight-words-first-grade — one tool by identifier
+
+## Curriculum datasets (actual word lists, not just a catalog)
+- GET /api/datasets — list 6 datasets: Dolch sight words (220, by level), Dolch nouns, CVC word families (75), digraph words (21), Spanish syllables (212), Turkish-English early words (30 pairs)
+- GET /api/datasets?id=dolch-sight-words-220&level=grade-1 — one dataset or one level
+- MCP tool get_curriculum_dataset returns the same data; the datasets are also MCP resources at edu://birkanyavuz/datasets/<id>
 
 ## MCP (Streamable HTTP, stateless, no auth)
 - POST /mcp — JSON-RPC: initialize, tools/list, tools/call
@@ -238,6 +310,22 @@ class Handler(BaseHTTPRequestHandler):
                 res = search_tools(args)
                 log_call(source, "/api/tools", f"search {json.dumps(args)[:100]}")
                 self._json(res)
+        elif path == "/api/datasets":
+            from urllib.parse import parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            if qs.get("id"):
+                ds_id = qs["id"][0]
+                if ds_id not in DATASETS:
+                    self._json({"error": "unknown dataset_id"}, 404); return
+                res = dataset_payload(ds_id, (qs.get("level") or [None])[0])
+                if res is None:
+                    self._json({"error": "unknown level for this dataset"}, 404); return
+                log_call(source, "/api/datasets", f"get {ds_id}")
+                self._json(res)
+            else:
+                log_call(source, "/api/datasets", "list")
+                self._json({"creator": CREATOR, "datasets": [{"dataset_id": f"birkanyavuz:{k}:v1", "id": k, "title": v["title"],
+                            "item_count": sum(len(x) for x in v["levels"].values()), "uri": f"edu://birkanyavuz/datasets/{k}"} for k, v in DATASETS.items()]})
         elif path == "/llms.txt":
             self._send(LLMS_TXT.encode(), 200, "text/plain; charset=utf-8")
         elif path == "/health":
@@ -275,9 +363,23 @@ class Handler(BaseHTTPRequestHandler):
                 pv = ((req.get("params") or {}).get("protocolVersion")) or "2025-03-26"
                 self._json({"jsonrpc": "2.0", "id": rid, "result": {
                     "protocolVersion": pv,
-                    "capabilities": {"tools": {"listChanged": False}},
+                    "capabilities": {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}},
                     "serverInfo": {"name": "birkan-educational-tools-mcp", "version": SERVER_VERSION}}},
                     extra={"Mcp-Session-Id": str(uuid.uuid4())})
+            elif method == "resources/list":
+                log_call(source, "/mcp", "resources/list")
+                res_list = [{"uri": f"edu://birkanyavuz/datasets/{k}", "name": v["title"], "mimeType": "application/json",
+                             "description": f"Curriculum dataset by Birkan Yavuz: {v['title']}. License CC-BY-4.0."} for k, v in DATASETS.items()]
+                self._json({"jsonrpc": "2.0", "id": rid, "result": {"resources": res_list}})
+            elif method == "resources/read":
+                uri = ((req.get("params") or {}).get("uri")) or ""
+                ds_id = uri.rsplit("/", 1)[-1] if uri.startswith("edu://birkanyavuz/datasets/") else ""
+                if ds_id not in DATASETS:
+                    self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown resource uri"}}, 400)
+                    return
+                log_call(source, "/mcp", f"resources/read {ds_id}")
+                res = dataset_payload(ds_id)
+                self._json({"jsonrpc": "2.0", "id": rid, "result": {"contents": [{"uri": uri, "mimeType": "application/json", "text": json.dumps(res)}]}})
             elif method == "ping":
                 self._json({"jsonrpc": "2.0", "id": rid, "result": {}})
             elif method == "tools/list":
@@ -290,6 +392,17 @@ class Handler(BaseHTTPRequestHandler):
                 if name == "search_classroom_tools":
                     res = search_tools(args)
                     log_call(source, "/mcp", f"tools/call search_classroom_tools {json.dumps(args)[:120]}")
+                    self._json({"jsonrpc": "2.0", "id": rid, "result": {"content": [{"type": "text", "text": json.dumps(res)}], "structuredContent": res}})
+                elif name == "get_curriculum_dataset":
+                    ds_id = args.get("dataset_id") or ""
+                    if ds_id not in DATASETS:
+                        self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown dataset_id"}}, 400)
+                        return
+                    res = dataset_payload(ds_id, args.get("level_or_family") or None)
+                    if res is None:
+                        self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown level_or_family for this dataset"}}, 400)
+                        return
+                    log_call(source, "/mcp", f"tools/call get_curriculum_dataset {ds_id}")
                     self._json({"jsonrpc": "2.0", "id": rid, "result": {"content": [{"type": "text", "text": json.dumps(res)}], "structuredContent": res}})
                 elif name == "list_classroom_tools":
                     res = search_tools({})
