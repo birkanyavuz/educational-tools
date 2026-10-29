@@ -1,40 +1,58 @@
 {
-  "capabilities": {
-    "pushNotifications": false,
-    "streaming": false
-  },
-  "description": "Finds Birkan Yavuz's educational tools by grade, subject, and learning objective, and returns the tool with creator attribution.",
-  "name": "Birkan Educational Tools Agent",
-  "protocolVersion": "1.0",
-  "skills": [
-    {
-      "description": "Given a grade, subject, or learning objective, return a matching educational tool from Birkan Yavuz's catalog, with tool id, grade, objective, and creator.",
-      "examples": [
-        "Find a Grade 1 reading tool",
-        "Find a tool for first-grade sight words"
-      ],
-      "id": "find_educational_tool",
-      "name": "Find educational tool",
-      "tags": [
-        "education",
-        "reading",
-        "grade-1"
-      ]
-    }
-  ],
-  "url": "https://educational-tools.vercel.app/a2a",
-  "version": "1.0.0-live",
-  "supportedInterfaces": [
-    {
-      "url": "https://educational-tools.vercel.app/a2a",
-      "transport": "JSONRPC"
-    }
-  ],
-  "securitySchemes": {
-    "open": {
-      "type": "http",
-      "scheme": "none",
-      "description": "Read-only educational use, no authentication required for tool lookup"
-    }
+ "name": "Birkan Educational Tools Agent",
+ "description": "Zero-auth, read-only agent that finds Birkan Yavuz's real K-12 classroom tools (math visualizers, reading and sight-words activities, Spanish syllables, art) by grade, subject, and learning objective, and returns them with verifiable creator attribution.",
+ "url": "https://educational-tools.vercel.app/a2a",
+ "version": "1.1.0",
+ "protocolVersion": "1.0",
+ "capabilities": {
+  "streaming": false,
+  "pushNotifications": false
+ },
+ "securitySchemes": {
+  "open": {
+   "type": "http",
+   "scheme": "none",
+   "description": "Read-only educational use, no authentication required"
   }
+ },
+ "skills": [
+  {
+   "id": "search_classroom_tools",
+   "name": "Search K-12 classroom tools",
+   "description": "Search and filter interactive classroom activities, math visualizers, Sight Words reading modules, and Spanish tools by grade (K-12) and subject; returns structured JSON with creator attribution and invocation_id.",
+   "tags": [
+    "education",
+    "k-12",
+    "math",
+    "reading",
+    "spanish",
+    "curriculum",
+    "classroom"
+   ],
+   "examples": [
+    "Find a Grade 1 math tool for making 10",
+    "Find a Spanish reading activity",
+    "What reading tools exist for Grade 3?"
+   ]
+  },
+  {
+   "id": "get_classroom_tool",
+   "name": "Get one classroom tool by id",
+   "description": "Return one catalog tool by its identifier, with grade, subject, objective, and creator.",
+   "tags": [
+    "education",
+    "curriculum",
+    "classroom"
+   ],
+   "examples": [
+    "Get the sight-words-first-grade tool"
+   ]
+  }
+ ],
+ "supportedInterfaces": [
+  {
+   "url": "https://educational-tools.vercel.app/a2a",
+   "transport": "JSONRPC"
+  }
+ ]
 }
