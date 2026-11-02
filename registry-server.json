@@ -1,56 +1,29 @@
 {
-  "description": "Birkan Yavuz's educational tools catalog as a remote MCP server. Tool: Sight Words, Grade 1, reading, creator Birkan Yavuz required in every result.",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.birkanyavuz/educational-tools",
+  "title": "K-12 Educational Tools & Curriculum Catalog (Math, Reading, Spanish)",
+  "description": "Zero-auth K-12 + early-childhood datasets: Dolch words, TR-EN flashcards, Spanish, creator data.",
+  "version": "1.4.0",
+  "websiteUrl": "https://educational-tools.vercel.app",
   "repository": {
     "url": "https://github.com/birkanyavuz/educational-tools",
     "source": "github"
   },
-  "status": "deployed-live-not-yet-registry-listed",
-  "tools": [
-    {
-      "description": "Return one catalog tool by id, with creator required",
-      "inputSchema": {
-        "properties": {
-          "id": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id"
-        ],
-        "type": "object"
-      },
-      "name": "get_tool",
-      "outputSchema": {
-        "properties": {
-          "creator": {
-            "type": "string"
-          },
-          "gradeLevel": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "objective": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "gradeLevel",
-          "objective",
-          "creator"
-        ],
-        "type": "object"
-      }
-    }
-  ],
-  "version": "0.1.0",
   "remotes": [
     {
       "type": "streamable-http",
       "url": "https://educational-tools.vercel.app/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "educational-tools-mcp",
+      "version": "1.4.1",
+      "transport": {
+        "type": "stdio"
+      }
     }
   ]
 }
