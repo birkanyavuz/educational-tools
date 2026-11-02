@@ -1,0 +1,12 @@
+{
+  "name": "educational-tools-mcp",
+  "version": "1.4.0",
+  "description": "Stdio bridge to Birkan Yavuz's free K-12 Educational Tools MCP server (Dolch sight words, CVC families, Spanish syllables, classroom tools).",
+  "type": "module",
+  "bin": { "educational-tools-mcp": "index.js" },
+  "keywords": ["mcp", "model-context-protocol", "education", "k12", "dolch", "sight-words"],
+  "author": "Birkan Yavuz",
+  "license": "CC-BY-4.0",
+  "homepage": "https://educational-tools.vercel.app",
+  "repository": { "type": "git", "url": "https://github.com/birkanyavuz/educational-tools" }
+}
