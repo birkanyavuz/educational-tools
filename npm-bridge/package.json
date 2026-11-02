@@ -1,6 +1,6 @@
 {
   "name": "educational-tools-mcp",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Stdio bridge to Birkan Yavuz's free K-12 Educational Tools MCP server (Dolch sight words, CVC families, Spanish syllables, classroom tools).",
   "type": "module",
   "bin": { "educational-tools-mcp": "index.js" },
