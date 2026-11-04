@@ -10,12 +10,12 @@ Creator: Birkan Yavuz. License: CC-BY-4.0.
 import sys, json
 
 from public_server import (DATASETS, TOOL_DEFS, BY_ID, CREATOR, SERVER_VERSION,
-                           dataset_payload, search_tools, _single)
+                           dataset_payload, search_tools, _single, get_word_list_payload)
 
 INSTRUCTIONS = ("Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: "
                 "Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English flashcards (animals, colors, objects), Turkish-English "
                 "early words, plus 24 interactive math/reading/Spanish classroom tools with Common Core standard codes. "
-                "Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and "
+                "Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, get_word_list for a one-call word list by topic, and "
                 "resources/list to pin datasets into a workspace.")
 
 
@@ -55,6 +55,14 @@ def handle(req):
             res = dataset_payload(ds_id, args.get("level_or_family") or None)
             if res is None:
                 return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown level_or_family for this dataset"}}
+        elif name == "get_word_list":
+            topic = args.get("topic") or ""
+            count = args.get("count")
+            if count is not None and (not isinstance(count, int) or isinstance(count, bool) or count <= 0):
+                return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "count must be a positive integer"}}
+            res = get_word_list_payload(topic, args.get("level") or None, count)
+            if res is None:
+                return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown topic or level; topics: sight words, Dolch nouns, CVC, digraph, Spanish syllables, animals, colors, objects, Turkish early words"}}
         elif name in ("get_classroom_tool", "get_tool"):
             t = BY_ID.get(args.get("id") or "")
             if not t:

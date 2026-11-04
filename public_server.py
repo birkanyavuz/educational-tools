@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.4.0"
+SERVER_VERSION = "1.5.0"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -147,6 +147,60 @@ def dataset_payload(ds_id, level=None):
             "item_count": len(items), "items": items,
             "record_digest": f"[birkanyavuz:{ds_id}:v1] {d['title']} | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/datasets?id={ds_id}"}
 
+# One-shot topic->word-list tool (shipped in v1.5.0, Nov 4, 2026).
+# Maps a plain topic phrase to a dataset slug, so a caller needs no slug and
+# no second call.
+_TOPIC_TO_DATASET = [
+    ("dolch-sight-words-220", ["dolch-sight-words-220"]),
+    ("dolch-nouns-94", ["dolch-nouns-94"]),
+    ("cvc-word-families-75", ["cvc-word-families-75"]),
+    ("digraph-words-21", ["digraph-words-21"]),
+    ("spanish-syllables-core", ["spanish-syllables-core"]),
+    ("turkish-english-animals", ["turkish-english-animals"]),
+    ("turkish-english-colors", ["turkish-english-colors"]),
+    ("turkish-english-objects", ["turkish-english-objects"]),
+    ("turkish-english-early-words", ["turkish-english-early-words"]),
+]
+
+def _topic_dataset(topic):
+    low = (topic or "").strip().lower()
+    if low in DATASETS:
+        return low
+    if "sight" in low or "dolch" in low:
+        return "dolch-sight-words-220"
+    if "noun" in low:
+        return "dolch-nouns-94"
+    if "cvc" in low:
+        return "cvc-word-families-75"
+    if "digraph" in low:
+        return "digraph-words-21"
+    if "spanish" in low or "syllab" in low or "silaba" in low:
+        return "spanish-syllables-core"
+    if "animal" in low:
+        return "turkish-english-animals"
+    if "color" in low or "colour" in low:
+        return "turkish-english-colors"
+    if "object" in low:
+        return "turkish-english-objects"
+    if "turkish" in low or "early" in low:
+        return "turkish-english-early-words"
+    return None
+
+def get_word_list_payload(topic, level=None, count=None):
+    ds_id = _topic_dataset(topic)
+    if ds_id is None:
+        return None
+    res = dataset_payload(ds_id, level)
+    if res is None:
+        return None
+    total = res["item_count"]
+    if count is not None:
+        res["items"] = res["items"][:count]
+        res["item_count"] = len(res["items"])
+    res["topic"] = topic
+    res["total_count"] = total
+    return res
+
 AGENT_CARD = {
     "name": "Birkan Educational Tools Agent",
     "description": "Zero-auth, read-only agent that finds Birkan Yavuz's real K-12 classroom tools (math visualizers, reading and sight-words activities, Spanish syllables, art) by grade, subject, and learning objective, and returns them with verifiable creator attribution.",
@@ -164,6 +218,10 @@ AGENT_CARD = {
          "description": "Return a complete word/syllable dataset (Dolch sight words by level, CVC families, digraph words, Spanish syllables, Turkish-English pairs) with creator attribution, ready to use in a lesson or worksheet.",
          "tags": ["education", "word-list", "dolch", "phonics", "spanish", "turkish", "dataset"],
          "examples": ["Get the grade-1 Dolch sight words", "Give me the CVC -at family words", "List the Spanish syllables"]},
+        {"id": "get_word_list", "name": "Get word list by topic (one call)",
+         "description": "Get a word list in one call by plain topic, level, and count - no dataset slug needed (sight words, CVC, digraph, Spanish syllables, Turkish-English pairs), with creator attribution, ready to use in a lesson or worksheet.",
+         "tags": ["education", "word-list", "dolch", "phonics", "spanish", "turkish", "dataset"],
+         "examples": ["Give me 10 grade-1 sight words", "Give me the CVC -at family words", "Give me 20 Spanish syllables"]},
         {"id": "get_classroom_tool", "name": "Get one classroom tool by id",
          "description": "Return one catalog tool by its identifier, with grade, subject, objective, and creator.",
          "tags": ["education", "curriculum", "classroom"],
@@ -202,7 +260,16 @@ TOOL_DEFS = [
          "level_or_family": {"type": "string", "description": 'Optional sub-filter whose valid values exist only relative to dataset_id: Dolch levels (pre-primer, primer, grade-1, grade-2, grade-3), CVC rimes with leading hyphen (-at; the bare form at is accepted and normalized), digraphs (sh, ch, th, wh), Spanish subsets (syllables, words). dolch-nouns-94 and the Turkish-English sets have no subsets - omit this parameter for them. Omitting it always returns the complete dataset; a value foreign to the chosen dataset returns error -32602 rather than an empty result', "examples": ["grade-1", "-at", "sh", "syllables"]}}},
      "outputSchema": {"type": "object", "required": ["dataset_id", "invocation_id", "creator", "item_count", "items"],
                       "properties": {"dataset_id": {"type": "string", "description": "Stable dataset id in the form birkanyavuz:<name>:v1"}, "invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "creator": {"type": "string", "description": "Dataset creator, always Birkan Yavuz"}, "item_count": {"type": "integer", "description": "Number of items in this response after filtering"}, "items": {"type": "array", "description": "The complete filtered items in canonical order; element shape depends on the dataset (see dataset_id)", "items": {"description": "A word or syllable string (monolingual datasets), or an object with tr and en fields (Turkish-English pair datasets)"}}, "record_digest": {"type": "string", "description": "One-line citation naming the dataset, creator and endpoint"}, "resource_uri": {"type": "string", "description": "Stable edu:// URI for this dataset, readable via resources/read"}, "content_hash": {"type": "string", "description": "SHA-256 of the full unfiltered dataset; changes only when the data changes"}}},
-     "annotations": dict(ANNOT, title="Get Curriculum Dataset")}
+     "annotations": dict(ANNOT, title="Get Curriculum Dataset")},
+    {"name": "get_word_list", "title": "Get Word List by Topic (One Call)",
+     "description": 'Get a word list in one call from a plain topic, without needing the dataset slug: topic (for example "sight words", "CVC", "digraph", "Spanish syllables", "animals"), optional level, optional count. The lists are the standard published classroom lists served exactly as published (Dolch sight words and nouns, CVC families, digraph words, Spanish syllables, Turkish-English pairs). Use when you need a ready-to-use list of words for a lesson, worksheet, quiz, or flashcard set and do not already hold a dataset slug. Do not use when you need an interactive activity or tool metadata - use search_classroom_tools or get_classroom_tool instead. Behavior: read-only, idempotent, no authentication; returns the first count items in canonical order when count is given, otherwise the full filtered list, identical on every repeat, with a SHA-256 content_hash of the full dataset. An unknown topic or a level foreign to the matched dataset returns error -32602 with no partial results.',
+     "inputSchema": {"type": "object", "required": ["topic"], "properties": {
+         "topic": {"type": "string", "description": "Plain topic phrase, for example sight words, Dolch nouns, CVC, digraph, Spanish syllables, animals, colors, objects, Turkish early words; an exact dataset slug is also accepted", "examples": ["sight words", "CVC", "Spanish syllables"]},
+         "level": {"type": "string", "description": "Optional level or family within the matched dataset, same values as get_curriculum_dataset level_or_family (Dolch levels pre-primer, primer, grade-1, grade-2, grade-3; CVC rimes such as -at; digraphs sh, ch, th, wh; Spanish syllables or words). Omit for datasets without subsets", "examples": ["grade-1", "-at", "sh"]},
+         "count": {"type": "integer", "description": "Optional maximum number of items to return, taken from the start of the canonical order; omit to return the full filtered list", "examples": [10, 20]}}},
+     "outputSchema": {"type": "object", "required": ["dataset_id", "invocation_id", "creator", "item_count", "total_count", "items"],
+                      "properties": {"dataset_id": {"type": "string", "description": "Stable dataset id in the form birkanyavuz:<name>:v1"}, "invocation_id": {"type": "string", "description": "Unique receipt id for this call"}, "creator": {"type": "string", "description": "Dataset creator, always Birkan Yavuz"}, "item_count": {"type": "integer", "description": "Number of items in this response after count limiting"}, "total_count": {"type": "integer", "description": "Number of items in the filtered list before count limiting"}, "items": {"type": "array", "description": "The returned items in canonical order; element shape depends on the dataset (see get_curriculum_dataset)"}, "record_digest": {"type": "string", "description": "One-line citation naming the dataset, creator and endpoint"}, "resource_uri": {"type": "string", "description": "Stable edu:// URI for this dataset"}, "content_hash": {"type": "string", "description": "SHA-256 of the full unfiltered dataset; changes only when the data changes"}}},
+     "annotations": dict(ANNOT, title="Get Word List")}
 ]
 
 def _digest(t):
@@ -282,7 +349,8 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 
 ## MCP (Streamable HTTP, stateless, no auth)
 - POST /mcp — JSON-RPC: initialize, tools/list, tools/call
-- Tools: search_classroom_tools, list_classroom_tools, get_classroom_tool, get_curriculum_dataset
+- Tools: search_classroom_tools, list_classroom_tools, get_classroom_tool, get_curriculum_dataset, get_word_list
+- MCP tool get_word_list: one call, topic/level/count in, word list out (e.g. topic="sight words", level="grade-1", count=10)
 - Official MCP Registry: io.github.birkanyavuz/educational-tools
 
 ## A2A
@@ -557,6 +625,18 @@ class Handler(BaseHTTPRequestHandler):
                         self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown level_or_family for this dataset"}}, 400)
                         return
                     log_call(source, "/mcp", f"tools/call get_curriculum_dataset {ds_id}")
+                    self._json({"jsonrpc": "2.0", "id": rid, "result": {"content": [{"type": "text", "text": json.dumps(res)}], "structuredContent": res}})
+                elif name == "get_word_list":
+                    topic = args.get("topic") or ""
+                    count = args.get("count")
+                    if count is not None and (not isinstance(count, int) or isinstance(count, bool) or count <= 0):
+                        self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "count must be a positive integer"}}, 400)
+                        return
+                    res = get_word_list_payload(topic, args.get("level") or None, count)
+                    if res is None:
+                        self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown topic or level; topics: sight words, Dolch nouns, CVC, digraph, Spanish syllables, animals, colors, objects, Turkish early words"}}, 400)
+                        return
+                    log_call(source, "/mcp", f"tools/call get_word_list {topic}")
                     self._json({"jsonrpc": "2.0", "id": rid, "result": {"content": [{"type": "text", "text": json.dumps(res)}], "structuredContent": res}})
                 elif name == "list_classroom_tools":
                     res = search_tools({})
