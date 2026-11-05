@@ -6,8 +6,9 @@ read-only K-12 classroom tools). Paste one prompt at a time. Each prompt uses
 the real tool `get_word_list`: topic, level, and count in, the words out in a
 single call. The lists are the standard published classroom lists (Dolch sight
 words and nouns, CVC families, digraph words, Spanish syllables,
-Turkish-English pairs). This tool returns words only — no definitions or
-example sentences yet — so prompts below ask only for words.
+Turkish-English pairs). This tool returns words with no definitions; the
+core Turkish-English pairs also carry one simple example sentence each —
+the prompts below still ask only for what the tool actually returns.
 
 1. "Using the educational-tools server, call get_word_list with topic 'sight words', level 'grade-1', and count 10, and lay the words out as flashcards I can print."
 2. "Using the educational-tools server, call get_word_list with topic 'CVC' and level '-at', and make a short worksheet where students fill in the missing first letter of each word."
