@@ -728,123 +728,183 @@
    "all": [
     {
      "en": "one",
-     "tr": "bir"
+     "tr": "bir",
+     "example_en": "I have one nose.",
+     "example_tr": "Bir burnum var."
     },
     {
      "en": "two",
-     "tr": "iki"
+     "tr": "iki",
+     "example_en": "I have two hands.",
+     "example_tr": "İki elim var."
     },
     {
      "en": "three",
-     "tr": "üç"
+     "tr": "üç",
+     "example_en": "I see three birds.",
+     "example_tr": "Üç kuş görüyorum."
     },
     {
      "en": "four",
-     "tr": "dört"
+     "tr": "dört",
+     "example_en": "The dog has four legs.",
+     "example_tr": "Köpeğin dört bacağı var."
     },
     {
      "en": "five",
-     "tr": "beş"
+     "tr": "beş",
+     "example_en": "I have five fingers.",
+     "example_tr": "Beş parmağım var."
     },
     {
      "en": "six",
-     "tr": "altı"
+     "tr": "altı",
+     "example_en": "There are six eggs.",
+     "example_tr": "Altı yumurta var."
     },
     {
      "en": "seven",
-     "tr": "yedi"
+     "tr": "yedi",
+     "example_en": "There are seven apples.",
+     "example_tr": "Yedi elma var."
     },
     {
      "en": "eight",
-     "tr": "sekiz"
+     "tr": "sekiz",
+     "example_en": "The spider has eight legs.",
+     "example_tr": "Örümceğin sekiz bacağı var."
     },
     {
      "en": "nine",
-     "tr": "dokuz"
+     "tr": "dokuz",
+     "example_en": "I see nine stars.",
+     "example_tr": "Dokuz yıldız görüyorum."
     },
     {
      "en": "ten",
-     "tr": "on"
+     "tr": "on",
+     "example_en": "I have ten toes.",
+     "example_tr": "On ayak parmağım var."
     },
     {
      "en": "red",
-     "tr": "kırmızı"
+     "tr": "kırmızı",
+     "example_en": "The apple is red.",
+     "example_tr": "Elma kırmızıdır."
     },
     {
      "en": "blue",
-     "tr": "mavi"
+     "tr": "mavi",
+     "example_en": "The sky is blue.",
+     "example_tr": "Gökyüzü mavidir."
     },
     {
      "en": "green",
-     "tr": "yeşil"
+     "tr": "yeşil",
+     "example_en": "The grass is green.",
+     "example_tr": "Çimen yeşildir."
     },
     {
      "en": "yellow",
-     "tr": "sarı"
+     "tr": "sarı",
+     "example_en": "The sun is yellow.",
+     "example_tr": "Güneş sarıdır."
     },
     {
      "en": "black",
-     "tr": "siyah"
+     "tr": "siyah",
+     "example_en": "The cat is black.",
+     "example_tr": "Kedi siyahtır."
     },
     {
      "en": "white",
-     "tr": "beyaz"
+     "tr": "beyaz",
+     "example_en": "The snow is white.",
+     "example_tr": "Kar beyazdır."
     },
     {
      "en": "orange",
-     "tr": "turuncu"
+     "tr": "turuncu",
+     "example_en": "The carrot is orange.",
+     "example_tr": "Havuç turuncudur."
     },
     {
      "en": "purple",
-     "tr": "mor"
+     "tr": "mor",
+     "example_en": "The grapes are purple.",
+     "example_tr": "Üzüm mordur."
     },
     {
      "en": "pink",
-     "tr": "pembe"
+     "tr": "pembe",
+     "example_en": "The flower is pink.",
+     "example_tr": "Çiçek pembedir."
     },
     {
      "en": "brown",
-     "tr": "kahverengi"
+     "tr": "kahverengi",
+     "example_en": "The bear is brown.",
+     "example_tr": "Ayı kahverengidir."
     },
     {
      "en": "cat",
-     "tr": "kedi"
+     "tr": "kedi",
+     "example_en": "The cat drinks milk.",
+     "example_tr": "Kedi süt içer."
     },
     {
      "en": "dog",
-     "tr": "köpek"
+     "tr": "köpek",
+     "example_en": "The dog runs fast.",
+     "example_tr": "Köpek hızlı koşar."
     },
     {
      "en": "bird",
-     "tr": "kuş"
+     "tr": "kuş",
+     "example_en": "The bird can fly.",
+     "example_tr": "Kuş uçabilir."
     },
     {
      "en": "fish",
-     "tr": "balık"
+     "tr": "balık",
+     "example_en": "The fish swims in the water.",
+     "example_tr": "Balık suda yüzer."
     },
     {
      "en": "horse",
-     "tr": "at"
+     "tr": "at",
+     "example_en": "The horse eats grass.",
+     "example_tr": "At ot yer."
     },
     {
      "en": "cow",
-     "tr": "inek"
+     "tr": "inek",
+     "example_en": "The cow gives milk.",
+     "example_tr": "İnek süt verir."
     },
     {
      "en": "sheep",
-     "tr": "koyun"
+     "tr": "koyun",
+     "example_en": "The sheep is white.",
+     "example_tr": "Koyun beyazdır."
     },
     {
      "en": "duck",
-     "tr": "ördek"
+     "tr": "ördek",
+     "example_en": "The duck swims in the pond.",
+     "example_tr": "Ördek gölette yüzer."
     },
     {
      "en": "lion",
-     "tr": "aslan"
+     "tr": "aslan",
+     "example_en": "The lion is strong.",
+     "example_tr": "Aslan güçlüdür."
     },
     {
      "en": "bear",
-     "tr": "ayı"
+     "tr": "ayı",
+     "example_en": "The bear sleeps in winter.",
+     "example_tr": "Ayı kışın uyur."
     }
    ]
   },
@@ -1637,23 +1697,33 @@
    "all": [
     {
      "tr": "Kırmızı",
-     "en": "red"
+     "en": "red",
+     "example_en": "My ball is red.",
+     "example_tr": "Topum kırmızıdır."
     },
     {
      "tr": "Mavi",
-     "en": "blue"
+     "en": "blue",
+     "example_en": "The sea is blue.",
+     "example_tr": "Deniz mavidir."
     },
     {
      "tr": "Yeşil",
-     "en": "green"
+     "en": "green",
+     "example_en": "The leaf is green.",
+     "example_tr": "Yaprak yeşildir."
     },
     {
      "tr": "Sarı",
-     "en": "yellow"
+     "en": "yellow",
+     "example_en": "The banana is yellow.",
+     "example_tr": "Muz sarıdır."
     },
     {
      "tr": "Turuncu",
-     "en": "orange"
+     "en": "orange",
+     "example_en": "My shirt is orange.",
+     "example_tr": "Gömleğim turuncudur."
     }
    ]
   }
@@ -1665,31 +1735,45 @@
    "all": [
     {
      "tr": "Bardak",
-     "en": "cup"
+     "en": "cup",
+     "example_en": "The cup is on the table.",
+     "example_tr": "Bardak masada."
     },
     {
      "tr": "Top",
-     "en": "ball"
+     "en": "ball",
+     "example_en": "The ball is round.",
+     "example_tr": "Top yuvarlaktır."
     },
     {
      "tr": "Fare",
-     "en": "mouse"
+     "en": "mouse",
+     "example_en": "The mouse is small.",
+     "example_tr": "Fare küçüktür."
     },
     {
      "tr": "Kitap",
-     "en": "book"
+     "en": "book",
+     "example_en": "I read a book.",
+     "example_tr": "Kitap okuyorum."
     },
     {
      "tr": "Şapka",
-     "en": "hat"
+     "en": "hat",
+     "example_en": "The hat is on my head.",
+     "example_tr": "Şapka başımda."
     },
     {
      "tr": "Kaşık",
-     "en": "spoon"
+     "en": "spoon",
+     "example_en": "I eat with a spoon.",
+     "example_tr": "Kaşıkla yemek yerim."
     },
     {
      "tr": "Ayakkabı",
-     "en": "shoe"
+     "en": "shoe",
+     "example_en": "My shoe is new.",
+     "example_tr": "Ayakkabım yeni."
     }
    ]
   }
