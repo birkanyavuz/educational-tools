@@ -31,7 +31,9 @@ needed. The lists are the standard published classroom lists served exactly as
 published (Dolch sight words and nouns, CVC families, digraph words, Spanish
 syllables, Turkish-English pairs); no definitions are attached, but the core
 Turkish-English sets (early words, colors, everyday objects) include one
-simple example sentence per pair in English and Turkish.
+simple example sentence per pair in English and Turkish, and every grade-1
+Dolch word carries a short carrier phrase (3–5 words, decodable except the
+target word) in a `carrier_phrases` map — e.g. `after` → "Run after the cat."
 
 - "Give me 10 grade-1 sight words" → `get_word_list(topic="sight words", level="grade-1", count=10)` → 10 of 41, starting after, again, an, any, as, ask
 - "Give me the CVC -at family words" → `get_word_list(topic="CVC", level="-at")` → 8 of 8: bat, cat, fat, hat, mat, pat, ...

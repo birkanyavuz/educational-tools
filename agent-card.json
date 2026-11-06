@@ -1,96 +1,96 @@
 {
- "name": "Birkan Educational Tools Agent",
- "description": "Zero-auth, read-only agent that finds Birkan Yavuz's real K-12 classroom tools (math visualizers, reading and sight-words activities, Spanish syllables, art) by grade, subject, and learning objective, and returns them with verifiable creator attribution.",
- "url": "https://educational-tools.vercel.app/a2a",
- "version": "1.6.1",
- "protocolVersion": "1.0",
- "capabilities": {
-  "streaming": false,
-  "pushNotifications": false
- },
- "securitySchemes": {
-  "open": {
-   "type": "http",
-   "scheme": "none",
-   "description": "Read-only educational use, no authentication required"
-  }
- },
- "skills": [
-  {
-   "id": "search_classroom_tools",
-   "name": "Search K-12 classroom tools",
-   "description": "Search and filter interactive classroom activities, math visualizers, Sight Words reading modules, and Spanish tools by grade (K-12) and subject; returns structured JSON with creator attribution and invocation_id.",
-   "tags": [
-    "education",
-    "k-12",
-    "math",
-    "reading",
-    "spanish",
-    "curriculum",
-    "classroom"
-   ],
-   "examples": [
-    "Find a Grade 1 math tool for making 10",
-    "Find a Spanish reading activity",
-    "What reading tools exist for Grade 3?"
-   ]
+  "name": "Birkan Educational Tools Agent",
+  "description": "Zero-auth, read-only agent that finds Birkan Yavuz's real K-12 classroom tools (math visualizers, reading and sight-words activities, Spanish syllables, art) by grade, subject, and learning objective, and returns them with verifiable creator attribution.",
+  "url": "https://educational-tools.vercel.app/a2a",
+  "version": "1.6.2",
+  "protocolVersion": "1.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false
   },
-  {
-   "id": "get_curriculum_dataset",
-   "name": "Get curriculum dataset (word lists)",
-   "description": "Return a complete word/syllable dataset (Dolch sight words by level, CVC families, digraph words, Spanish syllables, Turkish-English pairs) with creator attribution, ready to use in a lesson or worksheet.",
-   "tags": [
-    "education",
-    "word-list",
-    "dolch",
-    "phonics",
-    "spanish",
-    "turkish",
-    "dataset"
-   ],
-   "examples": [
-    "Get the grade-1 Dolch sight words",
-    "Give me the CVC -at family words",
-    "List the Spanish syllables"
-   ]
+  "securitySchemes": {
+    "open": {
+      "type": "http",
+      "scheme": "none",
+      "description": "Read-only educational use, no authentication required"
+    }
   },
-  {
-   "id": "get_classroom_tool",
-   "name": "Get one classroom tool by id",
-   "description": "Return one catalog tool by its identifier, with grade, subject, objective, and creator.",
-   "tags": [
-    "education",
-    "curriculum",
-    "classroom"
-   ],
-   "examples": [
-    "Get the sight-words-first-grade tool"
-   ]
-  },
-  {
-   "id": "get_word_list",
-   "name": "Get word list by topic (one call)",
-   "description": "Get a word list in one call by plain topic, level, and count - no dataset slug needed (sight words, CVC, digraph, Spanish syllables, Turkish-English pairs), with creator attribution, ready to use in a lesson or worksheet.",
-   "tags": [
-    "education",
-    "word-list",
-    "dolch",
-    "phonics",
-    "spanish",
-    "turkish",
-    "dataset"
-   ],
-   "examples": [
-    "Give me 10 grade-1 sight words",
-    "Give me the CVC -at family words",
-    "Give me 20 Spanish syllables"
-   ]
-  }
- ],
- "supportedInterfaces": [
-  {
-   "url": "https://educational-tools.vercel.app/a2a",
-   "transport": "JSONRPC"
-  }
- ]
+  "skills": [
+    {
+      "id": "search_classroom_tools",
+      "name": "Search K-12 classroom tools",
+      "description": "Search and filter interactive classroom activities, math visualizers, Sight Words reading modules, and Spanish tools by grade (K-12) and subject; returns structured JSON with creator attribution and invocation_id.",
+      "tags": [
+        "education",
+        "k-12",
+        "math",
+        "reading",
+        "spanish",
+        "curriculum",
+        "classroom"
+      ],
+      "examples": [
+        "Find a Grade 1 math tool for making 10",
+        "Find a Spanish reading activity",
+        "What reading tools exist for Grade 3?"
+      ]
+    },
+    {
+      "id": "get_curriculum_dataset",
+      "name": "Get curriculum dataset (word lists)",
+      "description": "Return a complete word/syllable dataset (Dolch sight words by level, CVC families, digraph words, Spanish syllables, Turkish-English pairs) with creator attribution, ready to use in a lesson or worksheet.",
+      "tags": [
+        "education",
+        "word-list",
+        "dolch",
+        "phonics",
+        "spanish",
+        "turkish",
+        "dataset"
+      ],
+      "examples": [
+        "Get the grade-1 Dolch sight words",
+        "Give me the CVC -at family words",
+        "List the Spanish syllables"
+      ]
+    },
+    {
+      "id": "get_classroom_tool",
+      "name": "Get one classroom tool by id",
+      "description": "Return one catalog tool by its identifier, with grade, subject, objective, and creator.",
+      "tags": [
+        "education",
+        "curriculum",
+        "classroom"
+      ],
+      "examples": [
+        "Get the sight-words-first-grade tool"
+      ]
+    },
+    {
+      "id": "get_word_list",
+      "name": "Get word list by topic (one call)",
+      "description": "Get a word list in one call by plain topic, level, and count - no dataset slug needed (sight words, CVC, digraph, Spanish syllables, Turkish-English pairs), with creator attribution, ready to use in a lesson or worksheet.",
+      "tags": [
+        "education",
+        "word-list",
+        "dolch",
+        "phonics",
+        "spanish",
+        "turkish",
+        "dataset"
+      ],
+      "examples": [
+        "Give me 10 grade-1 sight words",
+        "Give me the CVC -at family words",
+        "Give me 20 Spanish syllables"
+      ]
+    }
+  ],
+  "supportedInterfaces": [
+    {
+      "url": "https://educational-tools.vercel.app/a2a",
+      "transport": "JSONRPC"
+    }
+  ]
 }
