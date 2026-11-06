@@ -43,6 +43,15 @@ count returns error -32602 with no partial results. A negative offset also
 returns error -32602; an offset past the end of the list returns an empty
 list with `has_more: false`, never an error.
 
+## Example tool-call traces
+
+Real calls against the live server, captured verbatim:
+[examples/tool_call_traces.jsonl](examples/tool_call_traces.jsonl) — five
+records marked `"is_example": true` covering bilingual pairs with example
+sentences, offset pagination, a leveled plain-word list, pairs without
+sentences, and an error (-32602) followed by a successful retry using the
+valid topics named in the error message itself.
+
 ## Repo layout
 
 - `api/index.py` — the deployed server (Vercel serverless)
