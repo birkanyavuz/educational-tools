@@ -16,7 +16,7 @@ See `llms-install.md` for the copy-paste MCP config, or drop this repo's root
 `.mcp.json` / `gemini-extension.json` into a workspace — installer agents read them
 automatically. Tools: `search_classroom_tools`, `list_classroom_tools`,
 `get_classroom_tool`, `get_tool` (legacy alias), `get_curriculum_dataset`,
-and `get_word_list` — one call, topic/level/count in, word list out. All tools carry read-only annotations
+and `get_word_list` — one call, topic/level/count/offset in, word list out. All tools carry read-only annotations
 (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`,
 `openWorldHint: false`).
 
@@ -36,9 +36,12 @@ simple example sentence per pair in English and Turkish.
 - "Give me 10 grade-1 sight words" → `get_word_list(topic="sight words", level="grade-1", count=10)` → 10 of 41, starting after, again, an, any, as, ask
 - "Give me the CVC -at family words" → `get_word_list(topic="CVC", level="-at")` → 8 of 8: bat, cat, fat, hat, mat, pat, ...
 - "Give me 20 Spanish syllables" → `get_word_list(topic="Spanish syllables", count=20)` → 20 of 212, starting ma, me, mi, mo, mu, pa
+- "Give me the next 10 grade-1 sight words" → `get_word_list(topic="sight words", level="grade-1", count=10, offset=10)` → 10 of 41, starting from, give, going, had, has
 
 An unknown topic, a level foreign to the matched dataset, or a non-positive
-count returns error -32602 with no partial results.
+count returns error -32602 with no partial results. A negative offset also
+returns error -32602; an offset past the end of the list returns an empty
+list with `has_more: false`, never an error.
 
 ## Repo layout
 

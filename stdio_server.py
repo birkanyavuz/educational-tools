@@ -51,7 +51,7 @@ def handle(req):
         elif name == "get_curriculum_dataset":
             ds_id = args.get("dataset_id") or ""
             if ds_id not in DATASETS:
-                return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown dataset_id"}}
+                return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown dataset_id; datasets: dolch-sight-words-220, dolch-nouns-94, cvc-word-families-75, digraph-words-21, spanish-syllables-core, turkish-english-early-words, turkish-english-animals, turkish-english-colors, turkish-english-objects"}}
             res = dataset_payload(ds_id, args.get("level_or_family") or None)
             if res is None:
                 return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown level_or_family for this dataset"}}
@@ -60,7 +60,12 @@ def handle(req):
             count = args.get("count")
             if count is not None and (not isinstance(count, int) or isinstance(count, bool) or count <= 0):
                 return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "count must be a positive integer"}}
-            res = get_word_list_payload(topic, args.get("level") or None, count)
+            offset = args.get("offset", 0)
+            if offset is None:
+                offset = 0
+            if not isinstance(offset, int) or isinstance(offset, bool) or offset < 0:
+                return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "offset must be a non-negative integer"}}
+            res = get_word_list_payload(topic, args.get("level") or None, count, offset)
             if res is None:
                 return {"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown topic or level; topics: sight words, Dolch nouns, CVC, digraph, Spanish syllables, animals, colors, objects, Turkish early words"}}
         elif name in ("get_classroom_tool", "get_tool"):
