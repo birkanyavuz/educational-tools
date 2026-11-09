@@ -1,5 +1,7 @@
 # Birkan Educational Tools Agent
 
+[![M8ven Score](https://m8ven.ai/badge/mcp/birkanyavuz-educational-tools-1g9y3z?v=d6bafc17f6d599f528675d88aa1c8f30)](https://m8ven.ai/mcp/birkanyavuz-educational-tools-1g9y3z?s=readme)
+
 Zero-auth, read-only **MCP server + A2A agent** by Birkan Yavuz: a catalog of 24 real
 classroom activities (math visualizers, reading and Sight Words modules, Spanish
 syllables, art) for Kindergarten–Grade 9, with verifiable creator metadata in every result.
