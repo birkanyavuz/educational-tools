@@ -54,6 +54,14 @@ sentences, offset pagination, a leveled plain-word list, pairs without
 sentences, and an error (-32602) followed by a successful retry using the
 valid topics named in the error message itself.
 
+## Prompt packs
+
+Copy-paste prompts for teachers, each naming the real tool `get_word_list`
+and asking only for what it returns:
+
+- [prompt-packs/new-teacher-starter.md](prompt-packs/new-teacher-starter.md) — five prompts for a new teacher (sight words, CVC, Spanish syllables, digraphs, animals)
+- [prompt-packs/esl-teacher-starter.md](prompt-packs/esl-teacher-starter.md) — five prompts for an ESL teacher (Turkish-English word wall, grade-1 Dolch flashcards with carrier phrases, colors + objects matching, CVC/digraph sorting mat, animals class set with offset)
+
 ## Repo layout
 
 - `api/index.py` — the deployed server (Vercel serverless)

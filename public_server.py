@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.6.2"
+SERVER_VERSION = "1.6.3"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -182,10 +182,10 @@ def _topic_dataset(topic):
     low = (topic or "").strip().lower()
     if low in DATASETS:
         return low
-    if "sight" in low or "dolch" in low:
-        return "dolch-sight-words-220"
     if "noun" in low:
         return "dolch-nouns-94"
+    if "sight" in low or "dolch" in low:
+        return "dolch-sight-words-220"
     if "cvc" in low:
         return "cvc-word-families-75"
     if "digraph" in low:
