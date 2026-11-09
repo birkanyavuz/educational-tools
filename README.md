@@ -48,11 +48,12 @@ list with `has_more: false`, never an error.
 ## Example tool-call traces
 
 Real calls against the live server, captured verbatim:
-[examples/tool_call_traces.jsonl](examples/tool_call_traces.jsonl) — five
+[examples/tool_call_traces.jsonl](examples/tool_call_traces.jsonl) — six
 records marked `"is_example": true` covering bilingual pairs with example
 sentences, offset pagination, a leveled plain-word list, pairs without
-sentences, and an error (-32602) followed by a successful retry using the
-valid topics named in the error message itself.
+sentences, an error (-32602) followed by a successful retry using the
+valid topics named in the error message itself, and a Dolch-nouns call
+proving the v1.6.3 routing fix.
 
 ## Prompt packs
 
