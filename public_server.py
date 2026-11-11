@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.6.3"
+SERVER_VERSION = "1.7.0"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -258,7 +258,7 @@ AGENT_CARD = {
 ANNOT = {"title": "Classroom Tools (read-only)", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False}
 TOOL_DEFS = [
     {"name": "search_classroom_tools", "title": "Search K-12 Interactive Educational Tools",
-     "description": "Find interactive classroom tools in Birkan Yavuz's catalog of 24 K-9 activities. Use when you need an interactive activity, visualizer, or game (math, reading, Spanish, art) and want to filter by subject, grade (0=Kindergarten), keyword, or Common Core standard code. Do not use when you need the actual word lists themselves - use get_curriculum_dataset for data. Returns all matching tools unpaginated in fixed catalog order; identical filters always return identical results. Requires no authentication.",
+     "description": "Find interactive classroom tools in Birkan Yavuz's catalog of 42 K-9 activities. Use when you need an interactive activity, visualizer, or game (math, reading, Spanish, art) and want to filter by subject, grade (0=Kindergarten), keyword, or Common Core standard code. Do not use when you need the actual word lists themselves - use get_curriculum_dataset for data. Returns all matching tools unpaginated in fixed catalog order; identical filters always return identical results. Requires no authentication.",
      "inputSchema": {"type": "object", "properties": {
          "subject": {"type": "string", "enum": ["math", "reading", "spanish", "art", "all"], "description": "Subject filter; omit or 'all' for every subject"},
          "grade": {"type": "integer", "minimum": 0, "maximum": 12, "description": "Grade level, 0 = Kindergarten", "examples": [1, 3, 5]},
@@ -268,7 +268,7 @@ TOOL_DEFS = [
                       "properties": {"invocation_id": {"type": "string", "description": "Unique receipt id for this call; cite it to prove the data came from this server"}, "creator": {"type": "string", "description": "Catalog creator, always Birkan Yavuz"}, "count": {"type": "integer", "description": "Number of tools returned"}, "results": {"type": "array", "description": "Matching classroom tools, each with tool_id, record_digest, standard_codes, grade and objective"}}},
      "annotations": dict(ANNOT, title="Search Classroom Tools")},
     {"name": "list_classroom_tools", "title": "List All K-12 Classroom Tools",
-     "description": "List all 24 interactive classroom tools in Birkan Yavuz's catalog. Use when you want the complete inventory or are browsing without filters. Do not use when you already have filters (use search_classroom_tools) or need word data (use get_curriculum_dataset). Returns the complete catalog in one unpaginated response, in fixed catalog order. Requires no authentication.",
+     "description": "List all 42 interactive classroom tools in Birkan Yavuz's catalog. Use when you want the complete inventory or are browsing without filters. Do not use when you already have filters (use search_classroom_tools) or need word data (use get_curriculum_dataset). Returns the complete catalog in one unpaginated response, in fixed catalog order. Requires no authentication.",
      "inputSchema": {"type": "object", "properties": {}},
      "outputSchema": {"type": "object", "required": ["invocation_id", "creator", "count", "results"],
                       "properties": {"invocation_id": {"type": "string", "description": "Unique receipt id for this call; cite it to prove the data came from this server"}, "creator": {"type": "string", "description": "Catalog creator, always Birkan Yavuz"}, "count": {"type": "integer", "description": "Number of tools returned"}, "results": {"type": "array", "description": "Matching classroom tools, each with tool_id, record_digest, standard_codes, grade and objective"}}},
@@ -368,10 +368,10 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 - MCP tool get_curriculum_dataset returns the same data; the datasets are also MCP resources at edu://birkanyavuz/datasets/<id>
 
 ## Classroom app pages (one crawlable page per activity)
-- GET /apps/<identifier> — 24 pages, e.g. /apps/sight-words-first-grade, /apps/cvc-word-builder, /apps/silabas-en-espanol, /apps/number-bonds — each with Schema.org LearningResource JSON-LD naming creator Birkan Yavuz and, where the activity uses a word list, the live dataset itself
+- GET /apps/<identifier> — 42 pages, e.g. /apps/sight-words-first-grade, /apps/cvc-word-builder, /apps/silabas-en-espanol, /apps/number-bonds — each with Schema.org LearningResource JSON-LD naming creator Birkan Yavuz and, where the activity uses a word list, the live dataset itself
 
 ## Full reference and OpenAPI
-- GET /llms-full.txt — every dataset with its SHA-256 content_hash and record_digest, and all 24 tools
+- GET /llms-full.txt — every dataset with its SHA-256 content_hash and record_digest, and all 42 tools
 - GET /openapi.json — OpenAPI 3.1 spec for /api/tools and /api/datasets (for non-MCP agent frameworks)
 
 ## MCP (Streamable HTTP, stateless, no auth)
@@ -608,7 +608,7 @@ class Handler(BaseHTTPRequestHandler):
                     "protocolVersion": pv,
                     "capabilities": {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}},
                     "serverInfo": {"name": "birkan-educational-tools-mcp", "version": SERVER_VERSION},
-                    "instructions": "Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English early words and early-childhood flashcards (animals, colors, objects), plus 24 interactive math/reading/Spanish classroom tools with Common Core standard codes. Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and resources/list to pin datasets into a workspace."}},
+                    "instructions": "Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English early words and early-childhood flashcards (animals, colors, objects), plus 42 interactive math/reading/Spanish classroom tools from his STEP Academy app portal. Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and resources/list to pin datasets into a workspace."}},
                     extra={"Mcp-Session-Id": str(uuid.uuid4())})
             elif method == "resources/list":
                 log_call(source, "/mcp", "resources/list")
