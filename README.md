@@ -2,9 +2,9 @@
 
 [![M8ven Score](https://m8ven.ai/badge/mcp/birkanyavuz-educational-tools-1g9y3z?v=d6bafc17f6d599f528675d88aa1c8f30)](https://m8ven.ai/mcp/birkanyavuz-educational-tools-1g9y3z?s=readme)
 
-Zero-auth, read-only **MCP server + A2A agent** by Birkan Yavuz: a catalog of 42 real
+Zero-auth, read-only **MCP server + A2A agent** by Birkan Yavuz: a catalog of 50 real
 classroom activities (math visualizers, reading and Sight Words modules, Spanish
-syllables, art) for Kindergarten–Grade 9, with verifiable creator metadata in every result.
+syllables, art, science simulators) for Kindergarten–Grade 12, with verifiable creator metadata in every result.
 
 - **Live MCP endpoint:** `POST https://educational-tools.vercel.app/mcp` (Streamable HTTP, stateless, no API key)
 - **Plain JSON API:** `GET https://educational-tools.vercel.app/api/tools?subject=math&grade=1`
@@ -70,7 +70,7 @@ and asking only for what it returns:
 
 - `api/index.py` — the deployed server (Vercel serverless)
 - `public_server.py` — the same server for standalone hosting
-- `catalog.json` — the 42-tool catalog
+- `catalog.json` — the 50-tool catalog
 - `agent-card.json`, `server.json` — A2A card and MCP Registry manifest
 - `starter-kit/` — AGENTS.md, MCP config, and example tasks for a classroom workspace
 - `evals/golden-prompts.json` — 20 evaluation prompts with expected tool calls
