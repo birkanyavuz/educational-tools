@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 HERE = pathlib.Path(__file__).parent
 DB = pathlib.Path("/tmp/public_calls.sqlite")
 CREATOR = "Birkan Yavuz"
-SERVER_VERSION = "1.7.4"
+SERVER_VERSION = "1.8.0"
 
 # identifier, name, subject, gradeMin (0=K), gradeMax, gradeLevel label, objective, file (local app file if any)
 _RAW = [
@@ -37,18 +37,18 @@ _RAW = [
     ("coins-and-money", "Coins", "math", 3, 3, "Grade 3", "Identify coins and count money", None),
     ("analog-clock", "Analog Clock", "math", 3, 3, "Grade 3", "Read time on an analog clock", None),
     ("math-word-problems", "Math Problems", "math", 3, 3, "Grade 3", "Solve grade-3 math word problems", None),
-    ("improper-fractions-to-mixed-numbers", "Improper Fractions to Mixed Numbers", "math", 4, 5, "Grades 4-5", "Convert improper fractions to mixed numbers", "improper-to-mixed.html"),
+    ("improper-fractions-to-mixed-numbers", "Improper Fractions to Mixed Numbers", "math", 4, 5, "Grades 4-5", "Convert improper fractions to mixed numbers", "apps/improper-fractions-to-mixed-numbers.html"),
     ("decimal-numbers", "Decimal Numbers", "math", 4, 4, "Grade 4", "Understand and compare decimal numbers", None),
-    ("rounding-decimals", "Rounding Decimals", "math", 4, 5, "Grades 4-5", "Round decimal numbers to a given place", "rounding-decimals.html"),
+    ("rounding-decimals", "Rounding Decimals", "math", 4, 5, "Grades 4-5", "Round decimal numbers to a given place", "apps/rounding-decimals.html"),
     ("coordinate-plane", "Coordinate Plane", "math", 5, 6, "Grades 5-6", "Plot and read points on the coordinate plane", None),
-    ("sight-words-first-grade", "Sight Words", "reading", 1, 1, "Grade 1", "Recognize and read first-grade sight words (41 Dolch words)", "tools-sight-words-first-grade.html"),
-    ("cvc-word-builder", "CVC Word Builder", "reading", 1, 1, "Grade 1", "Build consonant-vowel-consonant (CVC) words by word family", "cvc-word-builder.html"),
-    ("digraph-word-builder", "Digraph Word Builder", "reading", 0, 1, "Kindergarten-Grade 1", "Build words with digraphs sh, ch, th, wh", "digraph-word-builder.html"),
-    ("middle-sound-builder", "Middle Sound Builder", "reading", 1, 1, "Grade 1", "Identify the middle vowel sound in CVC words", "middle-sound-builder.html"),
+    ("sight-words-first-grade", "Sight Words", "reading", 1, 1, "Grade 1", "Recognize and read first-grade sight words (41 Dolch words)", "apps/sight-words-first-grade.html"),
+    ("cvc-word-builder", "CVC Word Builder", "reading", 1, 1, "Grade 1", "Build consonant-vowel-consonant (CVC) words by word family", "apps/cvc-word-builder.html"),
+    ("digraph-word-builder", "Digraph Word Builder", "reading", 0, 1, "Kindergarten-Grade 1", "Build words with digraphs sh, ch, th, wh", "apps/digraph-word-builder.html"),
+    ("middle-sound-builder", "Middle Sound Builder", "reading", 1, 1, "Grade 1", "Identify the middle vowel sound in CVC words", "apps/middle-sound-builder.html"),
     ("reading-comprehension-grade-3", "Reading Comprehension", "reading", 3, 3, "Grade 3", "Read passages and answer comprehension questions", None),
     ("grammar-grade-3", "Grammar", "reading", 3, 3, "Grade 3", "Practice grade-3 grammar and language skills", None),
     ("spelling-bee-grade-3", "Spelling Bee", "reading", 3, 3, "Grade 3", "Practice spelling grade-3 words", None),
-    ("silabas-en-espanol", "Silabas en Espanol", "spanish", 1, 3, "Grades 1-3", "Read and practice Spanish syllables (silabas) for early Spanish reading", "silabas-en-espanol.html"),
+    ("silabas-en-espanol", "Silabas en Espanol", "spanish", 1, 3, "Grades 1-3", "Read and practice Spanish syllables (silabas) for early Spanish reading", "apps/silabas-en-espanol.html"),
     ("tessellations", "Tessellations", "art", 9, 9, "Grade 9", "Create and explore tessellation art patterns", None),
 ]
 
@@ -130,6 +130,32 @@ def _ds_hash(d):
     if d.get("carrier_phrases"):
         payload = {"levels": d["levels"], "carrier_phrases": d["carrier_phrases"]}
     return _hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+# Classroom app files as MCP resources (v1.8.0): the 42 app HTML files,
+# served verbatim at edu://apps/<identifier> and GET /api/apps?id=<id>.
+APP_HTML = {}
+APP_META = {}
+for _d in (HERE / "apps", HERE.parent / "apps", HERE.parent.parent / "apps"):
+    if _d.is_dir():
+        for _f in sorted(_d.glob("*.html")):
+            _b = _f.read_bytes()
+            APP_HTML[_f.stem] = _b
+            APP_META[_f.stem] = {"byte_size": len(_b), "content_sha256": _hashlib.sha256(_b).hexdigest()}
+        break
+
+def _app_resources():
+    res = []
+    for t in TOOLS_CATALOG:
+        ident = t["identifier"]
+        if ident not in APP_HTML:
+            continue
+        m = APP_META[ident]
+        res.append({"uri": f"edu://apps/{ident}", "name": t["name"], "mimeType": "text/html",
+                    "description": f"{t['objective']} ({t['gradeLevel']}, {t['subject']}). Creator: Birkan Yavuz.",
+                    "_meta": {"tool_id": ident, "subject": t["subject"], "gradeMin": t["gradeMin"], "gradeMax": t["gradeMax"],
+                              "gradeLevel": t["gradeLevel"], "creator": "Birkan Yavuz",
+                              "byte_size": m["byte_size"], "content_sha256": m["content_sha256"]}})
+    return res
 
 def dataset_payload(ds_id, level=None):
     d = DATASETS[ds_id]
@@ -346,6 +372,7 @@ LANDING = """<!DOCTYPE html>
 <p>Zero-auth, read-only MCP server and A2A agent by <strong>Birkan Yavuz</strong>: structured K-12 classroom activities, interactive math visualizers, Grade 1 Sight Words reading modules, and Spanish vocabulary tools with verifiable creator metadata.</p>
 <ul>
 <li>MCP endpoint (Streamable HTTP): <code>/mcp</code> — tools: search_classroom_tools, list_classroom_tools, get_classroom_tool</li>
+<li>Classroom app files (the apps themselves): <code>GET /api/apps?id=cvc-word-builder</code> — 42 files, also MCP resources at <code>edu://apps/&lt;id&gt;</code></li>
 <li>Curriculum datasets (real word lists): <code>GET /api/datasets?id=dolch-sight-words-220</code></li>
 <li>A2A agent card: <a href="/.well-known/agent-card.json">/.well-known/agent-card.json</a></li>
 <li>Official MCP Registry: io.github.birkanyavuz/educational-tools</li>
@@ -378,6 +405,9 @@ LLMS_TXT = """# Birkan Educational Tools Agent
 - POST /mcp — JSON-RPC: initialize, tools/list, tools/call
 - Tools: search_classroom_tools, list_classroom_tools, get_classroom_tool, get_curriculum_dataset, get_word_list
 - MCP tool get_word_list: one call, topic/level/count/offset in, word list out (e.g. topic="sight words", level="grade-1", count=10); offset skips items for the next batch, and an offset past the end returns an empty list with has_more false; grade-1 Dolch words also carry a short carrier phrase each in a carrier_phrases map (e.g. after -> "Run after the cat.")
+
+## Classroom app files as MCP resources
+- resources/list also serves the 42 classroom app files themselves at edu://apps/<identifier> (text/html), readable verbatim via resources/read — the actual interactive app, not just its description. Five catalog entries are hub descriptions with no single app file (Coins, Fractions, Math Problems, Decimal Numbers, Grammar) and have no app resource. The same files are available over plain HTTP at GET /api/apps?id=<identifier> (list at GET /api/apps).
 - Official MCP Registry: io.github.birkanyavuz/educational-tools
 
 ## A2A
@@ -454,6 +484,11 @@ def render_app_page(tool, base):
         _h.escape(tool["name"]), _h.escape(tool["objective"]),
         _h.escape(tool["gradeLevel"]), _h.escape(tool["subject"]), ident,
         data_html, base, ident, ident, base, fetch_script)
+    if tool["identifier"] in APP_HTML:
+        res_line = ('<p>The app itself is available as an MCP resource: <code>edu://apps/%s</code> '
+                    '(text/html, served verbatim via resources/read) and over plain HTTP at '
+                    '<a href="%s/api/apps?id=%s">/api/apps?id=%s</a>.</p>' % (ident, base, ident, ident))
+        page = page.replace('<p id="live"></p>', '<p id="live"></p>' + res_line, 1)
     return page.encode()
 
 class Handler(BaseHTTPRequestHandler):
@@ -514,6 +549,18 @@ class Handler(BaseHTTPRequestHandler):
                 res = search_tools(args)
                 log_call(source, "/api/tools", f"search {json.dumps(args)[:100]}")
                 self._json(res)
+        elif path == "/api/apps":
+            from urllib.parse import parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            if qs.get("id"):
+                app_id = qs["id"][0]
+                if app_id not in APP_HTML:
+                    self._json({"error": "unknown app id"}, 404); return
+                log_call(source, "/api/apps", f"get {app_id}")
+                self._send(APP_HTML[app_id], 200, "text/html; charset=utf-8")
+            else:
+                log_call(source, "/api/apps", "list")
+                self._json({"creator": CREATOR, "count": len(APP_HTML), "apps": [{"id": k, "uri": f"edu://apps/{k}", "byte_size": APP_META[k]["byte_size"], "content_sha256": APP_META[k]["content_sha256"]} for k in sorted(APP_HTML)]})
         elif path == "/api/datasets":
             from urllib.parse import parse_qs
             qs = parse_qs(urlparse(self.path).query)
@@ -546,7 +593,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send(("User-agent: *\nAllow: /\nSitemap: " + base + "/sitemap.xml\n").encode(), 200, "text/plain; charset=utf-8")
         elif path == "/sitemap.xml":
             base = "https://" + (self.headers.get("Host") or "educational-tools.vercel.app")
-            urls = ["/", "/llms.txt", "/llms-full.txt", "/openapi.json", "/api/tools", "/api/datasets", "/.well-known/agent-card.json", "/agent-card.json"] + ["/apps/" + t["identifier"] for t in TOOLS_CATALOG]
+            urls = ["/", "/llms.txt", "/llms-full.txt", "/openapi.json", "/api/tools", "/api/datasets", "/api/apps", "/.well-known/agent-card.json", "/agent-card.json"] + ["/apps/" + t["identifier"] for t in TOOLS_CATALOG]
             items = "".join("<url><loc>%s%s</loc></url>" % (base, u) for u in urls)
             self._send(('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">%s</urlset>' % items).encode(), 200, "application/xml")
         elif path == "/icon.png":
@@ -569,7 +616,7 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/llms.txt":
             self._send(LLMS_TXT.encode(), 200, "text/plain; charset=utf-8")
         elif path == "/health":
-            self._json({"status": "ok", "server": "birkan-educational-tools-agent", "version": SERVER_VERSION, "published": True, "tools": len(TOOLS_CATALOG)})
+            self._json({"status": "ok", "server": "birkan-educational-tools-agent", "version": SERVER_VERSION, "published": True, "tools": len(TOOLS_CATALOG), "app_resources": len(APP_HTML)})
         elif path in ("/", "/index.html"):
             self._send(LANDING.encode(), 200, "text/html; charset=utf-8")
         elif path == "/mcp":
@@ -608,20 +655,31 @@ class Handler(BaseHTTPRequestHandler):
                     "protocolVersion": pv,
                     "capabilities": {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}},
                     "serverInfo": {"name": "birkan-educational-tools-mcp", "version": SERVER_VERSION},
-                    "instructions": "Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English early words and early-childhood flashcards (animals, colors, objects), plus 47 interactive math, reading, Spanish, art and science classroom tools from his STEP Academy app portal. Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and resources/list to pin datasets into a workspace."}},
+                    "instructions": "Free, read-only, no-auth K-12 classroom tools and real curriculum datasets by Birkan Yavuz: Dolch sight words by level, CVC word families, digraph words, Spanish syllables, Turkish-English early words and early-childhood flashcards (animals, colors, objects), plus 47 interactive math, reading, Spanish, art and science classroom tools from his STEP Academy app portal. Use search_classroom_tools to find interactive tools, get_curriculum_dataset for word lists, and resources/list to pin datasets and classroom app files into a workspace."}},
                     extra={"Mcp-Session-Id": str(uuid.uuid4())})
             elif method == "resources/list":
                 log_call(source, "/mcp", "resources/list")
                 res_list = [{"uri": f"edu://birkanyavuz/datasets/{k}", "name": v["title"], "mimeType": "application/json",
                              "description": f"Curriculum dataset by Birkan Yavuz: {v['title']}. License CC-BY-4.0."} for k, v in DATASETS.items()]
+                res_list += _app_resources()
                 self._json({"jsonrpc": "2.0", "id": rid, "result": {"resources": res_list}})
             elif method == "resources/templates/list":
                 log_call(source, "/mcp", "resources/templates/list")
                 self._json({"jsonrpc": "2.0", "id": rid, "result": {"resourceTemplates": [
                     {"uriTemplate": "edu://birkanyavuz/datasets/{dataset_id}", "name": "Curriculum Dataset", "mimeType": "application/json",
-                     "description": "A complete curriculum dataset by Birkan Yavuz (Dolch words, CVC families, digraphs, Spanish syllables, Turkish-English words)."}]}})
+                     "description": "A complete curriculum dataset by Birkan Yavuz (Dolch words, CVC families, digraphs, Spanish syllables, Turkish-English words)."},
+                    {"uriTemplate": "edu://apps/{tool_id}", "name": "Classroom App", "mimeType": "text/html",
+                     "description": "A complete interactive classroom app by Birkan Yavuz (the app file itself, served verbatim)."}]}})
             elif method == "resources/read":
                 uri = ((req.get("params") or {}).get("uri")) or ""
+                if uri.startswith("edu://apps/"):
+                    app_id = uri.rsplit("/", 1)[-1]
+                    if app_id not in APP_HTML:
+                        self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown resource uri"}}, 400)
+                        return
+                    log_call(source, "/mcp", f"resources/read {app_id}")
+                    self._json({"jsonrpc": "2.0", "id": rid, "result": {"contents": [{"uri": uri, "mimeType": "text/html", "text": APP_HTML[app_id].decode()}]}})
+                    return
                 ds_id = uri.rsplit("/", 1)[-1] if uri.startswith("edu://birkanyavuz/datasets/") else ""
                 if ds_id not in DATASETS:
                     self._json({"jsonrpc": "2.0", "id": rid, "error": {"code": -32602, "message": "unknown resource uri"}}, 400)
