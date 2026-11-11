@@ -605,6 +605,102 @@
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
    "standard_codes": []
+  },
+  {
+   "identifier": "doubles-addition",
+   "name": "Doubles - Addition",
+   "subject": "math",
+   "gradeMin": 1,
+   "gradeMax": 1,
+   "gradeLevel": "Grade 1",
+   "objective": "Add with doubles and near doubles facts",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
+  },
+  {
+   "identifier": "algebraic-thinking",
+   "name": "Algebraic Thinking",
+   "subject": "math",
+   "gradeMin": 3,
+   "gradeMax": 3,
+   "gradeLevel": "Grade 3",
+   "objective": "Early algebraic thinking with patterns and unknowns",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
+  },
+  {
+   "identifier": "grammar-gremlin",
+   "name": "Grammar Gremlin",
+   "subject": "reading",
+   "gradeMin": 3,
+   "gradeMax": 3,
+   "gradeLevel": "Grade 3",
+   "objective": "Find and fix grammar mistakes",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
+  },
+  {
+   "identifier": "linear-equation-explorer",
+   "name": "Linear Equation Explorer",
+   "subject": "math",
+   "gradeMin": 8,
+   "gradeMax": 8,
+   "gradeLevel": "Grade 8",
+   "objective": "Explore linear equations and functions",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
+  },
+  {
+   "identifier": "projectile-cannon-simulator",
+   "name": "Projectile Cannon Simulator",
+   "subject": "science",
+   "gradeMin": 9,
+   "gradeMax": 12,
+   "gradeLevel": "Grades 9-12",
+   "objective": "Simulate projectile motion with a cannon",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
+  },
+  {
+   "identifier": "virtual-circuit-sandbox",
+   "name": "Virtual Circuit Sandbox",
+   "subject": "science",
+   "gradeMin": 6,
+   "gradeMax": 12,
+   "gradeLevel": "Grades 6-12",
+   "objective": "Build and test virtual electric circuits",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
+  },
+  {
+   "identifier": "molecule-builder",
+   "name": "Molecule Builder",
+   "subject": "science",
+   "gradeMin": 6,
+   "gradeMax": 12,
+   "gradeLevel": "Grades 6-12",
+   "objective": "Build molecules from atoms",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
+  },
+  {
+   "identifier": "food-chain",
+   "name": "Food Chain",
+   "subject": "science",
+   "gradeMin": 3,
+   "gradeMax": 6,
+   "gradeLevel": "Grades 3-6",
+   "objective": "Explore food chains and who eats whom",
+   "creator": "Birkan Yavuz",
+   "kind": "interactive classroom activity",
+   "standard_codes": []
   }
  ]
 }
