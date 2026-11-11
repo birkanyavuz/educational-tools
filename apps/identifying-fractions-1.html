@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Identifying Fractions</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+    text-align: center;
+    background: #e8f5e9;
+    padding: 0;
+    margin: 0;
+    color: #333;
+    user-select: none;
+  }
+
+  .container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    width: 750px; 
+    margin: 20px auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 4px solid #2e7d32;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 { color: #2e7d32; margin: 0; font-size: 2.2rem; } 
+
+  .main-area {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 25px 0;
+  }
+
+  /* THE FRACTION BAR */
+  #fraction-bar {
+    display: flex;
+    width: 450px;
+    height: 80px;
+    border: 4px solid #000;
+    background: #fff;
+    flex-shrink: 0;
+  }
+
+  .segment {
+    flex: 1;
+    border-right: 2px solid #000;
+  }
+  .segment:last-child { border-right: none; }
+  .filled { background-color: #42a5f5; }
+
+  .equal-sign {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  /* FRACTION INPUT AREA */
+  .fraction-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  input[type="number"] {
+    width: 80px;
+    height: 80px;
+    font-size: 2.8rem;
+    text-align: center;
+    font-family: 'Comic Sans MS', sans-serif;
+    border: 3px solid #333;
+    border-radius: 10px;
+    background: #fdfdfd;
+    transition: background-color 0.2s;
+  }
+
+  input:focus { outline: none; border-color: #2e7d32; }
+
+  .fraction-line {
+    width: 100px;
+    height: 6px;
+    background-color: #000;
+    border-radius: 3px;
+  }
+
+  /* HIGH VISIBILITY FEEDBACK BOX */
+  .feedback-box {
+    font-size: 1.15rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    min-height: 70px; /* Slightly increased to fit two stacked lines */
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column; /* Forces content to stack vertically */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    max-width: 550px;
+    opacity: 0; 
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .show-correct {
+    opacity: 1;
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 2px solid #34d399;
+  }
+
+  .show-incorrect {
+    opacity: 1;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 2px solid #f87171;
+  }
+
+  .controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+
+  button {
+    font-size: 1.3rem; 
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+  }
+  button:active { transform: scale(0.95); }
+
+  .btn-new { background-color: #1976d2; }
+  .btn-check { background-color: #4caf50; }
+
+  /* Hide arrows in number input */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Identifying Fractions</h1>
+    
+    <div class="main-area">
+      <div id="fraction-bar"></div>
+
+      <div class="equal-sign">=</div>
+
+      <div class="fraction-input-container">
+        <input type="number" id="num-input" placeholder="?" autocomplete="off">
+        <div class="fraction-line"></div>
+        <input type="number" id="den-input" placeholder="?" autocomplete="off">
+      </div>
+    </div>
+
+    <div id="feedback" class="feedback-box"></div>
+
+    <div class="controls">
+      <button id="main-btn" class="btn-check" onclick="handleMainAction()">✔️ Check Answer</button>
+    </div>
+  </div>
+
+  <script>
+    let currentNumerator = 0;
+    let currentDenominator = 0;
+    let isWaitingForNext = false; 
+
+    function generateFraction() {
+      isWaitingForNext = false;
+      const mainBtn = document.getElementById('main-btn');
+      mainBtn.innerText = "✔️ Check Answer";
+      mainBtn.className = "btn-check";
+
+      const feedback = document.getElementById('feedback');
+      const numIn = document.getElementById('num-input');
+      const denIn = document.getElementById('den-input');
+      
+      feedback.className = "feedback-box";
+      feedback.innerHTML = "";
+      
+      numIn.value = "";
+      denIn.value = "";
+      numIn.style.backgroundColor = "#fdfdfd";
+      denIn.style.backgroundColor = "#fdfdfd";
+      numIn.disabled = false;
+      denIn.disabled = false;
+
+      currentDenominator = Math.floor(Math.random() * 9) + 2;
+      currentNumerator = Math.floor(Math.random() * currentDenominator) + 1;
+
+      const bar = document.getElementById('fraction-bar');
+      bar.innerHTML = "";
+
+      for (let i = 0; i < currentDenominator; i++) {
+        const seg = document.createElement('div');
+        seg.className = "segment";
+        if (i < currentNumerator) {
+          seg.classList.add('filled');
+        }
+        bar.appendChild(seg);
+      }
+
+      numIn.focus(); 
+    }
+
+    function checkAnswer() {
+      const userNum = parseInt(document.getElementById('num-input').value);
+      const userDen = parseInt(document.getElementById('den-input').value);
+      const feedback = document.getElementById('feedback');
+      const numIn = document.getElementById('num-input');
+      const denIn = document.getElementById('den-input');
+
+      if (isNaN(userNum) || isNaN(userDen)) {
+        feedback.className = "feedback-box show-incorrect";
+        feedback.innerHTML = "🤔 <strong>Missing Numbers!</strong><br>Please fill in both boxes.";
+        return;
+      }
+
+      if (userNum === currentNumerator && userDen === currentDenominator) {
+        feedback.className = "feedback-box show-correct";
+        feedback.innerHTML = "🎉 <strong>Correct!</strong><br>Excellent job! 🎉";
+        
+        numIn.style.backgroundColor = "#e8f5e9";
+        denIn.style.backgroundColor = "#e8f5e9";
+        numIn.disabled = true;
+        denIn.disabled = true;
+
+        isWaitingForNext = true;
+        const mainBtn = document.getElementById('main-btn');
+        mainBtn.innerText = "🔄 Next Question";
+        mainBtn.className = "btn-new";
+        
+        if (document.activeElement) {
+            document.activeElement.blur();
+        }
+
+      } else {
+        feedback.className = "feedback-box show-incorrect";
+        feedback.innerHTML = "❌ <strong>Not quite!</strong><br>Count the blue pieces (top) and total pieces (bottom).";
+        
+        numIn.style.backgroundColor = "#ffebee";
+        denIn.style.backgroundColor = "#ffebee";
+      }
+    }
+
+    function handleMainAction() {
+      if (isWaitingForNext) {
+        generateFraction();
+      } else {
+        checkAnswer();
+      }
+    }
+
+    function clearErrorStyles() {
+      if (!isWaitingForNext) {
+        document.getElementById('num-input').style.backgroundColor = "#fdfdfd";
+        document.getElementById('den-input').style.backgroundColor = "#fdfdfd";
+        document.getElementById('feedback').className = "feedback-box";
+      }
+    }
+
+    document.getElementById('num-input').addEventListener('input', clearErrorStyles);
+    document.getElementById('den-input').addEventListener('input', clearErrorStyles);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleMainAction();
+      }
+    });
+
+    window.onload = generateFraction;
+  </script>
+</body>
+</html>

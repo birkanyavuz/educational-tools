@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3rd Grade Fraction Comparator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .instructions {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .comparison-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .fraction-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px;
+        }
+
+        .fraction {
+            font-size: 3rem;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .fraction .num {
+            border-bottom: 4px solid #333;
+            padding: 0 10px;
+        }
+
+        .fraction .den {
+            padding: 0 10px;
+        }
+
+        /* Fraction Bar Visuals */
+        .bar-container {
+            width: 100%;
+            height: 40px;
+            background-color: #e2e8f0;
+            border: 3px solid #64748b;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .fill-blue { background-color: #3b82f6; }
+        .fill-green { background-color: #10b981; }
+
+        /* Grid lines to show denominator pieces */
+        .grid-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            pointer-events: none;
+        }
+
+        .grid-line {
+            height: 100%;
+            border-right: 2px dashed rgba(0,0,0,0.3);
+            box-sizing: border-box;
+        }
+        .grid-line:last-child { border-right: none; }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .symbol-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 120px;
+        }
+
+        input[type="text"] {
+            font-size: 3rem;
+            width: 80px;
+            height: 80px;
+            text-align: center;
+            border: 4px solid #cbd5e1;
+            border-radius: 12px;
+            color: #0f172a;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        #symbol-translation {
+            font-size: 1.1rem;
+            color: #475569;
+            font-weight: bold;
+            min-height: 25px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background-color: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        button:hover { background-color: #1d4ed8; }
+        button:active { transform: scale(0.95); }
+
+        #next-btn {
+            background-color: #059669;
+            margin-top: 20px;
+            display: none;
+        }
+        #next-btn:hover { background-color: #047857; }
+
+        .feedback-box {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .correct { background-color: #d1fae5; color: #065f46; border: 2px solid #34d399; }
+        .incorrect { background-color: #fee2e2; color: #991b1b; border: 2px solid #f87171; }
+        
+        .step-explanation {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: #333;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #f59e0b;
+            text-align: left;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Compare the Fractions</h1>
+    <p class="instructions">Look at the visual bars. Type <strong>&lt;</strong>, <strong>&gt;</strong>, or <strong>=</strong> in the box and press <strong>Enter</strong>.</p>
+
+    <div class="comparison-area">
+        <div class="fraction-box">
+            <div class="fraction">
+                <span class="num" id="num1">1</span>
+                <span class="den" id="den1">2</span>
+            </div>
+            <div class="bar-container">
+                <div id="bar-fill-1" class="bar-fill fill-blue"></div>
+                <div id="grid-1" class="grid-lines"></div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="symbol-container">
+                <input type="text" id="symbol-input" placeholder="?" maxlength="1" autocomplete="off">
+                <span id="symbol-translation"></span>
+            </div>
+            <button id="check-btn" onclick="checkAnswer()">Check</button>
+        </div>
+
+        <div class="fraction-box">
+            <div class="fraction">
+                <span class="num" id="num2">3</span>
+                <span class="den" id="den2">4</span>
+            </div>
+            <div class="bar-container">
+                <div id="bar-fill-2" class="bar-fill fill-green"></div>
+                <div id="grid-2" class="grid-lines"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="feedback" class="feedback-box"></div>
+    <button id="next-btn" onclick="generateProblem()">Next Problem</button>
+</div>
+
+<script>
+    let currentF1 = { n: 1, d: 2 };
+    let currentF2 = { n: 3, d: 4 };
+    let correctSymbol = "";
+
+    const denominators = [2, 3, 4, 6, 8]; 
+
+    function generateProblem() {
+        document.getElementById('symbol-input').value = "";
+        document.getElementById('symbol-translation').innerText = "";
+        document.getElementById('symbol-input').disabled = false;
+        document.getElementById('symbol-input').focus();
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('check-btn').style.display = 'block';
+
+        const problemType = Math.random();
+        
+        let d1, d2, n1, n2;
+
+        if (problemType < 0.4) {
+            d1 = d2 = denominators[Math.floor(Math.random() * denominators.length)];
+            n1 = Math.floor(Math.random() * d1) + 1;
+            n2 = Math.floor(Math.random() * d2) + 1;
+        } else if (problemType < 0.8) {
+            d1 = denominators[Math.floor(Math.random() * denominators.length)];
+            d2 = denominators[Math.floor(Math.random() * denominators.length)];
+            let maxNum = Math.min(d1, d2);
+            n1 = n2 = Math.floor(Math.random() * maxNum) + 1;
+        } else {
+            d1 = denominators[Math.floor(Math.random() * denominators.length)];
+            d2 = denominators[Math.floor(Math.random() * denominators.length)];
+            n1 = Math.floor(Math.random() * d1) + 1;
+            n2 = Math.floor(Math.random() * d2) + 1;
+        }
+
+        currentF1 = { n: n1, d: d1 };
+        currentF2 = { n: n2, d: d2 };
+
+        let val1 = n1 / d1;
+        let val2 = n2 / d2;
+        
+        if (val1 > val2) correctSymbol = ">";
+        else if (val1 < val2) correctSymbol = "<";
+        else correctSymbol = "=";
+
+        document.getElementById('num1').innerText = n1;
+        document.getElementById('den1').innerText = d1;
+        document.getElementById('num2').innerText = n2;
+        document.getElementById('den2').innerText = d2;
+
+        document.getElementById('bar-fill-1').style.width = (val1 * 100) + "%";
+        document.getElementById('bar-fill-2').style.width = (val2 * 100) + "%";
+
+        drawGridLines('grid-1', d1);
+        drawGridLines('grid-2', d2);
+    }
+
+    function drawGridLines(elementId, denominator) {
+        const gridContainer = document.getElementById(elementId);
+        gridContainer.innerHTML = '';
+        for (let i = 0; i < denominator; i++) {
+            let line = document.createElement('div');
+            line.className = 'grid-line';
+            line.style.width = (100 / denominator) + "%";
+            gridContainer.appendChild(line);
+        }
+    }
+
+    function generateStepByStep(f1, f2) {
+        let explanation = "<strong>Step-by-Step Reasoning:</strong><br>";
+        
+        let v1 = f1.n / f1.d;
+        let v2 = f2.n / f2.d;
+        
+        // Helper functions to handle grammar
+        const pieceWord = (num) => num === 1 ? "piece" : "pieces";
+        const isAre = (num) => num === 1 ? "is" : "are";
+        
+        if (f1.d === f2.d) {
+            explanation += `Both shapes are cut into <strong>${f1.d} equal pieces</strong> (the denominators are the same). `;
+            
+            if (f1.n === f2.n) {
+                explanation += `Because both fractions give you ${f1.n} ${pieceWord(f1.n)}, they are exactly equal.`;
+            } else {
+                let moreOrLess = f1.n > f2.n ? "more" : "less";
+                let greaterOrSmaller = f1.n > f2.n ? "bigger" : "smaller";
+                explanation += `Because ${f1.n} ${pieceWord(f1.n)} ${isAre(f1.n)} ${moreOrLess} than ${f2.n} ${pieceWord(f2.n)}, the first fraction is ${greaterOrSmaller}.`;
+            }
+            
+        } else if (f1.n === f2.n) {
+            explanation += `Both fractions give you exactly <strong>${f1.n} ${pieceWord(f1.n)}</strong> (the numerators are the same). `;
+            
+            let sizeComparison = f1.d > f2.d ? "smaller" : "bigger";
+            let fractionComparison = v1 > v2 ? "bigger" : "smaller";
+            
+            explanation += `However, cutting a whole into ${f1.d} pieces makes them <strong>${sizeComparison}</strong> than cutting it into ${f2.d} pieces. `;
+            explanation += `Therefore, having ${f1.n} ${sizeComparison} ${pieceWord(f1.n)} means the first fraction is ${fractionComparison}.`;
+            
+        } else {
+            let spaceComparison = "";
+            if (correctSymbol === '>') spaceComparison = "more space than";
+            else if (correctSymbol === '<') spaceComparison = "less space than";
+            else spaceComparison = "the exact same amount of space as";
+            
+            explanation += `These fractions have different numerators and denominators. By looking at the colored fraction bars above, you can clearly see that the blue bar takes up <strong>${spaceComparison}</strong> the green bar.`;
+        }
+        
+        return explanation;
+    }
+
+    function checkAnswer() {
+        const input = document.getElementById('symbol-input').value.trim();
+        const feedbackDiv = document.getElementById('feedback');
+
+        if (input !== "<" && input !== ">" && input !== "=") {
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.className = 'feedback-box incorrect';
+            feedbackDiv.innerHTML = "<strong>Oops!</strong> Please type <strong>&lt;</strong>, <strong>&gt;</strong>, or <strong>=</strong>.";
+            return;
+        }
+
+        feedbackDiv.style.display = 'block';
+        
+        let explanationHtml = `<div class="step-explanation">${generateStepByStep(currentF1, currentF2)}</div>`;
+
+        if (input === correctSymbol) {
+            feedbackDiv.className = 'feedback-box correct';
+            feedbackDiv.innerHTML = "<strong>Correct! Great job!</strong> 🎉" + explanationHtml;
+            document.getElementById('symbol-input').disabled = true;
+            document.getElementById('check-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').focus();
+        } else {
+            feedbackDiv.className = 'feedback-box incorrect';
+            feedbackDiv.innerHTML = "<strong>Not quite!</strong> Try looking closely at the fraction bars again. Which color stretches further?" + explanationHtml;
+        }
+    }
+
+    document.getElementById('symbol-input').addEventListener('input', function(e) {
+        const val = e.target.value.trim();
+        const trans = document.getElementById('symbol-translation');
+        if (val === '<') trans.innerText = "(is smaller than)";
+        else if (val === '>') trans.innerText = "(is bigger than)";
+        else if (val === '=') trans.innerText = "(is equal to)";
+        else trans.innerText = "";
+    });
+
+    document.getElementById('symbol-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    window.onload = generateProblem;
+</script>
+
+</body>
+</html>

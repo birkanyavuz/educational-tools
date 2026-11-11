@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2nd Grade Bar Graphs</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 20px 20px 20px; 
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 15px 30px 30px 30px; 
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 { margin-top: 0; color: #2c3e50; margin-bottom: 10px; }
+
+        /* The Ultimate CSS Grid Layout */
+        .chart-container {
+            display: grid;
+            column-gap: 10px;
+            margin: 10px auto 20px;
+            justify-content: center;
+        }
+
+        /* --- VERTICAL LAYOUT CONFIG --- */
+        .chart-container.vertical {
+            grid-template-columns: 20px 400px;
+            grid-template-rows: 300px auto;
+        }
+
+        .vertical .grid-area {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); 
+            align-items: flex-end;
+            justify-items: center;
+            height: 300px;
+            background-size: 100% 30px;
+            background-image: linear-gradient(to top, transparent 28px, #95a5a6 28px, #95a5a6 30px);
+            border-left: 4px solid #2d3436;
+            border-bottom: 4px solid #2d3436;
+        }
+
+        .vertical .label-axis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); 
+            justify-items: center;
+            padding-top: 10px;
+        }
+
+        .vertical .bar {
+            display: flex;
+            flex-direction: column-reverse;
+            width: 30px;
+        }
+
+        /* --- HORIZONTAL LAYOUT CONFIG --- */
+        .chart-container.horizontal {
+            grid-template-columns: max-content 300px;
+            grid-template-rows: 240px 30px;
+        }
+
+        .horizontal .grid-area {
+            display: grid;
+            grid-template-rows: repeat(4, 1fr);
+            align-items: center;
+            width: 300px;
+            height: 240px;
+            background-size: 30px 100%;
+            background-image: linear-gradient(to right, transparent 28px, #95a5a6 28px, #95a5a6 30px);
+            border-left: 4px solid #2d3436;
+            border-bottom: 4px solid #2d3436;
+        }
+
+        .horizontal .label-axis {
+            display: grid;
+            grid-template-rows: repeat(4, 1fr);
+            align-items: center;
+            justify-items: end;
+            padding-right: 15px;
+            height: 240px;
+        }
+
+        .horizontal .bar {
+            display: flex;
+            flex-direction: row;
+            height: 30px;
+            align-items: center;
+        }
+
+        /* --- SHARED ELEMENTS --- */
+        .number-axis {
+            position: relative;
+            font-weight: bold;
+            color: #2d3436;
+            font-size: 14px;
+        }
+
+        .vertical-numbers {
+            height: 300px;
+            width: 20px;
+        }
+
+        .horizontal-numbers {
+            width: 300px;
+            height: 30px;
+        }
+
+        .label-item {
+            display: flex;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .vertical .label-item {
+            flex-direction: column; 
+            align-items: center;
+            justify-content: flex-start;
+            gap: 6px;
+        }
+
+        .horizontal .label-item {
+            flex-direction: row;
+            align-items: center; 
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .block {
+            width: 30px;
+            height: 30px;
+            box-sizing: border-box;
+            border: 2px solid rgba(0,0,0,0.5);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        /* External Button Controls */
+        .builder-controls {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .b-btn {
+            width: 28px;
+            height: 28px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            padding-bottom: 2px;
+            transition: transform 0.1s;
+        }
+        .btn-add { background: #2ecc71; }
+        .btn-sub { background: #e74c3c; }
+        .b-btn:active { transform: scale(0.9); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+        /* Content Areas */
+        #data-table-area { display: none; margin-bottom: 10px; }
+        #read-question-area { display: none; }
+
+        .question-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #bdc3c7;
+            margin: 5px 0;
+            font-size: 20px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 20px;
+            width: 80px;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            margin: 0 10px;
+        }
+
+        .data-table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            font-size: 18px;
+        }
+        .data-table th, .data-table td {
+            border: 2px solid #bdc3c7;
+            padding: 6px 15px;
+            text-align: center;
+        }
+        .data-table th { background: #ecf0f1; }
+
+        /* The Master Button */
+        button.action-btn {
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 5px;
+            min-width: 250px;
+            transition: all 0.2s;
+        }
+        
+        .btn-check { background: #27ae60; }
+        .btn-check:hover { background: #219150; }
+        .btn-next { background: #8e44ad; }
+        .btn-next:hover { background: #732d91; }
+        button.action-btn:active { transform: translateY(2px); }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 22px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        .correct { color: #27ae60; }
+        .incorrect { color: #c0392b; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Data & Graphs</h1>
+    
+    <div id="data-table-area">
+        <table class="data-table" id="make-table"></table>
+    </div>
+
+    <div id="graph-container"></div>
+    
+    <div id="read-question-area" class="question-box">
+        <div id="read-question">Loading question...</div>
+        <div style="margin-top: 10px;">
+            <label>Answer:</label>
+            <input type="number" id="read-answer" min="0">
+        </div>
+    </div>
+
+    <button id="master-action-btn" class="action-btn btn-check" onclick="handleAction()">Check Answer</button>
+    <div id="feedback-display" class="feedback"></div>
+</div>
+
+<script>
+    const maxVal = 10;
+    const themes = [
+        { title: "Pets", items: ["Dogs", "Cats", "Fish", "Birds"], colors: ["#e74c3c", "#3498db", "#f1c40f", "#2ecc71"] },
+        { title: "Snacks", items: ["Apples", "Chips", "Cookies", "Grapes"], colors: ["#e74c3c", "#e67e22", "#8e44ad", "#9b59b6"] },
+        { title: "Toys", items: ["Cars", "Dolls", "Blocks", "Bears"], colors: ["#c0392b", "#2980b9", "#f39c12", "#16a085"] },
+        { title: "Bugs", items: ["Ants", "Bees", "Moths", "Worms"], colors: ["#27ae60", "#f1c40f", "#8e44ad", "#d35400"] }
+    ];
+
+    // Replaced RNG with sequential pedagogical cycling
+    const problemCycle = [
+        { mode: 'read', orientation: 'vertical' },
+        { mode: 'make', orientation: 'horizontal' },
+        { mode: 'read', orientation: 'horizontal' },
+        { mode: 'make', orientation: 'vertical' }
+    ];
+    let cycleIndex = 0;
+
+    let appMode = 'read'; 
+    let problemState = 'check'; 
+    let currentTheme = null;
+    let currentOrientation = 'vertical';
+    let readExpected = 0;
+    let makeData = {};
+    let makeState = {}; 
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function renderGraph(dataObj, isInteractive) {
+        const container = document.getElementById('graph-container');
+        let html = `<div class="chart-container ${currentOrientation}">`;
+        
+        let numbersHtml = '';
+        if (currentOrientation === 'vertical') {
+            for (let i = 10; i >= 0; i--) {
+                let topPos = (10 - i) * 30;
+                numbersHtml += `<span style="position:absolute; right:5px; top:${topPos}px; transform:translateY(-50%);">${i}</span>`;
+            }
+            html += `<div class="number-axis vertical-numbers">${numbersHtml}</div>`;
+        } else {
+            // Horizontal label axis comes before the grid
+            html += `<div class="label-axis">`;
+            currentTheme.items.forEach((item) => {
+                let controlsHtml = '';
+                if (isInteractive) {
+                    controlsHtml = `
+                        <div class="builder-controls">
+                            <button class="b-btn btn-add" onclick="modifyBar('${item}', 1)">+</button>
+                            <button class="b-btn btn-sub" onclick="modifyBar('${item}', -1)">-</button>
+                        </div>
+                    `;
+                }
+                html += `<div class="label-item">
+                            ${controlsHtml}
+                            <span>${item}</span>
+                         </div>`;
+            });
+            html += `</div>`;
+        }
+
+        let gridAreaHtml = `<div class="grid-area">`;
+        currentTheme.items.forEach((item, index) => {
+            let val = dataObj[item];
+            let blocksHtml = '';
+            for(let i=0; i<val; i++) {
+                blocksHtml += `<div class="block" style="background-color: ${currentTheme.colors[index]}"></div>`;
+            }
+            gridAreaHtml += `<div class="bar">${blocksHtml}</div>`;
+        });
+        gridAreaHtml += `</div>`;
+        html += gridAreaHtml;
+
+        if (currentOrientation === 'vertical') {
+            // Vertical label axis comes after the grid
+            html += `<div></div>`; // Empty spacer for the grid corner
+            html += `<div class="label-axis">`;
+            currentTheme.items.forEach((item) => {
+                let controlsHtml = '';
+                if (isInteractive) {
+                    controlsHtml = `
+                        <div class="builder-controls">
+                            <button class="b-btn btn-add" onclick="modifyBar('${item}', 1)">+</button>
+                            <button class="b-btn btn-sub" onclick="modifyBar('${item}', -1)">-</button>
+                        </div>
+                    `;
+                }
+                html += `<div class="label-item">
+                            <span>${item}</span>
+                            ${controlsHtml}
+                         </div>`;
+            });
+            html += `</div>`;
+        } else {
+            html += `<div></div>`; // Empty spacer for the grid corner
+            let numbersHtml = '';
+            for (let i = 0; i <= 10; i++) {
+                let leftPos = i * 30;
+                numbersHtml += `<span style="position:absolute; left:${leftPos}px; top:5px; transform:translateX(-50%);">${i}</span>`;
+            }
+            html += `<div class="number-axis horizontal-numbers">${numbersHtml}</div>`;
+        }
+
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    function generateProblem() {
+        // Extract layout requirements from the cycle, then increment
+        appMode = problemCycle[cycleIndex].mode;
+        currentOrientation = problemCycle[cycleIndex].orientation;
+        cycleIndex = (cycleIndex + 1) % problemCycle.length;
+
+        // Theme and questions remain random
+        currentTheme = themes[getRandomInt(0, themes.length - 1)];
+        problemState = 'check';
+
+        document.getElementById('feedback-display').innerHTML = '';
+        let btn = document.getElementById('master-action-btn');
+        btn.className = 'action-btn btn-check';
+
+        if (appMode === 'read') {
+            document.getElementById('data-table-area').style.display = 'none';
+            document.getElementById('read-question-area').style.display = 'block';
+            btn.innerText = 'Check Answer';
+            setupReadProblem();
+        } else {
+            document.getElementById('data-table-area').style.display = 'block';
+            document.getElementById('read-question-area').style.display = 'none';
+            btn.innerText = 'Check Graph';
+            setupMakeProblem();
+        }
+    }
+
+    function setupReadProblem() {
+        let answerInput = document.getElementById('read-answer');
+        answerInput.value = '';
+        answerInput.focus();
+        
+        let data = {};
+        currentTheme.items.forEach((item) => {
+            data[item] = getRandomInt(1, 9);
+        });
+
+        renderGraph(data, false);
+
+        let qType = getRandomInt(1, 5);
+        let items = currentTheme.items;
+        let item1 = items[getRandomInt(0, 3)];
+        let item2 = items[getRandomInt(0, 3)];
+        while(item1 === item2) { item2 = items[getRandomInt(0, 3)]; }
+
+        let qText = "";
+        if (qType === 1) {
+            qText = `How many ${item1} are there?`;
+            readExpected = data[item1];
+        } else if (qType === 2) {
+            qText = `How many ${item1} and ${item2} are there in total?`;
+            readExpected = data[item1] + data[item2];
+        } else if (qType === 3) {
+            let maxItem = data[item1] >= data[item2] ? item1 : item2;
+            let minItem = data[item1] < data[item2] ? item1 : item2;
+            qText = `How many more ${maxItem} are there than ${minItem}?`;
+            readExpected = data[maxItem] - data[minItem];
+        } else if (qType === 4) {
+            let maxItem = data[item1] >= data[item2] ? item1 : item2;
+            let minItem = data[item1] < data[item2] ? item1 : item2;
+            qText = `How many fewer ${minItem} are there than ${maxItem}?`;
+            readExpected = data[maxItem] - data[minItem];
+        } else if (qType === 5) {
+            qText = `How many items are there in total across all categories?`;
+            readExpected = data[items[0]] + data[items[1]] + data[items[2]] + data[items[3]];
+        }
+        
+        document.getElementById('read-question').innerText = qText;
+    }
+
+    function setupMakeProblem() {
+        makeData = {};
+        makeState = {};
+
+        let tableHtml = `<tr>`;
+        currentTheme.items.forEach(item => tableHtml += `<th>${item}</th>`);
+        tableHtml += `</tr><tr>`;
+
+        currentTheme.items.forEach(item => {
+            let val = getRandomInt(1, 8);
+            makeData[item] = val;
+            makeState[item] = 0; 
+            tableHtml += `<td>${val}</td>`;
+        });
+        tableHtml += `</tr>`;
+        
+        document.getElementById('make-table').innerHTML = tableHtml;
+        renderGraph(makeState, true);
+    }
+
+    function modifyBar(item, change) {
+        if (problemState === 'next') return; 
+        
+        let newVal = makeState[item] + change;
+        if (newVal >= 0 && newVal <= maxVal) {
+            makeState[item] = newVal;
+            renderGraph(makeState, true);
+        }
+        document.getElementById('feedback-display').innerHTML = '';
+    }
+
+    function handleAction() {
+        if (problemState === 'next') {
+            generateProblem();
+            return;
+        }
+
+        let fb = document.getElementById('feedback-display');
+        let isCorrect = false;
+
+        if (appMode === 'read') {
+            let guess = parseInt(document.getElementById('read-answer').value);
+            if (isNaN(guess)) { fb.innerHTML = "Please enter a number."; return; }
+            isCorrect = (guess === readExpected);
+        } else {
+            isCorrect = true;
+            for (let item of currentTheme.items) {
+                if (makeData[item] !== makeState[item]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+        }
+
+        if (isCorrect) {
+            fb.innerHTML = "<span class='correct'>✓ Excellent! That is perfectly correct.</span>";
+            problemState = 'next';
+            let btn = document.getElementById('master-action-btn');
+            btn.innerText = 'Next Challenge';
+            btn.className = 'action-btn btn-next';
+            btn.focus(); 
+        } else {
+            fb.innerHTML = "<span class='incorrect'>✗ Not quite. Double-check your work and try again!</span>";
+        }
+    }
+
+    window.onload = () => {
+        generateProblem();
+        
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleAction();
+            }
+        });
+    };
+</script>
+
+</body>
+</html>

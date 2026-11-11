@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Base Ten Counter</title>
+<style>
+  * { box-sizing: border-box; }
+  body { 
+    font-family: sans-serif; 
+    text-align: center; 
+    margin: 0; 
+    padding: 0; 
+    background: #eef2f5; 
+    overflow: hidden; 
+  }
+  h1 { 
+    margin: 2px 0 0 0; 
+    font-size: 1.5rem; 
+    color: #2c3e50; 
+  }
+  #game-board { 
+    display: flex; 
+    justify-content: center; 
+    gap: 8px; 
+    margin: 2px 0; 
+  }
+  .tens-area, .ones-area { 
+    display: flex; 
+    gap: 6px; 
+    align-items: flex-end; 
+    padding: 4px; 
+    border: 2px dashed #bdc3c7; 
+    border-radius: 6px; 
+    background: white; 
+    min-width: 110px; 
+    min-height: 360px; 
+    justify-content: center; 
+  }
+  .ten-rod { 
+    width: 35px; 
+    height: 350px; 
+    background: repeating-linear-gradient(
+      to bottom,
+      #3498db 0px,
+      #3498db 34px,
+      #2980b9 34px,
+      #2980b9 35px
+    );
+    border: 1px solid #2980b9; 
+    border-radius: 2px; 
+  }
+  .ones-column {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 6px; /* Increased separation */
+  }
+  .one-block { 
+    width: 35px; 
+    height: 35px; 
+    background: #e74c3c; 
+    border: 1px solid #c0392b; 
+    border-radius: 2px; 
+  }
+  .controls { 
+    margin-top: 2px; 
+  }
+  input { 
+    font-size: 2rem; 
+    width: 100px; 
+    text-align: center; 
+    padding: 0; 
+    border: 3px solid #34495e; 
+    border-radius: 6px; 
+  }
+  #feedback { 
+    font-size: 1.2rem; 
+    font-weight: bold; 
+    margin-top: 2px; 
+    min-height: 20px; 
+  }
+  .correct { color: #27ae60; }
+  .incorrect { color: #c0392b; }
+</style>
+</head>
+<body>
+  <h1>Count the Base Ten Blocks</h1>
+  <div id="game-board">
+    <div id="tens-container" class="tens-area"></div>
+    <div id="ones-container" class="ones-area"></div>
+  </div>
+  <div class="controls">
+    <input type="number" id="answer-input" placeholder="?" autofocus>
+  </div>
+  <div id="feedback">Type the number and press "Enter"</div>
+
+<script>
+  let expectedAnswer = 0;
+  const input = document.getElementById('answer-input');
+  const feedback = document.getElementById('feedback');
+
+  function generateProblem() {
+    const tens = Math.floor(Math.random() * 9) + 1; 
+    const ones = Math.floor(Math.random() * 10); 
+    expectedAnswer = (tens * 10) + ones;
+    
+    document.getElementById('tens-container').innerHTML = '<div class="ten-rod"></div>'.repeat(tens);
+    
+    let onesHtml = '<div class="ones-column">';
+    for (let i = 0; i < ones; i++) {
+      if (i === 5) {
+        onesHtml += '</div><div class="ones-column">';
+      }
+      onesHtml += '<div class="one-block"></div>';
+    }
+    onesHtml += '</div>';
+    document.getElementById('ones-container').innerHTML = onesHtml;
+    
+    input.value = '';
+    feedback.innerText = 'Type the number and press "Enter"';
+    feedback.className = '';
+  }
+
+  input.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      const val = parseInt(input.value, 10);
+      if (val === expectedAnswer) {
+        feedback.innerText = '✓ Correct!';
+        feedback.className = 'correct';
+        input.disabled = true;
+        setTimeout(() => {
+          input.disabled = false;
+          generateProblem();
+          input.focus();
+        }, 1000);
+      } else {
+        feedback.innerText = '✗ Try again!';
+        feedback.className = 'incorrect';
+        input.value = '';
+      }
+    }
+  });
+
+  generateProblem();
+</script>
+</body>
+</html>

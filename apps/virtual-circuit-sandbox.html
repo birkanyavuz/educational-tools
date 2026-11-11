@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Virtual Circuit Sandbox (STEP Academy Lab)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { 
+    font-family: 'Courier New', Courier, monospace; 
+    background: #050505; 
+    margin: 0; 
+    padding: 10px; 
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .app-container {
+    width: 100%;
+    max-width: 1000px;
+    background: #111111;
+    border: 2px solid #222;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  }
+  h1 { margin: 0 0 10px 0; color: #4fc1ff; text-align: center; font-family: 'Segoe UI', sans-serif;}
+  
+  .dashboard {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .telemetry {
+    flex: 1;
+    min-width: 300px;
+    background: #000;
+    border: 2px solid #4fc1ff;
+    border-radius: 8px;
+    padding: 15px;
+    color: #ce9178;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .telemetry span.val { color: #b5cea8; float: right; }
+  .telemetry span.alert { color: #f44336; float: right; animation: flash 1s infinite; }
+  @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+  }
+  .btn {
+    padding: 10px 20px; font-size: 1rem; font-weight: bold; color: white; 
+    background: #007acc; border: none; border-radius: 5px; cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.3s;
+  }
+  .btn:hover { background: #0098ff; }
+  .btn-red { background: #d32f2f; }
+  .btn-red:hover { background: #f44336; }
+  .btn:disabled { background: #333; color: #ffeb3b; cursor: not-allowed; border: 1px solid #444; }
+
+  .instructions {
+    background: #1a1a1a;
+    color: #4fc1ff;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+  }
+  .instructions ul { margin: 5px 0 0 0; padding-left: 20px; color: #aaa;}
+
+  .canvas-wrapper {
+    position: relative;
+    width: 100%;
+    background: #0a0a0a; 
+    border: 2px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  canvas { display: block; width: 100%; cursor: default; }
+
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1>⚡ Virtual Circuit Sandbox</h1>
+
+  <div class="dashboard">
+    <div class="telemetry" id="telemetry">
+      <div>Net Voltage (V): <span class="val" id="tel-v">0.0 V</span></div>
+      <div>Equivalent Resistance (R): <span class="val" id="tel-r">0 Ω</span></div>
+      <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;">
+        Total Load Current (I): <span class="val" id="tel-i" style="color: #4fc1ff;">0.00 A</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-red" onclick="clearBoard()">🗑️ Clear Board</button>
+      <button class="btn" id="btn-replace" onclick="replaceBulbs()" disabled>💡 Replace Shattered Bulbs</button>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <strong>Quick Tips:</strong>
+    <ul>
+      <li><strong>🔍 Multimeter Probe:</strong> Hover your mouse over any wire, terminal, or component to see its live physics!</li>
+      <li><strong>✂️ Erase Cable:</strong> Double-click any cable to erase it.</li>
+      <li><strong>🗑️ Delete Component:</strong> Drag a component into the trash bin to delete it.</li>
+     
+    </ul>
+  </div>
+
+  <div class="canvas-wrapper">
+    <canvas id="circuitCanvas" width="900" height="500"></canvas>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('circuitCanvas');
+  const ctx = canvas.getContext('2d');
+  
+  let components = [];
+  let wires = [];
+  let activeLoopData = { v: 0, r: 0, i: 0, short: false, shattered: false };
+  
+  let draggingComp = null;
+  let hasDragged = false;
+  let mouseDownPos = {x: 0, y: 0};
+  let activeWiringTerminal = null; 
+  let hoveredTerminal = null;
+  let hoveredWire = null;
+  let mouseX = 0, mouseY = 0;
+
+  const TYPES = {
+    BATTERY: { w: 60, h: 30, color: '#fdd835', label: '1.5V' },
+    RESISTOR: { w: 50, h: 20, color: '#8d6e63', label: '10Ω' },
+    BULB: { w: 40, h: 40, color: '#fff', label: '5Ω' },
+    SWITCH: { w: 50, h: 20, color: '#90a4ae', label: 'SW' }
+  };
+
+  const shelf = [
+    { type: 'BATTERY', x: 120, y: 50 },
+    { type: 'RESISTOR', x: 280, y: 50 },
+    { type: 'BULB', x: 440, y: 50 },
+    { type: 'SWITCH', x: 600, y: 50 }
+  ];
+
+  class Component {
+    constructor(id, type, x, y) {
+      this.id = id;
+      this.type = type;
+      this.x = x;
+      this.y = y;
+      this.w = TYPES[type].w;
+      this.h = TYPES[type].h;
+      
+      this.t1 = { id: id+'_1', comp: this, offsetX: -this.w/2 - 12, offsetY: 0, getPos: () => ({x: this.x + this.t1.offsetX, y: this.y + this.t1.offsetY}), voltage: 0 };
+      this.t2 = { id: id+'_2', comp: this, offsetX: this.w/2 + 12, offsetY: 0, getPos: () => ({x: this.x + this.t2.offsetX, y: this.y + this.t2.offsetY}), voltage: 0 };
+      
+      this.closed = false; 
+      this.shattered = false; 
+      this.smoking = false; 
+      this.current = 0; 
+      
+      this.boxW = this.w + 45; 
+      this.boxH = Math.max(this.h + 20, 50); 
+    }
+    
+    draw(ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.strokeStyle = '#444';
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(-this.boxW/2, -this.boxH/2, this.boxW, this.boxH);
+      ctx.setLineDash([]); 
+      
+      ctx.fillStyle = TYPES[this.type].color;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+
+      if (this.type === 'BATTERY') {
+        ctx.strokeRect(-this.w/2, -this.h/2, this.w, this.h);
+        ctx.fillStyle = '#111'; ctx.fillRect(-this.w/2, -this.h/2, this.w/2, this.h); 
+        ctx.fillStyle = '#d32f2f'; ctx.fillRect(0, -this.h/2, this.w/2, this.h);
+        ctx.fillStyle = '#ccc'; ctx.fillRect(this.w/2, -this.h/4, 4, this.h/2);
+        ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Courier';
+        ctx.fillText('-', -20, 6); ctx.fillText('+', 10, 6);
+        
+        if (this.smoking) {
+          ctx.fillStyle = 'rgba(255,100,0,0.8)'; ctx.font = '24px Courier';
+          ctx.fillText('🔥', -12, -20);
+        }
+      } 
+      else if (this.type === 'RESISTOR') {
+        ctx.beginPath();
+        ctx.moveTo(-this.w/2, 0); ctx.lineTo(-15, 0); ctx.lineTo(-10, -10);
+        ctx.lineTo(0, 10); ctx.lineTo(10, -10); ctx.lineTo(15, 0); ctx.lineTo(this.w/2, 0);
+        ctx.stroke();
+      }
+      else if (this.type === 'SWITCH') {
+        ctx.beginPath();
+        ctx.moveTo(-this.w/2, 0); ctx.lineTo(-10, 0);
+        if (this.closed) { ctx.lineTo(10, 0); } else { ctx.lineTo(10, -15); }
+        ctx.moveTo(10, 0); ctx.lineTo(this.w/2, 0);
+        ctx.stroke();
+      }
+      else if (this.type === 'BULB') {
+        if (this.shattered) {
+          ctx.strokeStyle = '#444';
+          ctx.beginPath(); ctx.arc(0, -10, 15, 0, Math.PI); ctx.stroke();
+          ctx.font = '24px Courier'; ctx.fillText('💥', -12, -5);
+        } else {
+          let isPowered = Math.abs(this.current) > 0.005;
+          let baseR = 20, baseG = 20, baseB = 20; 
+
+          if (isPowered) {
+            let rawRatio = Math.abs(this.current) / 0.3; 
+            let visualIntensity = Math.pow(Math.min(rawRatio, 2.0), 0.6); 
+            
+            if (visualIntensity > 0.05) {
+              let glowSize = 10 + (80 * Math.min(visualIntensity, 1.2)); 
+              let grad = ctx.createRadialGradient(0, -10, 2, 0, -10, glowSize);
+              grad.addColorStop(0, `rgba(255, 200, 0, ${Math.min(visualIntensity * 0.9, 1.0)})`);
+              grad.addColorStop(1, 'rgba(255, 200, 0, 0)');
+              ctx.fillStyle = grad;
+              ctx.beginPath(); ctx.arc(0, -10, glowSize, 0, Math.PI*2); ctx.fill();
+            }
+
+            let r, g, b;
+            if (rawRatio < 0.1) {
+               let t = rawRatio / 0.1;
+               r = baseR + (120 - baseR) * t; g = baseG; b = baseB;
+            } else if (rawRatio < 0.5) {
+               let t = (rawRatio - 0.1) / 0.4;
+               r = 120 + (255 - 120) * t; g = baseG + (140 - baseG) * t; b = baseB;
+            } else if (rawRatio <= 1.0) {
+               let t = (rawRatio - 0.5) / 0.5;
+               r = 255; g = 140 + (115) * t; b = baseB + (150 - baseB) * t;
+            } else {
+               let t = Math.min((rawRatio - 1.0) / 1.0, 1.0);
+               r = 255; g = 255; b = 150 + (105 * t); 
+            }
+            ctx.fillStyle = `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
+            ctx.beginPath(); ctx.arc(0, -10, 15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+          } else { 
+            ctx.fillStyle = `rgb(${baseR}, ${baseG}, ${baseB})`; 
+            ctx.beginPath(); ctx.arc(0, -10, 15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+          }
+        }
+        ctx.fillStyle = '#666'; ctx.fillRect(-8, 5, 16, 10); 
+      }
+
+      let t1Color = this.type === 'BATTERY' ? '#111' : '#888';
+      let t2Color = this.type === 'BATTERY' ? '#d32f2f' : '#888';
+
+      this.drawTerminal(ctx, this.t1, t1Color);
+      this.drawTerminal(ctx, this.t2, t2Color);
+      ctx.restore();
+    }
+
+    drawTerminal(ctx, t, color) {
+      let isHovered = hoveredTerminal && hoveredTerminal.id === t.id;
+      if (isHovered || (activeWiringTerminal && activeWiringTerminal.id === t.id)) {
+        ctx.strokeStyle = '#ffeb3b';
+        ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(t.offsetX, t.offsetY, 12, 0, Math.PI*2); ctx.stroke();
+      }
+      ctx.fillStyle = color;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(t.offsetX, t.offsetY, 9, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    }
+
+    getBounds() { return { x: this.x - this.boxW/2, y: this.y - this.boxH/2, w: this.boxW, h: this.boxH }; }
+  }
+
+  function getScaledMousePos(e) {
+    let rect = canvas.getBoundingClientRect();
+    return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) };
+  }
+
+  function pointToLineSegDist(px, py, x1, y1, x2, y2) {
+    let l2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    if (l2 === 0) return Math.hypot(px - x1, py - y1);
+    let t = Math.max(0, Math.min(1, ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2));
+    return Math.hypot(px - (x1 + t * (x2 - x1)), py - (y1 + t * (y2 - y1)));
+  }
+
+  function getTerminalAt(x, y) {
+    for (let c of components) {
+      if (Math.hypot(x - c.t1.getPos().x, y - c.t1.getPos().y) <= 15) return c.t1;
+      if (Math.hypot(x - c.t2.getPos().x, y - c.t2.getPos().y) <= 15) return c.t2;
+    }
+    return null;
+  }
+
+  function getComponentAt(x, y) {
+    for (let i = components.length - 1; i >= 0; i--) {
+      let b = components[i].getBounds();
+      if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) return components[i];
+    }
+    for (let s of shelf) {
+      let boxW = TYPES[s.type].w + 45, boxH = Math.max(TYPES[s.type].h + 20, 50);
+      if (x >= s.x - boxW/2 && x <= s.x + boxW/2 && y >= s.y - boxH/2 && y <= s.y + boxH/2) return s;
+    }
+    return null;
+  }
+
+  function bridgeConnections(comp) {
+    let t1Wires = wires.filter(w => w.n1.id === comp.t1.id || w.n2.id === comp.t1.id);
+    let t2Wires = wires.filter(w => w.n1.id === comp.t2.id || w.n2.id === comp.t2.id);
+    
+    t1Wires.forEach(w1 => {
+      let other1 = (w1.n1.id === comp.t1.id) ? w1.n2 : w1.n1;
+      t2Wires.forEach(w2 => {
+        let other2 = (w2.n1.id === comp.t2.id) ? w2.n2 : w2.n1;
+        if (other1.comp.id !== other2.comp.id) wires.push({ n1: other1, n2: other2, current: 0, ePhase: 0 });
+      });
+    });
+  }
+
+  function checkForWireSplice(comp) {
+    const threshold = 25; 
+    for (let i = wires.length - 1; i >= 0; i--) {
+      let w = wires[i];
+      if (w.n1.comp.id === comp.id || w.n2.comp.id === comp.id) continue;
+
+      let p1 = w.n1.getPos();
+      let p2 = w.n2.getPos();
+      
+      if (pointToLineSegDist(comp.x, comp.y, p1.x, p1.y, p2.x, p2.y) < threshold) {
+        wires.splice(i, 1);
+        
+        let t1Pos = comp.t1.getPos();
+        let t2Pos = comp.t2.getPos();
+        
+        let distOptionA = Math.hypot(p1.x - t1Pos.x, p1.y - t1Pos.y) + Math.hypot(p2.x - t2Pos.x, p2.y - t2Pos.y);
+        let distOptionB = Math.hypot(p1.x - t2Pos.x, p1.y - t2Pos.y) + Math.hypot(p2.x - t1Pos.x, p2.y - t1Pos.y);
+        
+        let optionA = false;
+
+        if (comp.type === 'BATTERY') {
+          function traceForBattery(startNode) {
+            let visited = new Set();
+            let queue = [startNode];
+            visited.add(startNode.id);
+            
+            while(queue.length > 0) {
+              let curr = queue.shift();
+              if (curr.comp.type === 'BATTERY' && curr.comp.id !== comp.id) {
+                return curr.id.endsWith('_1') ? -1 : 1; 
+              }
+              
+              let otherTerm = (curr.id === curr.comp.t1.id) ? curr.comp.t2 : curr.comp.t1;
+              if (!visited.has(otherTerm.id)) { visited.add(otherTerm.id); queue.push(otherTerm); }
+              
+              wires.forEach(wire => {
+                let next = null;
+                if (wire.n1.id === curr.id) next = wire.n2; else if (wire.n2.id === curr.id) next = wire.n1;
+                if (next && !visited.has(next.id)) { visited.add(next.id); queue.push(next); }
+              });
+            }
+            return 0; 
+          }
+
+          let pol1 = traceForBattery(w.n1);
+          let pol2 = traceForBattery(w.n2);
+
+          if (pol1 === -1 || pol2 === 1) optionA = false; 
+          else if (pol1 === 1 || pol2 === -1) optionA = true;  
+          else optionA = distOptionA < distOptionB; 
+        } else {
+          optionA = distOptionA < distOptionB;
+        }
+        
+        if (optionA) {
+          wires.push({ n1: w.n1, n2: comp.t1, current: 0, ePhase: 0 });
+          wires.push({ n1: comp.t2, n2: w.n2, current: 0, ePhase: 0 });
+        } else {
+          wires.push({ n1: w.n1, n2: comp.t2, current: 0, ePhase: 0 });
+          wires.push({ n1: comp.t1, n2: w.n2, current: 0, ePhase: 0 });
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  canvas.addEventListener('mousedown', e => {
+    let pos = getScaledMousePos(e);
+    mouseDownPos = pos;
+    hasDragged = false;
+
+    let clickedTerminal = getTerminalAt(pos.x, pos.y);
+    if (clickedTerminal) {
+      if (!activeWiringTerminal) { activeWiringTerminal = clickedTerminal; } 
+      else {
+        if (clickedTerminal.comp.id !== activeWiringTerminal.comp.id) {
+          wires.push({ n1: activeWiringTerminal, n2: clickedTerminal, current: 0, ePhase: 0 });
+        }
+        activeWiringTerminal = null; analyzeCircuit();
+      }
+      return; 
+    }
+
+    let comp = getComponentAt(pos.x, pos.y);
+    if (comp) {
+      if (!comp.id) {
+        let newComp = new Component('c'+Date.now(), comp.type, pos.x, pos.y);
+        components.push(newComp);
+        draggingComp = newComp;
+      } else { draggingComp = comp; }
+    }
+  });
+
+  canvas.addEventListener('mousemove', e => {
+    let pos = getScaledMousePos(e);
+    mouseX = pos.x; mouseY = pos.y;
+    hoveredTerminal = getTerminalAt(pos.x, pos.y);
+    
+    hoveredWire = null;
+    if (!hoveredTerminal) {
+      for (let i = wires.length - 1; i >= 0; i--) {
+        let w = wires[i];
+        let p1 = w.n1.getPos(); let p2 = w.n2.getPos();
+        if (pointToLineSegDist(mouseX, mouseY, p1.x, p1.y, p2.x, p2.y) <= 8) {
+          hoveredWire = w; break;
+        }
+      }
+    }
+
+    if (draggingComp) {
+      if (Math.hypot(pos.x - mouseDownPos.x, pos.y - mouseDownPos.y) > 3) hasDragged = true;
+      draggingComp.x = Math.round(pos.x / 10) * 10; 
+      draggingComp.y = Math.round(pos.y / 10) * 10;
+    }
+  });
+
+  canvas.addEventListener('mouseup', e => {
+    if (draggingComp) {
+      if (mouseX > canvas.width - 60 && mouseY > canvas.height - 60) {
+        bridgeConnections(draggingComp); 
+        components = components.filter(c => c.id !== draggingComp.id);
+        wires = wires.filter(w => w.n1.comp.id !== draggingComp.id && w.n2.comp.id !== draggingComp.id);
+      } else {
+        if (!hasDragged && draggingComp.type === 'SWITCH') {
+          draggingComp.closed = !draggingComp.closed;
+        }
+        if (hasDragged) {
+          let isAlreadyWired = wires.some(w => w.n1.comp.id === draggingComp.id || w.n2.comp.id === draggingComp.id);
+          if (!isAlreadyWired) checkForWireSplice(draggingComp);
+        }
+      }
+      draggingComp = null; analyzeCircuit(); 
+    }
+  });
+
+  canvas.addEventListener('dblclick', e => {
+    let pos = getScaledMousePos(e);
+    for (let i = wires.length - 1; i >= 0; i--) {
+      let w = wires[i];
+      let p1 = w.n1.getPos();
+      let p2 = w.n2.getPos();
+      if (pointToLineSegDist(pos.x, pos.y, p1.x, p1.y, p2.x, p2.y) <= 10) {
+        wires.splice(i, 1); analyzeCircuit(); break;
+      }
+    }
+  });
+
+  function clearBoard() { components = []; wires = []; analyzeCircuit(); }
+  function replaceBulbs() { components.forEach(c => c.shattered = false); analyzeCircuit(); }
+
+  // --- TRUE MODIFIED NODAL ANALYSIS (MNA) SOLVER ---
+  function solveMatrix(A, b) {
+    let n = A.length;
+    let M = A.map((row, i) => [...row, b[i]]); 
+
+    for (let i = 0; i < n; i++) {
+        let maxEl = Math.abs(M[i][i]); let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+            if (Math.abs(M[k][i]) > maxEl) { maxEl = Math.abs(M[k][i]); maxRow = k; }
+        }
+        let tmp = M[maxRow]; M[maxRow] = M[i]; M[i] = tmp;
+
+        if (Math.abs(M[i][i]) < 1e-10) continue; 
+
+        for (let k = i + 1; k < n; k++) {
+            let c = -M[k][i] / M[i][i];
+            for (let j = i; j <= n; j++) {
+                if (i === j) M[k][j] = 0;
+                else M[k][j] += c * M[i][j];
+            }
+        }
+    }
+
+    let x = new Array(n).fill(0);
+    for (let i = n - 1; i >= 0; i--) {
+        if (Math.abs(M[i][i]) < 1e-10) continue;
+        x[i] = M[i][n];
+        for (let k = i + 1; k < n; k++) x[i] -= M[i][k] * x[k];
+        x[i] /= M[i][i];
+    }
+    return x;
+  }
+
+  function computeCircuitState(forceHeal = false) {
+    let terms = [];
+    components.forEach(c => { terms.push(c.t1); terms.push(c.t2); });
+    let nodeMap = new Map();
+    terms.forEach((t, idx) => nodeMap.set(t.id, idx));
+
+    let numNodes = terms.length - 1; 
+    if (numNodes < 0) return null;
+
+    let numV = components.filter(c => c.type === 'BATTERY').length;
+    let N = numNodes + numV;
+
+    let A = Array.from({length: N}, () => new Array(N).fill(0));
+    let b = new Array(N).fill(0);
+
+    for(let i=0; i<numNodes; i++) A[i][i] += 1e-9; 
+
+    function addG(n1, n2, g) {
+        if (n1 > 0) A[n1-1][n1-1] += g;
+        if (n2 > 0) A[n2-1][n2-1] += g;
+        if (n1 > 0 && n2 > 0) { A[n1-1][n2-1] -= g; A[n2-1][n1-1] -= g; }
+    }
+
+    let vIndex = 0;
+    let vMap = new Map();
+
+    components.forEach(c => {
+        let n1 = nodeMap.get(c.t1.id);
+        let n2 = nodeMap.get(c.t2.id);
+
+        if (c.type === 'BATTERY') {
+            let p = numNodes + vIndex;
+            if (n2 > 0) { A[n2-1][p] += 1; A[p][n2-1] += 1; }
+            if (n1 > 0) { A[n1-1][p] -= 1; A[p][n1-1] -= 1; }
+            b[p] = 1.5;
+            vMap.set(c.id, p);
+            vIndex++;
+        } else {
+            let r = 1e9;
+            if (c.type === 'RESISTOR') r = 10;
+            else if (c.type === 'BULB') r = (!forceHeal && c.shattered) ? 1e9 : 5;
+            else if (c.type === 'SWITCH') r = c.closed ? 1e-4 : 1e9;
+            addG(n1, n2, 1/r);
+        }
+    });
+
+    wires.forEach(w => {
+        let n1 = nodeMap.get(w.n1.id);
+        let n2 = nodeMap.get(w.n2.id);
+        addG(n1, n2, 1 / 1e-4); 
+    });
+
+    let x = solveMatrix(A, b);
+    let nodeVoltages = [0]; 
+    for (let i = 0; i < numNodes; i++) nodeVoltages.push(x[i]);
+
+    let result = { comps: new Map(), wires: new Map(), isShort: false };
+
+    components.forEach(c => {
+        let v1 = nodeVoltages[nodeMap.get(c.t1.id)];
+        let v2 = nodeVoltages[nodeMap.get(c.t2.id)];
+        let i = 0;
+        if (c.type === 'BATTERY') {
+            i = -x[vMap.get(c.id)]; 
+            if (Math.abs(i) > 10) result.isShort = true;
+        } else {
+            let r = 1e9;
+            if (c.type === 'RESISTOR') r = 10;
+            else if (c.type === 'BULB') r = (!forceHeal && c.shattered) ? 1e9 : 5;
+            else if (c.type === 'SWITCH') r = c.closed ? 1e-4 : 1e9;
+            i = (v2 - v1) / r; 
+        }
+        result.comps.set(c.id, { i: i, v1: v1, v2: v2 });
+    });
+
+    wires.forEach(w => {
+        let v1 = nodeVoltages[nodeMap.get(w.n1.id)];
+        let v2 = nodeVoltages[nodeMap.get(w.n2.id)];
+        result.wires.set(w, { i: (v2 - v1) / 1e-4, v1: v1, v2: v2 });
+    });
+
+    return { result, nodeVoltages };
+  }
+
+  // --- THE FIXED ANALYZE CIRCUIT (MNA DRIVEN) ---
+  function analyzeCircuit() {
+    components.forEach(c => { c.smoking = false; c.current = 0; });
+    wires.forEach(w => w.current = 0);
+    activeLoopData = { v: 0, r: 0, i: 0, short: false, shattered: false };
+
+    let statePackage = computeCircuitState(false);
+    if (!statePackage) { updateDashboard(); return; }
+    
+    let state = statePackage.result;
+
+    // 1. Recursive check for shattering based on precise MNA current
+    let justShattered = false;
+    components.forEach(c => {
+        if (c.type === 'BULB' && !c.shattered) {
+            if (Math.abs(state.comps.get(c.id).i) > 0.601) {
+                c.shattered = true;
+                justShattered = true;
+            }
+        }
+    });
+    if (justShattered) return analyzeCircuit(); // Re-run matrix with broken bulb (open circuit)
+
+    // 2. Apply the solved matrix variables directly to the components
+    components.forEach(c => {
+        let compState = state.comps.get(c.id);
+        c.current = compState.i;
+        c.t1.voltage = compState.v1;
+        c.t2.voltage = compState.v2;
+        if (c.type === 'BATTERY' && Math.abs(c.current) > 10) c.smoking = true;
+    });
+
+    wires.forEach(w => {
+        let wireState = state.wires.get(w);
+        w.current = wireState.i;
+        w.n1.voltage = wireState.v1;
+        w.n2.voltage = wireState.v2;
+    });
+
+    activeLoopData.short = state.isShort;
+
+    // 3. Telemetry Math (Load-Based Equivalent Resistance)
+    let loadPower = 0;
+    let maxBatI = 0;
+    
+    components.forEach(c => {
+        let i = Math.abs(c.current);
+        if (c.type === 'BATTERY') {
+            if (i > maxBatI) maxBatI = i;
+        } else if (c.type === 'RESISTOR') {
+            loadPower += i * i * 10;
+        } else if (c.type === 'BULB' && !c.shattered) {
+            loadPower += i * i * 5;
+        }
+    });
+
+    let maxV = Math.max(...statePackage.nodeVoltages);
+    let minV = Math.min(...statePackage.nodeVoltages);
+    activeLoopData.v = maxV - minV;
+
+    if (loadPower > 0.0001 && activeLoopData.v > 0) {
+        activeLoopData.r = (activeLoopData.v * activeLoopData.v) / loadPower;
+    } else {
+        activeLoopData.r = 0;
+    }
+    
+    activeLoopData.i = maxBatI; 
+
+    // 4. Predictive UI Logic for Replace Button
+    let anyShattered = components.some(c => c.type === 'BULB' && c.shattered);
+    let canReplace = false;
+
+    if (anyShattered) {
+        let healState = computeCircuitState(true).result;
+        canReplace = true;
+        components.forEach(c => {
+            if (c.type === 'BULB' && Math.abs(healState.comps.get(c.id).i) > 0.601) {
+                canReplace = false;
+            }
+        });
+    }
+
+    let btnReplace = document.getElementById('btn-replace');
+    if (anyShattered) {
+        if (canReplace) {
+            btnReplace.disabled = false; btnReplace.innerText = "💡 Replace Shattered Bulbs";
+        } else {
+            btnReplace.disabled = true; btnReplace.innerText = "⚠️ Voltage Too High to Replace!";
+        }
+    } else {
+        btnReplace.disabled = true; btnReplace.innerText = "💡 Replace Shattered Bulbs";
+    }
+
+    updateDashboard();
+  }
+
+  function updateDashboard() {
+    document.getElementById('tel-v').innerText = activeLoopData.v.toFixed(1) + ' V';
+    let tr = document.getElementById('tel-r');
+    let ti = document.getElementById('tel-i');
+    
+    if (activeLoopData.short) { 
+      tr.innerHTML = '<span class="alert">SHORT! (0 Ω)</span>'; 
+      ti.innerHTML = '<span class="alert">OVERLOAD</span>'; 
+    } else if (activeLoopData.i < 0.001) { 
+      tr.innerHTML = '<span class="alert">Infinite (Broken/Open)</span>'; 
+      ti.innerText = "0.00 A"; 
+    } else { 
+      tr.innerText = activeLoopData.r.toFixed(1) + " Ω"; 
+      ti.innerText = activeLoopData.i.toFixed(2) + " A"; 
+    }
+  }
+
+  function draw() {
+    ctx.fillStyle = '#0a0a0a'; 
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#1a1a1a';
+    for(let x=0; x<canvas.width; x+=25) {
+      for(let y=100; y<canvas.height; y+=25) {
+        ctx.fillRect(x, y, 2, 2);
+      }
+    }
+
+    ctx.fillStyle = '#111'; ctx.fillRect(0, 0, canvas.width, 100);
+    ctx.strokeStyle = '#333'; ctx.beginPath(); ctx.moveTo(0,100); ctx.lineTo(900,100); ctx.stroke();
+    
+    shelf.forEach(s => { let t = new Component('s', s.type, s.x, s.y); ctx.globalAlpha = 0.4; t.draw(ctx); ctx.globalAlpha = 1; });
+    
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 4;
+    wires.forEach(w => {
+      let p1 = w.n1.getPos();
+      let p2 = w.n2.getPos();
+      ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+    });
+
+    wires.forEach(w => {
+      let I = w.current;
+      if (Math.abs(I) > 0.001 && !activeLoopData.short) {
+        let p1 = w.n1.getPos();
+        let p2 = w.n2.getPos();
+
+        let start = I > 0 ? p1 : p2;
+        let end = I > 0 ? p2 : p1;
+
+        let d = Math.hypot(end.x - start.x, end.y - start.y);
+        
+        if (typeof w.ePhase !== 'number') w.ePhase = 0;
+        
+        let visualSpeed = Math.abs(I) * 10.0; 
+        visualSpeed = Math.max(0.2, Math.min(visualSpeed, 15.0)); 
+        
+        w.ePhase += visualSpeed;
+        
+        let spacing = 25;
+        let offset = w.ePhase % spacing;
+
+        ctx.fillStyle = '#4fc1ff';
+        for(let j = offset; j < d; j += spacing) {
+          let ex = start.x + (end.x - start.x) * (j / d);
+          let ey = start.y + (end.y - start.y) * (j / d);
+          ctx.beginPath(); ctx.arc(ex, ey, 3.5, 0, Math.PI*2); ctx.fill();
+        }
+      }
+    });
+
+    if (activeWiringTerminal) {
+      let p1 = activeWiringTerminal.getPos();
+      ctx.setLineDash([5,5]); ctx.strokeStyle = '#ffeb3b'; ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(mouseX, mouseY); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    components.forEach(c => c.draw(ctx));
+    
+    let trashX = canvas.width - 60;
+    let trashY = canvas.height - 60;
+    let trashSize = 50;
+    let isHoveringTrash = draggingComp && mouseX > trashX && mouseY > trashY;
+
+    ctx.fillStyle = isHoveringTrash ? '#d32f2f' : '#222'; 
+    ctx.fillRect(trashX, trashY, trashSize, trashSize);
+    
+    ctx.strokeStyle = isHoveringTrash ? '#ffeb3b' : '#111'; 
+    ctx.lineWidth = 2;
+    ctx.strokeRect(trashX, trashY, trashSize, trashSize);
+    
+    ctx.fillStyle = isHoveringTrash ? '#fff' : '#aaa'; 
+    ctx.font = '24px Arial'; 
+    ctx.fillText('🗑️', trashX + 12, trashY + 32);
+
+    if (!draggingComp && !hasDragged && !activeWiringTerminal) {
+        let tooltipLines = null;
+        
+        if (hoveredTerminal && hoveredTerminal.comp.id) {
+            tooltipLines = [
+                "Node: " + (hoveredTerminal.id.endsWith('_1') ? "Negative (-)" : "Positive (+)"),
+                "Abs. Voltage: " + (hoveredTerminal.voltage || 0).toFixed(2) + " V"
+            ];
+        } else if (hoveredWire) {
+            tooltipLines = [
+                "--- Wire ---",
+                "Branch Current: " + Math.abs(hoveredWire.current || 0).toFixed(2) + " A"
+            ];
+        } else {
+            let hc = getComponentAt(mouseX, mouseY);
+            if (hc && hc.id) { 
+                let vDrop = Math.abs((hc.t1.voltage || 0) - (hc.t2.voltage || 0));
+                let i = Math.abs(hc.current || 0);
+                tooltipLines = [`--- ${hc.type} ---`];
+                
+                if (hc.type === 'BATTERY') {
+                    tooltipLines.push("Source Push: 1.50 V");
+                    tooltipLines.push("Net Contrib.: " + vDrop.toFixed(2) + " V");
+                } else {
+                    tooltipLines.push("Voltage Drop: " + vDrop.toFixed(2) + " V");
+                }
+                
+                tooltipLines.push("Local Current: " + i.toFixed(2) + " A");
+                
+                if (hc.type === 'RESISTOR') tooltipLines.push("Resistance: 10 Ω");
+                if (hc.type === 'BULB') tooltipLines.push(hc.shattered ? "Status: BROKEN (∞ Ω)" : "Resistance: 5 Ω");
+                if (hc.type === 'SWITCH') tooltipLines.push(hc.closed ? "Status: CLOSED (0 Ω)" : "Status: OPEN (∞ Ω)");
+            }
+        }
+
+        if (tooltipLines) {
+            ctx.font = 'bold 12px Courier';
+            let maxW = 0;
+            tooltipLines.forEach(l => maxW = Math.max(maxW, ctx.measureText(l).width));
+            let pad = 10;
+            let boxW = maxW + pad * 2;
+            let boxH = tooltipLines.length * 16 + pad * 2;
+            
+            let tX = mouseX + 15;
+            let tY = mouseY + 15;
+            if (tX + boxW > canvas.width) tX = mouseX - boxW - 10;
+            if (tY + boxH > canvas.height) tY = mouseY - boxH - 10;
+
+            ctx.fillStyle = 'rgba(15, 15, 15, 0.95)';
+            ctx.strokeStyle = '#4fc1ff';
+            ctx.lineWidth = 1;
+            ctx.fillRect(tX, tY, boxW, boxH);
+            ctx.strokeRect(tX, tY, boxW, boxH);
+
+            tooltipLines.forEach((l, idx) => {
+                if (idx === 0 && l.startsWith('---')) ctx.fillStyle = '#4fc1ff'; 
+                else ctx.fillStyle = '#eee';
+                ctx.fillText(l, tX + pad, tY + pad + 12 + idx * 16);
+            });
+        }
+    }
+    
+    requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+</body>
+</html>

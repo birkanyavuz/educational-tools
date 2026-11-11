@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time-Travel Clock</title>
+<style>
+  body { 
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; 
+    text-align: center; 
+    background: #e8f5e9; 
+    margin: 0; /* Removed default margin */
+    padding: 10px; /* Reduced from 20px */
+    color: #333;
+    user-select: none; 
+    box-sizing: border-box;
+  }
+  .container { 
+    background: white; 
+    border-radius: 15px; /* Slightly tighter radius */
+    padding: 15px 20px; /* Reduced padding from 30px */
+    max-width: 700px; 
+    margin: 0 auto; /* Pushes to top instead of auto-centering vertically if there was flex */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    border: 5px solid #4caf50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  h1 { color: #2e7d32; margin-top: 5px; margin-bottom: 5px; font-size: 26px; }
+
+  /* Clock Face Styling */
+  .clock-wrapper {
+    position: relative;
+    width: 260px; /* Slightly scaled down from 280px */
+    height: 260px;
+    background: #fff;
+    border: 10px solid #333;
+    border-radius: 50%;
+    margin: 10px 0; /* Reduced from 20px */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.1), 0 8px 15px rgba(0,0,0,0.2);
+    touch-action: none; 
+  }
+  
+  .number {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: calc(50% - 15px);
+    left: calc(50% - 15px);
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    line-height: 30px;
+    pointer-events: none; 
+  }
+
+  .center-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    background: #333;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* Interactive Hands Base */
+  .hand-container {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    z-index: 5;
+    cursor: grab;
+    border-radius: 6px;
+  }
+  .hand-container:active { cursor: grabbing; }
+
+  /* The Invisible Grab Box */
+  .hand-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -15px; 
+    width: 30px;
+    height: 100%;
+    background: transparent;
+  }
+
+  /* Hands */
+  .hour-hand {
+    width: 6px;
+    height: 65px; /* Scaled down slightly */
+    background: #e53935; 
+    margin-left: -3px; 
+  }
+  .minute-hand {
+    width: 4px;
+    height: 100px; /* Scaled down slightly */
+    background: #1e88e5; 
+    margin-left: -2px; 
+  }
+
+  /* Digital Display */
+  .digital-clock {
+    font-size: 3rem; /* Reduced from 4rem */
+    font-weight: bold;
+    background: #333;
+    color: #00ff00;
+    padding: 5px 30px; /* Reduced from 10px 40px */
+    border-radius: 12px;
+    font-family: 'Courier New', Courier, monospace;
+    border: 4px solid #bbb;
+    margin-bottom: 15px; /* Reduced from 30px */
+  }
+
+  /* Time Machine Controls */
+  .controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px; /* Reduced from 20px */
+    width: 100%;
+  }
+  .control-section {
+    background: #f1f8e9;
+    padding: 10px; /* Reduced from 15px */
+    border-radius: 12px;
+    border: 2px dashed #81c784;
+  }
+  .control-section h3 { margin: 0 0 8px 0; color: #555; font-size: 1.1rem; }
+  .btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px; /* Reduced from 10px */
+    flex-wrap: wrap;
+  }
+  button {
+    font-size: 1rem; /* Reduced from 1.1rem */
+    padding: 8px 12px; /* Reduced from 10px 15px */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: transform 0.1s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  button:active { transform: scale(0.95); box-shadow: 0 2px 3px rgba(0,0,0,0.1); }
+  
+  .btn-sub { background-color: #ff9800; }
+  .btn-add { background-color: #4caf50; }
+  .btn-sub:hover { background-color: #f57c00; }
+  .btn-add:hover { background-color: #388e3c; }
+
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Time-Travel Clock!</h1>
+    <p style="margin-top: -5px; margin-bottom: 5px; color: #555; font-size: 0.9rem;">Drag the hands or use the buttons!</p>
+    
+    <div class="clock-wrapper" id="clock-face">
+      <div class="hand-container hour-hand" id="hour-hand"></div>
+      <div class="hand-container minute-hand" id="minute-hand"></div>
+      <div class="center-dot"></div>
+    </div>
+
+    <div class="digital-clock" id="digital-display">
+      12:00 AM
+    </div>
+
+    <div class="controls-grid">
+      <div class="control-section">
+        <h3>Time Travel: Hours</h3>
+        <div class="btn-row">
+          <button class="btn-sub" onclick="timeTravel(-60)">- 1 Hr</button>
+          <button class="btn-add" onclick="timeTravel(60)">+ 1 Hr</button>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3>Time Travel: Minutes</h3>
+        <div class="btn-row">
+          <button class="btn-sub" onclick="timeTravel(-15)">- 15 Min</button>
+          <button class="btn-sub" onclick="timeTravel(-5)">- 5 Min</button>
+          <button class="btn-add" onclick="timeTravel(5)">+ 5 Min</button>
+          <button class="btn-add" onclick="timeTravel(15)">+ 15 Min</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTime = new Date(2024, 0, 1, 8, 0, 0); 
+    
+    let isDraggingHour = false;
+    let isDraggingMinute = false;
+    const clockFace = document.getElementById('clock-face');
+    const hourHand = document.getElementById('hour-hand');
+    const minuteHand = document.getElementById('minute-hand');
+
+    function initClockFace() {
+      for (let i = 1; i <= 12; i++) {
+        let num = document.createElement('div');
+        num.className = 'number';
+        num.innerText = i;
+        let angle = i * 30;
+        /* Adjusted the translation to account for the slightly smaller clock face */
+        num.style.transform = `rotate(${angle}deg) translate(0, -105px) rotate(-${angle}deg)`;
+        clockFace.appendChild(num);
+      }
+    }
+
+    function updateVisuals() {
+      let hours = currentTime.getHours();
+      let minutes = currentTime.getMinutes();
+
+      let minuteAngle = minutes * 6;
+      let hourAngle = (hours % 12) * 30 + (minutes * 0.5);
+
+      minuteHand.style.transform = `rotate(${minuteAngle}deg)`;
+      hourHand.style.transform = `rotate(${hourAngle}deg)`;
+
+      let ampm = hours >= 12 ? 'PM' : 'AM';
+      let displayHour = hours % 12;
+      if (displayHour === 0) displayHour = 12; 
+      let displayMinute = minutes < 10 ? '0' + minutes : minutes;
+
+      document.getElementById('digital-display').innerText = `${displayHour}:${displayMinute} ${ampm}`;
+    }
+
+    function timeTravel(minutesToAdd) {
+      currentTime.setMinutes(currentTime.getMinutes() + minutesToAdd);
+      updateVisuals();
+    }
+
+    function getClockCenter() {
+      let rect = clockFace.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+      };
+    }
+
+    function startDrag(e, type) {
+      e.preventDefault(); 
+      if (type === 'hour') isDraggingHour = true;
+      if (type === 'minute') isDraggingMinute = true;
+    }
+
+    function stopDrag() {
+      isDraggingHour = false;
+      isDraggingMinute = false;
+    }
+
+    function doDrag(e) {
+      if (!isDraggingHour && !isDraggingMinute) return;
+
+      let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      let center = getClockCenter();
+      
+      let dx = clientX - center.x;
+      let dy = clientY - center.y;
+      
+      let angle = Math.atan2(dy, dx) + (Math.PI / 2); 
+      if (angle < 0) angle += 2 * Math.PI;
+      let degrees = angle * (180 / Math.PI);
+
+      if (isDraggingMinute) {
+        let newMinutes = Math.round(degrees / 6) % 60;
+        let oldMinutes = currentTime.getMinutes();
+        
+        let diff = newMinutes - oldMinutes;
+        if (diff < -30) diff += 60; 
+        else if (diff > 30) diff -= 60; 
+        
+        currentTime.setMinutes(currentTime.getMinutes() + diff);
+      } 
+      else if (isDraggingHour) {
+        let newHour = Math.round(degrees / 30) % 12;
+        let oldHour = currentTime.getHours() % 12;
+        
+        let diff = newHour - oldHour;
+        if (diff < -6) diff += 12; 
+        else if (diff > 6) diff -= 12; 
+        
+        currentTime.setHours(currentTime.getHours() + diff);
+      }
+      
+      updateVisuals();
+    }
+
+    hourHand.addEventListener('mousedown', (e) => startDrag(e, 'hour'));
+    minuteHand.addEventListener('mousedown', (e) => startDrag(e, 'minute'));
+    document.addEventListener('mousemove', doDrag);
+    document.addEventListener('mouseup', stopDrag);
+
+    hourHand.addEventListener('touchstart', (e) => startDrag(e, 'hour'), {passive: false});
+    minuteHand.addEventListener('touchstart', (e) => startDrag(e, 'minute'), {passive: false});
+    document.addEventListener('touchmove', doDrag, {passive: false});
+    document.addEventListener('touchend', stopDrag);
+
+    initClockFace();
+    updateVisuals();
+  </script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraction Converter & Comparator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            text-align: center;
+            padding: 10px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            max-width: 850px;
+            width: 100%;
+            padding: 20px 30px; 
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+        }
+
+        h1 { color: #0f172a; margin: 5px 0; font-size: 1.8rem; }
+        .subtitle { margin: 5px 0 20px 0; color: #475569; }
+        
+        .main-problem {
+            font-size: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .fraction-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .fraction .num { border-bottom: 4px solid #1e293b; padding: 0 10px; }
+        .fraction .den { padding: 0 10px; }
+
+        .step-card {
+            background: #fff;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px; 
+            opacity: 0.4;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .step-card.active {
+            opacity: 1;
+            pointer-events: auto;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .step-card.completed {
+            opacity: 1;
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #475569;
+        }
+
+        .step-card.active .step-title { color: #2563eb; }
+        .step-card.completed .step-title { color: #059669; }
+
+        input[type="text"], input[type="number"] {
+            font-size: 1.5rem;
+            text-align: center;
+            border: 3px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px;
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        input:focus { outline: none; border-color: #3b82f6; }
+
+        .conversion-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .conversion-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            background: #f8fafc;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        button:active { transform: scale(0.95); }
+        .btn-next { background-color: #8b5cf6; display: none; margin: 10px auto 0; font-size: 1.2rem; padding: 12px 25px;}
+
+        .feedback {
+            margin-top: 5px;
+            font-weight: bold;
+            min-height: 20px;
+            font-size: 1rem;
+        }
+        .text-red { color: #ef4444; }
+        .text-green { color: #10b981; }
+        
+        .symbol-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+        
+        #symbol-translation {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-top: 5px;
+            min-height: 18px;
+            font-weight: normal;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Step-by-Step Fraction Comparison</h1>
+    <p class="subtitle">Let's make the pieces the same size so they are easy to compare!</p>
+
+    <div class="main-problem">
+        <div class="fraction-group">
+            <div id="vis1"></div>
+            <div class="fraction">
+                <span class="num" id="main-n1"></span>
+                <span class="den" id="main-d1"></span>
+            </div>
+        </div>
+        
+        <div id="final-symbol" style="width: 50px; text-align: center;">?</div>
+        
+        <div class="fraction-group">
+            <div class="fraction">
+                <span class="num" id="main-n2"></span>
+                <span class="den" id="main-d2"></span>
+            </div>
+            <div id="vis2"></div>
+        </div>
+    </div>
+
+    <div id="step1" class="step-card active">
+        <div class="step-title">Step 1: Find a Common Denominator</div>
+        <p style="margin: 5px 0 10px;">Find a number that both <strong><span id="txt-d1"></span></strong> and <strong><span id="txt-d2"></span></strong> can multiply into perfectly.</p>
+        <input type="number" id="input-cd" style="width: 100px;" placeholder="CD">
+        <div id="feedback1" class="feedback"></div>
+    </div>
+
+    <div id="step2" class="step-card">
+        <div class="step-title">Step 2: Convert the Fractions</div>
+        <p style="margin: 5px 0 10px;">Multiply the top <strong>AND</strong> bottom to make equivalent fractions.</p>
+        <div class="conversion-row">
+            <div class="conversion-group">
+                <div class="fraction">
+                    <span class="num" id="conv-n1"></span>
+                    <span class="den" id="conv-d1"></span>
+                </div>
+                <span>=</span>
+                <div class="fraction">
+                    <input type="number" id="input-new-n1" style="width: 60px;">
+                    <span class="den cd-display" style="padding-top: 5px;"></span>
+                </div>
+                <div id="step2-vis1" style="margin-left: 10px;"></div>
+            </div>
+            
+            <div class="conversion-group">
+                <div class="fraction">
+                    <span class="num" id="conv-n2"></span>
+                    <span class="den" id="conv-d2"></span>
+                </div>
+                <span>=</span>
+                <div class="fraction">
+                    <input type="number" id="input-new-n2" style="width: 60px;">
+                    <span class="den cd-display" style="padding-top: 5px;"></span>
+                </div>
+                <div id="step2-vis2" style="margin-left: 10px;"></div>
+            </div>
+        </div>
+        <div id="feedback2" class="feedback"></div>
+    </div>
+
+    <div id="step3" class="step-card">
+        <div class="step-title">Step 3: Compare</div>
+        <p style="margin: 5px 0 10px;">Now that the denominators are the same, type <strong>&lt;</strong>, <strong>&gt;</strong>, or <strong>=</strong></p>
+        <div style="font-size: 2rem; display: flex; justify-content: center; align-items: center; gap: 15px;">
+            <div class="fraction">
+                <span class="num" id="final-n1"></span>
+                <span class="den cd-display"></span>
+            </div>
+            
+            <div class="symbol-container">
+                <input type="text" id="input-symbol" style="width: 60px;" maxlength="1">
+                <span id="symbol-translation"></span>
+            </div>
+            
+            <div class="fraction">
+                <span class="num" id="final-n2"></span>
+                <span class="den cd-display"></span>
+            </div>
+        </div>
+        <div id="feedback3" class="feedback"></div>
+    </div>
+
+    <button id="btn-next-problem" class="btn-next" onclick="generateProblem()">Generate Next Problem</button>
+
+</div>
+
+<script>
+    let f1 = { n: 0, d: 0 };
+    let f2 = { n: 0, d: 0 };
+    let currentCD = 0;
+    let currentStep = 1;
+
+    function drawPieChart(n, d, color) {
+        const circumference = 2 * Math.PI * 25; 
+        const dashArray = (n / d) * circumference;
+        
+        let svg = `<svg viewBox="0 0 100 100" style="width: 70px; height: 70px; border-radius: 50%; background: #f1f5f9; transform: rotate(-90deg); border: 3px solid #94a3b8; box-shadow: inset 0 0 5px rgba(0,0,0,0.2);">`;
+        
+        svg += `<circle r="25" cx="50" cy="50" fill="transparent" stroke="${color}" stroke-width="50" stroke-dasharray="${dashArray} ${circumference}" />`;
+        
+        for(let i = 0; i < d; i++) {
+            let angle = (i / d) * 360;
+            // Changed stroke from #ffffff to #000000
+            svg += `<line x1="50" y1="50" x2="100" y2="50" stroke="#000000" stroke-width="2" transform="rotate(${angle} 50 50)" />`;
+        }
+        
+        svg += `</svg>`;
+        return svg;
+    }
+
+    function generateProblem() {
+        const dens = [2, 3, 4, 5, 6]; 
+        
+        f1.d = dens[Math.floor(Math.random() * dens.length)];
+        do { f2.d = dens[Math.floor(Math.random() * dens.length)]; } while (f1.d === f2.d); 
+
+        f1.n = Math.floor(Math.random() * f1.d) + 1;
+        f2.n = Math.floor(Math.random() * f2.d) + 1;
+
+        currentStep = 1;
+        document.getElementById('final-symbol').innerText = '?';
+        document.getElementById('btn-next-problem').style.display = 'none';
+        
+        ['step1', 'step2', 'step3'].forEach(id => {
+            document.getElementById(id).className = 'step-card';
+            document.getElementById(id).querySelector('.feedback').innerText = '';
+        });
+        
+        document.getElementById('step1').classList.add('active');
+        
+        document.getElementById('input-cd').value = '';
+        document.getElementById('input-new-n1').value = '';
+        document.getElementById('input-new-n2').value = '';
+        document.getElementById('input-symbol').value = '';
+        document.getElementById('symbol-translation').innerText = '';
+
+        document.getElementById('input-cd').disabled = false;
+        document.getElementById('input-new-n1').disabled = false;
+        document.getElementById('input-new-n2').disabled = false;
+        document.getElementById('input-symbol').disabled = false;
+
+        document.getElementById('main-n1').innerText = f1.n;
+        document.getElementById('main-d1').innerText = f1.d;
+        document.getElementById('main-n2').innerText = f2.n;
+        document.getElementById('main-d2').innerText = f2.d;
+        
+        document.getElementById('step2-vis1').innerHTML = '';
+        document.getElementById('step2-vis2').innerHTML = '';
+
+        document.getElementById('vis1').innerHTML = drawPieChart(f1.n, f1.d, '#3b82f6');
+        document.getElementById('vis2').innerHTML = drawPieChart(f2.n, f2.d, '#10b981'); 
+
+        document.getElementById('txt-d1').innerText = f1.d;
+        document.getElementById('txt-d2').innerText = f2.d;
+
+        document.getElementById('conv-n1').innerText = f1.n;
+        document.getElementById('conv-d1').innerText = f1.d;
+        document.getElementById('conv-n2').innerText = f2.n;
+        document.getElementById('conv-d2').innerText = f2.d;
+
+        document.getElementById('input-cd').focus();
+    }
+
+    function checkStep1() {
+        const input = parseInt(document.getElementById('input-cd').value);
+        const fb = document.getElementById('feedback1');
+        
+        if (isNaN(input)) return;
+
+        if (input % f1.d === 0 && input % f2.d === 0) {
+            currentCD = input;
+            fb.innerHTML = `<span class="text-green">Correct! ${input} is a common denominator.</span>`;
+            
+            document.getElementById('input-cd').disabled = true;
+            document.getElementById('step1').classList.replace('active', 'completed');
+            document.getElementById('step2').classList.add('active');
+            
+            document.querySelectorAll('.cd-display').forEach(el => el.innerText = currentCD);
+            
+            const correct_n1 = f1.n * (currentCD / f1.d);
+            const correct_n2 = f2.n * (currentCD / f2.d);
+            document.getElementById('step2-vis1').innerHTML = drawPieChart(correct_n1, currentCD, '#3b82f6');
+            document.getElementById('step2-vis2').innerHTML = drawPieChart(correct_n2, currentCD, '#10b981');
+
+            currentStep = 2;
+            document.getElementById('input-new-n1').focus();
+        } else {
+            fb.innerHTML = `<span class="text-red">Not quite. Both ${f1.d} and ${f2.d} must divide evenly into it.</span>`;
+        }
+    }
+
+    function checkStep2() {
+        const n1_ans = parseInt(document.getElementById('input-new-n1').value);
+        const n2_ans = parseInt(document.getElementById('input-new-n2').value);
+        const fb = document.getElementById('feedback2');
+
+        if (isNaN(n1_ans) || isNaN(n2_ans)) return;
+
+        const correct_n1 = f1.n * (currentCD / f1.d);
+        const correct_n2 = f2.n * (currentCD / f2.d);
+
+        if (n1_ans === correct_n1 && n2_ans === correct_n2) {
+            fb.innerHTML = `<span class="text-green">Perfect! You found the equivalent fractions.</span>`;
+            
+            document.getElementById('vis1').innerHTML = drawPieChart(correct_n1, currentCD, '#3b82f6');
+            document.getElementById('vis2').innerHTML = drawPieChart(correct_n2, currentCD, '#10b981');
+
+            document.getElementById('input-new-n1').disabled = true;
+            document.getElementById('input-new-n2').disabled = true;
+            document.getElementById('step2').classList.replace('active', 'completed');
+            document.getElementById('step3').classList.add('active');
+
+            document.getElementById('final-n1').innerText = correct_n1;
+            document.getElementById('final-n2').innerText = correct_n2;
+
+            currentStep = 3;
+            document.getElementById('input-symbol').focus();
+        } else {
+            fb.innerHTML = `<span class="text-red">Check your math! Or count the colored pieces in the circles.</span>`;
+        }
+    }
+
+    function checkStep3() {
+        const input = document.getElementById('input-symbol').value.trim();
+        const fb = document.getElementById('feedback3');
+
+        if (input !== "<" && input !== ">" && input !== "=") {
+            fb.innerHTML = `<span class="text-red">Please enter <, >, or =</span>`;
+            return;
+        }
+
+        const correct_n1 = f1.n * (currentCD / f1.d);
+        const correct_n2 = f2.n * (currentCD / f2.d);
+
+        let correctSymbol = "=";
+        if (correct_n1 > correct_n2) correctSymbol = ">";
+        else if (correct_n1 < correct_n2) correctSymbol = "<";
+
+        if (input === correctSymbol) {
+            fb.innerHTML = `<span class="text-green">Excellent! You've successfully compared the fractions!</span>`;
+            document.getElementById('final-symbol').innerText = input;
+            
+            document.getElementById('input-symbol').disabled = true;
+            document.getElementById('step3').classList.replace('active', 'completed');
+            
+            document.getElementById('btn-next-problem').style.display = 'block';
+            document.getElementById('btn-next-problem').focus();
+            currentStep = 4;
+        } else {
+            fb.innerHTML = `<span class="text-red">Incorrect. Compare the new numerators.</span>`;
+        }
+    }
+
+    document.getElementById('input-symbol').addEventListener('input', function(e) {
+        const val = e.target.value.trim();
+        const trans = document.getElementById('symbol-translation');
+        if (val === '<') trans.innerText = "(is smaller than)";
+        // Updated text translation here
+        else if (val === '>') trans.innerText = "(is bigger than)";
+        else if (val === '=') trans.innerText = "(is equal to)";
+        else trans.innerText = "";
+    });
+
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            if (currentStep === 1) checkStep1();
+            else if (currentStep === 2) checkStep2();
+            else if (currentStep === 3) checkStep3();
+        }
+    });
+
+    window.onload = generateProblem;
+</script>
+
+</body>
+</html>

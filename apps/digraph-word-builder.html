@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digraph Word Builder</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+         background: linear-gradient(180deg,#fef9e7,#e8f6ff); color:#21303e;
+         display:flex; justify-content:center; }
+  .app { width:100%; max-width:640px; padding:16px 14px 26px; text-align:center; }
+  h1 { font-size:30px; margin:6px 0 2px; }
+  .sub { font-size:16px; color:#5a6b7a; margin-bottom:12px; }
+  .stars { font-size:22px; min-height:30px; letter-spacing:2px; }
+  .card { background:#fff; border-radius:22px; box-shadow:0 6px 18px rgba(30,60,90,.13);
+          padding:20px 12px 16px; margin-top:8px; }
+  .pic { min-height:190px; display:flex; align-items:center; justify-content:center; }
+  .pic .q { font-size:92px; }
+  .pic img { max-width:100%; max-height:190px; border-radius:16px; object-fit:cover; }
+  .pic .emo { font-size:92px; }
+  .word { font-size:56px; font-weight:bold; letter-spacing:8px; margin:6px 0 2px; }
+  .word .blank { color:#f39c12; }
+  .word .done { color:#27ae60; }
+  .say { font-size:17px; color:#5a6b7a; min-height:22px; }
+  .tiles { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin:16px 0 6px; }
+  .tile { font-size:34px; font-weight:bold; width:70px; height:70px; border:none; border-radius:18px;
+          background:#4aa3ff; color:#fff; cursor:pointer; box-shadow:0 4px 0 #2f7fd6; }
+  .tile:active { transform:translateY(3px); box-shadow:0 1px 0 #2f7fd6; }
+  .tile.wrong { background:#e74c3c; box-shadow:0 4px 0 #b03a2e; animation:shake .3s; }
+  .tile.right { background:#27ae60; box-shadow:0 4px 0 #1e8449; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .row { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .btn { font-size:19px; font-weight:bold; border:none; border-radius:999px; padding:12px 22px;
+         cursor:pointer; background:#ffb020; color:#4a3200; box-shadow:0 4px 0 #d18d06; }
+  .btn:active { transform:translateY(3px); box-shadow:0 1px 0 #d18d06; }
+  .btn.blue { background:#d6ecff; color:#14507e; box-shadow:0 4px 0 #a8cdea; }
+  .fam { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:16px; }
+  .fam button { font-size:19px; font-weight:bold; border:3px solid #4aa3ff; background:#fff; color:#14507e;
+                border-radius:999px; padding:7px 14px; cursor:pointer; }
+  .fam button.on { background:#4aa3ff; color:#fff; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🔤 Digraph Word Builder</h1>
+  <div class="sub">Tap the two letters that start the word!</div>
+  <div class="stars" id="stars"></div>
+  <div class="card">
+    <div class="pic" id="pic"><span class="q">❓</span></div>
+    <div class="word" id="word"></div>
+    <div class="say" id="say">Which two letters come first?</div>
+    <div class="tiles" id="tiles"></div>
+    <div class="row">
+      <button class="btn blue" id="listen">🔊 Listen</button>
+      <button class="btn" id="next">Next Word ➜</button>
+    </div>
+  </div>
+</div>
+<script>
+  const WORDS = {"ship": ["sh", "ip", "https://img.myloview.com/stickers/cargo-ships-waiting-to-cross-panama-canal-700-338168012.jpg", "🚢", ["th", "ph"]], "shop": ["sh", "op", "https://shopmunki.com/cdn/shop/files/cute-storefront.png?v=1758565132&width=1100", "🏪", ["th", "ph"]], "sheep": ["sh", "eep", "https://images.squarespace-cdn.com/content/v1/5abe6c7aee17593713d276c4/1530127313887-ZAQQJ7F38D03JD1E590W/sheep1.jpg?format=2500w", "🐑", ["th", "wh", "ph"]], "shoe": ["sh", "oe", "https://sportcouture.ro/cdn/shop/files/1171541-CHE_1.webp?v=1758894426&width=1600", "👟", ["ch", "th", "wh"]], "shell": ["sh", "ell", "https://www.icraftvinyl.com/cdn/shop/files/shellcloseup.jpg?v=1717530427&width=1946", "🐚", ["ch", "th", "wh"]], "shark": ["sh", "ark", "https://miro.medium.com/v2/0*W9iogWfMs2wLpZPV", "🦈", ["ch", "th", "wh"]], "shed": ["sh", "ed", "https://www.homebase.co.uk/assets/bWFzdGVyfGltYWdlc3wyMDAwNTh8aW1hZ2UvanBlZ3xoNjUvaDBjLzk0MTU5Nzg3Nzg2NTQvMDU1NzkzMV8xLmpwZ3xmYTdkNTVjNjU4OTU0NTI0YTcwZmY0ZjY3MGNhMDc1NDk5YWIxZTYxMmNhOGY5YzVhOTgwZjY5OGVlOTdkMGVm/0557931-1.jpg", "🏠", ["ch", "th", "wh"]], "chip": ["ch", "ip", "https://blessedbeyondwords.com/wp-content/uploads/2025/07/Potato-Chips-2-2048x1566.webp", "🍟", ["th", "ph"]], "chick": ["ch", "ick", "https://img.ifunny.co/images/d2d295c0e2747a52b45a83baa061bdaa6195c124a9f893d461b3653859f505b9_1.jpg", "🐣", ["sh", "wh", "ph"]], "cheese": ["ch", "eese", "https://images.squarespace-cdn.com/content/v1/6940588e76080802a9915069/66b6fea8-bc13-4309-bd25-8b38e549bc81/Asset+1%404x-8.png?format=2500w", "🧀", ["sh", "th", "wh"]], "chair": ["ch", "air", "https://i.pinimg.com/736x/57/da/83/57da83e0f57a84da87ed030f449eb7f3.jpg", "🪑", ["sh", "th", "wh"]], "chop": ["ch", "op", "https://cookingpanda.com/cdn/shop/articles/Healthy_Cutting_Board.png?v=1738396578&width=350", "🪓", ["th", "ph"]], "cherry": ["ch", "erry", "https://www.manywake.com/cdn/shop/files/Cherry_16800b8f-bb13-4088-9a6a-9291ebc37408.png?v=1773881860&width=360", "🍒", ["th", "ph"]], "thumb": ["th", "umb", "https://static.vecteezy.com/system/resources/thumbnails/068/111/922/small_2x/close-up-of-a-light-skinned-hand-gesturing-thumbs-up-against-a-transparent-background-png.png", "👍", ["sh", "ch", "wh"]], "three": ["th", "ree", "https://static.vecteezy.com/system/resources/previews/002/117/448/non_2x/three-red-apples-free-photo.jpg", "3️⃣", ["ch", "wh", "ph"]], "thunder": ["th", "under", "https://wallpaperaccess.com/full/3969209.jpg", "⛈️", ["sh", "wh", "ph"]], "thorn": ["th", "orn", "https://chetsgardencenter.com/wp-content/uploads/2025/10/Why-Do-Roses-Have-Thorns-A-Fascinating-Look-into-Nature-1024x683-1.jpeg", "🌹", ["ch", "wh", "ph"]], "whale": ["wh", "ale", "https://ui.reslynx.com/img/GVI/fit/6e94f510a330.jpg", "🐳", ["ch", "ph"]], "wheel": ["wh", "eel", "https://econo-bikes.com/web/image/product.template/8317/image_1024?unique=1dc04f4", "🛞", ["sh", "ch", "th"]], "whistle": ["wh", "istle", "https://www.clarksonsaccountants.co.uk/Portals/0/Referees%20whistle.jpg", "🎶", ["sh", "ch", "ph"]], "whiskers": ["wh", "iskers", "https://a-z-animals.com/media/2022/06/catwhiskers-1024x683.jpg", "🐱", ["sh", "ch", "th"]]};
+  const DIGRAPHS = ["sh", "ch", "th", "wh"];
+  let cur = null, stars = 0, locked = false;
+  let bag = [], lastWord = "";
+  const $ = id => document.getElementById(id);
+  function speak(text){
+    try { const u = new SpeechSynthesisUtterance(text); u.rate = 0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){}
+  }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  function refill(){
+    bag = shuffle(Object.keys(WORDS));
+    if (bag.length > 1 && bag[bag.length-1] === lastWord) {
+      const t = bag[0]; bag[0] = bag[bag.length-1]; bag[bag.length-1] = t;
+    }
+  }
+  function newWord(){
+    locked = false;
+    if (!bag.length) refill();
+    const word = bag.pop();
+    const w = WORDS[word];
+    cur = { word: word, dg: w[0], rest: w[1], img: w[2], emoji: w[3], safe: w[4] };
+    lastWord = word;
+    $("pic").innerHTML = '<span class="q">❓</span>';
+    $("word").innerHTML = '<span class="blank">__</span>' + cur.rest;
+    $("say").textContent = "Which two letters come first?";
+    const opts = shuffle([cur.dg].concat(cur.safe));
+    $("tiles").innerHTML = "";
+    opts.forEach(d => {
+      const t = document.createElement("button");
+      t.className = "tile"; t.textContent = d; t.style.width = "92px";
+      t.onclick = () => pick(t, d);
+      $("tiles").appendChild(t);
+    });
+  }
+  function showPic(){
+    if (cur.img) {
+      const im = new Image();
+      im.onload = () => { $("pic").innerHTML = ""; $("pic").appendChild(im); };
+      im.onerror = () => { $("pic").innerHTML = '<span class="emo">' + cur.emoji + '</span>'; };
+      im.src = cur.img; im.alt = cur.word;
+    } else {
+      $("pic").innerHTML = '<span class="emo">' + cur.emoji + '</span>';
+    }
+  }
+  function pick(tile, dg){
+    if (locked) return;
+    if (dg === cur.dg) {
+      locked = true;
+      tile.classList.add("right");
+      showPic();
+      $("word").innerHTML = '<span class="done">' + cur.dg + '</span>' + cur.rest;
+      $("say").textContent = cur.word + "!";
+      stars++; $("stars").textContent = "⭐".repeat(Math.min(stars, 20));
+      speak(cur.word);
+    } else {
+      tile.classList.add("wrong");
+      $("say").textContent = "Try again! Listen: __" + cur.rest;
+      setTimeout(() => tile.classList.remove("wrong"), 350);
+    }
+  }
+  $("next").onclick = newWord;
+  $("listen").onclick = () => speak(cur ? (locked ? cur.word : "..." + cur.rest + ". Which two letters come first?") : "");
+  newWord();
+</script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equivalent Fractions: Scale & Simplify</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            text-align: center;
+            padding: 2vh 2vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden; 
+        }
+
+        .container {
+            background: white;
+            max-width: 1100px;
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 94vh;
+        }
+
+        h1 { color: #0f172a; margin: 0; font-size: 2rem; }
+        .subtitle { margin: 0; color: #475569; font-size: 1.2rem; }
+
+        .visual-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding: 15px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            flex-grow: 1;
+        }
+
+        .fraction-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+            font-size: 2.8rem;
+            line-height: 1.1;
+        }
+
+        .fraction .num { border-bottom: 5px solid #1e293b; padding: 0 12px; }
+        .fraction .den { padding: 0 12px; }
+
+        .equals-sign { font-size: 3rem; font-weight: bold; color: #475569; }
+
+        .steps-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .step-card {
+            flex: 1;
+            background: #fff;
+            border: 3px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 15px 20px;
+            opacity: 0.4;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .step-card.active {
+            opacity: 1;
+            pointer-events: auto;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .step-card.completed {
+            opacity: 1;
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .step-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #475569;
+        }
+
+        .step-card.active .step-title { color: #2563eb; }
+        .step-card.completed .step-title { color: #059669; }
+
+        .step-card p { margin: 5px 0; font-size: 1.15rem; }
+
+        .math-equation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        input[type="number"] {
+            font-size: 2.2rem;
+            text-align: center;
+            border: 3px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0;
+            width: 90px;
+            height: 60px;
+            color: #0f172a;
+            font-weight: bold;
+            -moz-appearance: textfield;
+        }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input:focus { outline: none; border-color: #3b82f6; background: #eff6ff; }
+
+        .feedback {
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.15rem;
+            margin-top: 5px;
+        }
+
+        .text-red { color: #ef4444; }
+        .text-green { color: #10b981; }
+
+        .btn-next {
+            background-color: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            align-self: center;
+            margin-top: 5px;
+        }
+        .btn-next:hover { background-color: #7c3aed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Equivalent Fractions: Scale & Simplify</h1>
+    <p class="subtitle">Find the hidden number to multiply or divide and make the fractions equal!</p>
+
+    <div class="visual-area">
+        <div class="fraction-display">
+            <div id="vis-left"></div>
+            <div class="fraction">
+                <span class="num" id="left-n">1</span>
+                <span class="den" id="left-d">2</span>
+            </div>
+        </div>
+
+        <div class="equals-sign">=</div>
+
+        <div class="fraction-display">
+            <div id="vis-right"></div>
+            <div class="fraction">
+                <span class="num" id="right-n" style="color: #cbd5e1;">?</span>
+                <span class="den" id="right-d">4</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="steps-container">
+        <div id="step1" class="step-card active">
+            <div class="step-title">Step 1: Figure out the cuts</div>
+            <p>What did we <strong id="s1-action">multiply</strong> <strong id="s1-d1"></strong> by to get <strong id="s1-d2"></strong>?</p>
+            <div class="math-equation">
+                <span id="eq-d1"></span>
+                <span id="op-symbol-1">×</span>
+                <input type="number" id="input-factor">
+                <span>=</span>
+                <span id="eq-d2"></span>
+            </div>
+            <div id="feedback1" class="feedback"></div>
+        </div>
+
+        <div id="step2" class="step-card">
+            <div class="step-title">Step 2: Balance the Top</div>
+            <p><span style="text-transform: capitalize;" id="s2-action">Multiply</span> the top number (<strong id="s2-n1"></strong>) by <strong class="display-mult"></strong>.</p>
+            <div class="math-equation">
+                <span id="eq-n1"></span>
+                <span id="op-symbol-2">×</span>
+                <span class="display-mult"></span>
+                <span>=</span>
+                <input type="number" id="input-numerator">
+            </div>
+            <div id="feedback2" class="feedback"></div>
+        </div>
+    </div>
+
+    <button id="btn-next-problem" class="btn-next" onclick="generateProblem()">Next Problem [Enter]</button>
+</div>
+
+<script>
+    let currentProblem = { n1: 0, d1: 0, n2: 0, d2: 0, factor: 0, operation: 'multiply' };
+    let currentStep = 1;
+
+    const basePairs = [
+        { d1: 2, d2: 4, mult: 2 }, { d1: 2, d2: 6, mult: 3 }, { d1: 2, d2: 8, mult: 4 },
+        { d1: 2, d2: 10, mult: 5 }, { d1: 2, d2: 12, mult: 6 }, { d1: 3, d2: 6, mult: 2 },
+        { d1: 3, d2: 9, mult: 3 }, { d1: 3, d2: 12, mult: 4 }, { d1: 4, d2: 8, mult: 2 },
+        { d1: 4, d2: 12, mult: 3 }, { d1: 5, d2: 10, mult: 2 }
+    ];
+
+    function drawPieChart(n, d, color, isHidden = false) {
+        const circumference = 2 * Math.PI * 40; 
+        const dashArray = isHidden ? 0 : (n / d) * circumference;
+        const strokeOpacity = isHidden ? 0.1 : 1;
+        
+        // Increased SVG rendering size to 110px
+        let svg = `<svg viewBox="0 0 100 100" style="width: 110px; height: 110px; border-radius: 50%; background: #f1f5f9; transform: rotate(-90deg); border: 4px solid #94a3b8; box-shadow: inset 0 0 8px rgba(0,0,0,0.2);">`;
+        svg += `<circle r="40" cx="50" cy="50" fill="transparent" stroke="${color}" stroke-width="80" stroke-opacity="${strokeOpacity}" stroke-dasharray="${dashArray} ${circumference}" />`;
+        
+        for(let i = 0; i < d; i++) {
+            let angle = (i / d) * 360;
+            svg += `<line x1="50" y1="50" x2="100" y2="50" stroke="#000000" stroke-width="1.5" transform="rotate(${angle} 50 50)" />`;
+        }
+        svg += `</svg>`;
+        return svg;
+    }
+
+    function generateProblem() {
+        const pair = basePairs[Math.floor(Math.random() * basePairs.length)];
+        const baseNum = Math.floor(Math.random() * (pair.d1 - 1)) + 1;
+        const scaledNum = baseNum * pair.mult;
+        
+        const isMultiply = Math.random() < 0.5;
+
+        currentProblem = {
+            factor: pair.mult,
+            operation: isMultiply ? 'multiply' : 'divide',
+            n1: isMultiply ? baseNum : scaledNum,
+            d1: isMultiply ? pair.d1 : pair.d2,
+            n2: isMultiply ? scaledNum : baseNum,
+            d2: isMultiply ? pair.d2 : pair.d1
+        };
+
+        currentStep = 1;
+        document.getElementById('step1').className = 'step-card active';
+        document.getElementById('step2').className = 'step-card';
+        document.getElementById('btn-next-problem').style.display = 'none';
+        document.getElementById('feedback1').innerText = '';
+        document.getElementById('feedback2').innerText = '';
+        
+        document.getElementById('input-factor').value = '';
+        document.getElementById('input-numerator').value = '';
+        document.getElementById('input-factor').disabled = false;
+        document.getElementById('input-numerator').disabled = false;
+        
+        document.getElementById('right-n').innerText = '?';
+        document.getElementById('right-n').style.color = '#cbd5e1';
+
+        document.getElementById('s1-action').innerText = currentProblem.operation;
+        document.getElementById('s2-action').innerText = currentProblem.operation;
+        const symbol = currentProblem.operation === 'multiply' ? '×' : '÷';
+        document.getElementById('op-symbol-1').innerText = symbol;
+        document.getElementById('op-symbol-2').innerText = symbol;
+
+        document.getElementById('left-n').innerText = currentProblem.n1;
+        document.getElementById('left-d').innerText = currentProblem.d1;
+        document.getElementById('right-d').innerText = currentProblem.d2;
+        document.getElementById('s1-d1').innerText = currentProblem.d1;
+        document.getElementById('s1-d2').innerText = currentProblem.d2;
+        document.getElementById('eq-d1').innerText = currentProblem.d1;
+        document.getElementById('eq-d2').innerText = currentProblem.d2;
+        document.getElementById('eq-n1').innerText = currentProblem.n1;
+        document.getElementById('s2-n1').innerText = currentProblem.n1;
+
+        document.getElementById('vis-left').innerHTML = drawPieChart(currentProblem.n1, currentProblem.d1, '#3b82f6');
+        document.getElementById('vis-right').innerHTML = drawPieChart(currentProblem.n2, currentProblem.d2, '#10b981', true);
+
+        document.getElementById('input-factor').focus();
+    }
+
+    function checkStep1() {
+        const input = parseInt(document.getElementById('input-factor').value);
+        if (isNaN(input)) return;
+
+        if (input === currentProblem.factor) {
+            document.getElementById('feedback1').innerHTML = `<span class="text-green">Correct! We ${currentProblem.operation}d by ${currentProblem.factor}.</span>`;
+            document.getElementById('input-factor').disabled = true;
+            document.getElementById('step1').classList.replace('active', 'completed');
+            document.getElementById('step2').classList.add('active');
+            document.querySelectorAll('.display-mult').forEach(el => el.innerText = currentProblem.factor);
+            
+            currentStep = 2;
+            document.getElementById('input-numerator').focus();
+        } else {
+            document.getElementById('feedback1').innerHTML = `<span class="text-red">Check math! ${currentProblem.d1} ${currentProblem.operation === 'multiply' ? '×' : '÷'} ? = ${currentProblem.d2}</span>`;
+        }
+    }
+
+    function checkStep2() {
+        const input = parseInt(document.getElementById('input-numerator').value);
+        if (isNaN(input)) return;
+
+        if (input === currentProblem.n2) {
+            document.getElementById('feedback2').innerHTML = `<span class="text-green">Perfect! Fractions are equivalent.</span>`;
+            document.getElementById('input-numerator').disabled = true;
+            document.getElementById('step2').classList.replace('active', 'completed');
+            
+            document.getElementById('right-n').innerText = currentProblem.n2;
+            document.getElementById('right-n').style.color = '#1e293b';
+            document.getElementById('vis-right').innerHTML = drawPieChart(currentProblem.n2, currentProblem.d2, '#10b981', false);
+
+            document.getElementById('btn-next-problem').style.display = 'block';
+            document.getElementById('btn-next-problem').focus();
+            currentStep = 3;
+        } else {
+            document.getElementById('feedback2').innerHTML = `<span class="text-red">Check math: ${currentProblem.n1} ${currentProblem.operation === 'multiply' ? '×' : '÷'} ${currentProblem.factor} = ?</span>`;
+        }
+    }
+
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            if (currentStep === 1) checkStep1();
+            else if (currentStep === 2) checkStep2();
+            else if (currentStep === 3) generateProblem();
+        }
+    });
+
+    window.onload = generateProblem;
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Coordinate Target Practice</title>
+<style>
+  * { box-sizing: border-box; }
+  body { 
+    font-family: sans-serif; 
+    text-align: center; 
+    margin: 0; 
+    padding: 4px; 
+    background: #eef2f5; 
+    overflow: hidden; 
+  }
+  h1 { 
+    margin: 2px 0 4px 0; 
+    font-size: 1.4rem; 
+    color: #2c3e50; 
+  }
+  #game-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 4px; 
+    margin-bottom: 4px;
+  }
+  #plane-container {
+    position: relative;
+    box-sizing: content-box;
+    width: 350px;
+    height: 350px;
+    border-left: 3px solid #2c3e50;
+    border-bottom: 3px solid #2c3e50;
+    border-top: 1px solid #bdc3c7;
+    border-right: 1px solid #bdc3c7;
+    background-image: 
+      linear-gradient(to right, #bdc3c7 1px, transparent 1px),
+      linear-gradient(to top, #bdc3c7 1px, transparent 1px);
+    background-size: 35px 35px;
+    background-position: left bottom;
+    margin: 4px 0 16px 20px;
+  }
+  .axis-label {
+    position: absolute;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  .y-label { 
+    left: -24px; 
+    transform: translateY(50%);
+    width: 18px;
+    text-align: right;
+  } 
+  .x-label { 
+    bottom: -22px; 
+    transform: translateX(-50%); 
+  } 
+  
+  #target-point {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background-color: #e74c3c;
+    border: 2px solid #c0392b;
+    border-radius: 50%;
+    transform: translate(-50%, 50%);
+    transition: all 0.2s;
+  }
+
+  .controls { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-top: 2px;
+  }
+  input { 
+    font-size: 1.5rem; 
+    width: 55px; 
+    text-align: center; 
+    padding: 2px; 
+    border: 2px solid #34495e; 
+    border-radius: 6px; 
+  }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+  
+  #feedback { 
+    font-size: 1.05rem; 
+    font-weight: bold; 
+    margin-top: 4px; 
+    min-height: 24px; 
+  }
+  .correct { color: #27ae60; }
+  .incorrect { color: #c0392b; }
+</style>
+</head>
+<body>
+  <h1>Coordinate Target Practice</h1>
+  
+  <div id="game-board">
+    <div id="plane-container">
+      <div id="target-point"></div>
+    </div>
+    
+    <div class="controls">
+      ( 
+      <input type="number" id="x-input" placeholder="x" autofocus> 
+      , 
+      <input type="number" id="y-input" placeholder="y"> 
+      )
+    </div>
+  </div>
+  
+  <div id="feedback">Find the red dot. Enter X, then Y, and press Enter!</div>
+
+<script>
+  let targetX = 0;
+  let targetY = 0;
+  
+  const point = document.getElementById('target-point');
+  const xInput = document.getElementById('x-input');
+  const yInput = document.getElementById('y-input');
+  const feedback = document.getElementById('feedback');
+  const plane = document.getElementById('plane-container');
+
+  function generateLabels() {
+    for (let i = 0; i <= 10; i += 2) {
+      if (i > 0) {
+        let yLabel = document.createElement('div');
+        yLabel.className = 'axis-label y-label';
+        yLabel.style.bottom = (i * 35) + 'px';
+        yLabel.innerText = i;
+        plane.appendChild(yLabel);
+      }
+      let xLabel = document.createElement('div');
+      xLabel.className = 'axis-label x-label';
+      xLabel.style.left = (i * 35) + 'px';
+      xLabel.innerText = i;
+      plane.appendChild(xLabel);
+    }
+  }
+
+  function generateProblem() {
+    targetX = Math.floor(Math.random() * 10) + 1;
+    targetY = Math.floor(Math.random() * 10) + 1;
+    
+    point.style.left = (targetX * 35) + 'px';
+    point.style.bottom = (targetY * 35) + 'px';
+    
+    xInput.value = '';
+    yInput.value = '';
+    xInput.disabled = false;
+    yInput.disabled = false;
+    
+    feedback.innerText = 'Find the red dot. Enter X, then Y, and press Enter!';
+    feedback.className = '';
+    xInput.focus();
+  }
+
+  function checkAnswer() {
+    const xVal = parseInt(xInput.value, 10);
+    const yVal = parseInt(yInput.value, 10);
+    
+    if (isNaN(xVal) || isNaN(yVal)) return;
+
+    if (xVal === targetX && yVal === targetY) {
+      feedback.innerText = '✓ Correct!';
+      feedback.className = 'correct';
+      xInput.disabled = true;
+      yInput.disabled = true;
+      setTimeout(generateProblem, 1000);
+    } else {
+      feedback.innerText = '✗ Try again! Walk across (X), climb up (Y), press Enter.';
+      feedback.className = 'incorrect';
+      xInput.value = '';
+      yInput.value = '';
+      xInput.focus();
+    }
+  }
+
+  xInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      if (xInput.value !== '') {
+        yInput.focus();
+      }
+    }
+  });
+
+  yInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      checkAnswer();
+    }
+  });
+
+  generateLabels();
+  generateProblem();
+</script>
+</body>
+</html>

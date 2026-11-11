@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Inference Inspector</title>
+<style>
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: #f4f1ea; 
+    color: #333; 
+    text-align: center; 
+    padding: 20px;
+  }
+  
+  .container { 
+    max-width: 750px; 
+    margin: 0 auto; 
+    background: white; 
+    padding: 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+    border-top: 8px solid #8e44ad;
+  }
+  
+  h1 { 
+    color: #8e44ad; 
+    font-size: 2.5rem; 
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+
+  .scoreboard {
+    display: flex;
+    justify-content: space-around;
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .score-highlight { color: #f1c40f; }
+
+  .instructions {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+  
+  .passage-box {
+    background: #fdfbf7;
+    border: 2px dashed #bdc3c7;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    text-align: left;
+    margin-bottom: 20px;
+    color: #2c3e50;
+  }
+  
+  .question-box {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #e67e22;
+    margin-bottom: 20px;
+  }
+  
+  input[type="text"] {
+    width: 80%;
+    max-width: 400px;
+    padding: 15px;
+    font-size: 1.5rem;
+    border: 3px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #8e44ad;
+  }
+  
+  #feedback {
+    font-size: 1.3rem;
+    font-weight: bold;
+    min-height: 35px;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .correct { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .incorrect { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🕵️ The Inference Inspector</h1>
+    
+    <div class="scoreboard">
+        <div>Cases Solved: <span id="cases-solved" class="score-highlight">0</span> / 100</div>
+        <div>Score: <span id="total-score" class="score-highlight">0</span></div>
+    </div>
+
+    <div class="instructions">Read the clues. Type your inference and press <strong>Enter</strong>. <br><span style="font-size:0.9em; color:#888;">(You can type just the word, or a full sentence!)</span></div>
+    
+    <div id="passage" class="passage-box">Loading case file...</div>
+    <div id="question" class="question-box"></div>
+    
+    <input type="text" id="student-answer" placeholder="Type your answer here..." autofocus autocomplete="off">
+    
+    <div id="feedback"></div>
+</div>
+
+<script>
+    // 100 Logically Corrected 3rd-Grade Inference Scenarios
+    const scenarios = [
+        // Seasons & Weather (1-10)
+        { text: "The girl shivered, pulled her thick wool coat tighter, and watched the white flakes fall on her boots.", question: "What season is it?", answers: ["winter"] },
+        { text: "Leaves of red, orange, and yellow crunched under my feet as the cool wind blew.", question: "What season is it?", answers: ["fall", "autumn"] },
+        { text: "Sweat dripped down his face as he took a sip of ice-cold lemonade and jumped into the pool.", question: "What season is it?", answers: ["summer"] },
+        { text: "Green buds appeared on the trees and tulips began to poke through the melting snow.", question: "What season is it?", answers: ["spring"] },
+        { text: "The sky grew dark, thunder rumbled in the distance, and everyone grabbed their umbrellas.", question: "What kind of weather is happening?", answers: ["rain", "storm", "thunderstorm", "raining"] },
+        { text: "The wind howled loudly, bending the trees and blowing the recycling bins down the street.", question: "What kind of weather is happening?", answers: ["windy", "wind", "stormy"] },
+        { text: "I couldn't see the house next door. A thick white cloud seemed to cover the ground.", question: "What kind of weather is happening?", answers: ["foggy", "fog"] },
+        { text: "The ground was completely white. We rolled three giant spheres and stacked them up.", question: "What kind of weather is happening?", answers: ["snowing", "snow", "snowy"] },
+        { text: "We put on sunglasses, rubbed lotion on our skin, and laid on our towels to dry off.", question: "What kind of weather is happening?", answers: ["sunny", "hot", "warm"] },
+        { text: "Ice pellets bounced off the roof sounding like tiny rocks hitting the metal.", question: "What kind of weather is happening?", answers: ["hail", "storm", "hailing"] },
+
+        // Settings & Vehicles (11-30)
+        { text: "Mark grabbed his towel, put on his sunglasses, and ran toward the sound of crashing waves.", question: "Where is Mark?", answers: ["beach", "ocean", "sea"] },
+        { text: "Rows of books lined the walls. People sat at tables, turning pages quietly and whispering.", question: "Where are they?", answers: ["library"] },
+        { text: "The smell of buttery popcorn filled the air as the giant screen lit up.", question: "Where are they?", answers: ["movie theater", "movies", "theater", "cinema"] },
+        { text: "She pushed a metal cart down the aisle, placing bread, apples, and milk inside.", question: "Where is she shopping?", answers: ["grocery store", "supermarket", "store"] },
+        { text: "He handed the woman a ticket, found his seat, and fastened his seatbelt as the engines roared.", question: "What vehicle is he in?", answers: ["airplane", "plane", "jet"] },
+        { text: "We looked at the ancient dinosaur bones and read the plaques on the walls.", question: "Where are we?", answers: ["museum"] },
+        { text: "The waiter handed us menus and asked what we would like to drink.", question: "Where are they?", answers: ["restaurant", "cafe", "diner"] },
+        { text: "Lions roared in the distance and monkeys swung from ropes in their enclosure.", question: "Where are they?", answers: ["zoo"] },
+        { text: "She leaned back in the chair, opened her mouth wide, and the woman looked at her teeth.", question: "Who is the woman looking at her teeth?", answers: ["dentist"] },
+        { text: "I rode my bike down the paved path, threw a frisbee, and pushed my sister on the swings.", question: "Where am I?", answers: ["park", "playground"] },
+        { text: "The scent of fresh bread and sugary frosting filled the room. Trays of cookies cooled.", question: "What kind of shop is this?", answers: ["bakery"] },
+        { text: "People carried boxes with stamps on them, waiting in line to hand them to the clerk.", question: "Where are they?", answers: ["post office"] },
+        { text: "Nurses walked quickly down the bright white hallways checking on resting patients.", question: "Where are they?", answers: ["hospital", "clinic"] },
+        { text: "Tractors drove past giant red barns and fields of tall green corn.", question: "Where are they?", answers: ["farm"] },
+        { text: "People were sliding across the smooth ice in circles, wearing special boots with blades.", question: "Where are they?", answers: ["ice rink", "skating rink", "rink"] },
+        { text: "The music was loud. People were riding a giant Ferris wheel and eating cotton candy.", question: "Where are they?", answers: ["carnival", "fair", "amusement park"] },
+        { text: "We set up our tent next to the fire ring and unrolled our sleeping bags.", question: "Where are they?", answers: ["campground", "forest", "woods"] },
+        { text: "We walked down the long pier, baited our hooks, and cast our lines into the water.", question: "What activity are they doing?", answers: ["fishing"] },
+        { text: "We put our dirty clothes into the metal machine, added soap, and pushed start.", question: "What is the metal machine?", answers: ["washing machine", "washer"] },
+        { text: "The band played loud music on the stage while thousands of people cheered and danced.", question: "Where are they?", answers: ["concert"] },
+
+        // Jobs & Occupations (31-50)
+        { text: "He put on his white coat, grabbed his stethoscope, and called the next patient.", question: "What is his job?", answers: ["doctor", "nurse", "physician"] },
+        { text: "She blew her silver whistle, stopped the traffic, and waved the kids safely across.", question: "What is her job?", answers: ["crossing guard", "police", "police officer", "traffic cop"] },
+        { text: "He carried a heavy hose, wore a thick jacket, and put on a helmet.", question: "What is his job?", answers: ["firefighter", "fireman"] },
+        { text: "She wrote the math problem on the whiteboard and asked the students to raise their hands.", question: "What is her job?", answers: ["teacher"] },
+        { text: "He wore a tall white hat, chopped vegetables rapidly, and stirred the boiling soup.", question: "What is his job?", answers: ["chef", "cook"] },
+        { text: "She climbed into the tractor and began to harvest the tall rows of corn.", question: "What is her job?", answers: ["farmer"] },
+        { text: "He opened the hood of the car, grabbed a wrench, and looked at the engine.", question: "What is his job?", answers: ["mechanic"] },
+        { text: "She mixed blue and yellow paint on her palette, then brushed it onto the canvas.", question: "What is her job?", answers: ["artist", "painter"] },
+        { text: "He put on a spacesuit, strapped into his seat, and waited for the countdown.", question: "What is his job?", answers: ["astronaut"] },
+        { text: "She gently examined the dog's injured paw and gave it a treat.", question: "What is her job?", answers: ["vet", "veterinarian"] },
+        { text: "He put the letters and packages into the blue boxes on everyone's front porch.", question: "What is his job?", answers: ["mail carrier", "mailman", "postman"] },
+        { text: "She put on a hard hat, grabbed a hammer, and climbed the ladder to fix the roof.", question: "What is her job?", answers: ["construction worker", "builder", "carpenter", "roofer"] },
+        { text: "He looked through a microscope and wrote down his observations in a notebook.", question: "What is his job?", answers: ["scientist"] },
+        { text: "She sat in the front seat, checked her mirrors, and drove the kids safely home.", question: "What is her job?", answers: ["bus driver", "driver"] },
+        { text: "He pulled out a wrench and fixed the leaking pipe under the kitchen sink.", question: "What is his job?", answers: ["plumber"] },
+        { text: "She cut the customer's hair with scissors and dried it with a blow dryer.", question: "What is her job?", answers: ["hairdresser", "barber", "stylist"] },
+        { text: "He scanned the groceries, put them in a bag, and told the customer the total price.", question: "What is his job?", answers: ["cashier"] },
+        { text: "She stood at the front of the plane, checked the controls, and took off into the sky.", question: "What is her job?", answers: ["pilot"] },
+        { text: "He held a camera up to his eye, adjusted the flash, and told everyone to say cheese.", question: "What is his job?", answers: ["photographer"] },
+        { text: "She typed quickly on her computer, fixing the bugs in the video game's code.", question: "What is her job?", answers: ["programmer", "coder", "game developer", "software engineer"] },
+
+        // Emotions & Traits (51-70)
+        { text: "She stomped her foot hard, crossed her arms tightly, and her face turned bright red.", question: "How is she feeling?", answers: ["mad", "angry", "furious", "upset"] },
+        { text: "He chewed his fingernails, his stomach did flips, and his leg bounced up and down.", question: "How is he feeling?", answers: ["nervous", "anxious", "scared", "worried"] },
+        { text: "A huge grin spread across her face, she jumped up and down, and gave her friend a hug.", question: "How is she feeling?", answers: ["happy", "excited", "joyful", "glad"] },
+        { text: "He dragged his feet, his eyelids felt heavy, and he let out a huge yawn.", question: "How is he feeling?", answers: ["tired", "sleepy", "exhausted"] },
+        { text: "Tears rolled down her cheeks as she looked at her broken toy.", question: "How is she feeling?", answers: ["sad", "upset", "heartbroken", "devastated"] },
+        { text: "His eyes went wide, he gasped loudly, and covered his mouth with his hands.", question: "How is he feeling?", answers: ["surprised", "shocked", "amazed"] },
+        { text: "She shined her flashlight into the dark closet and her hands began to tremble.", question: "How is she feeling?", answers: ["scared", "afraid", "terrified", "spooked"] },
+        { text: "His stomach let out a loud rumble and he stared at the plate of cookies.", question: "How is he feeling?", answers: ["hungry", "starving"] },
+        { text: "She drank the entire glass of water in three seconds flat.", question: "How is she feeling?", answers: ["thirsty", "parched"] },
+        { text: "He stood tall on the stage, holding his gold trophy up high for his parents to see.", question: "How is he feeling?", answers: ["proud"] },
+        { text: "She let out a long sigh, stared blankly at the wall, and wished she had a toy to play with.", question: "How is she feeling?", answers: ["bored"] },
+        { text: "He frowned as he watched his brother open the exact video game he wanted for himself.", question: "How is he feeling?", answers: ["jealous", "envious", "mad"] },
+        { text: "Her cheeks turned bright pink and she hid her face in her hands after tripping on the rug.", question: "How is she feeling?", answers: ["embarrassed", "shy"] },
+        { text: "He scratched his head and looked at the puzzle piece, unsure of where it belonged.", question: "How is he feeling?", answers: ["confused", "stuck"] },
+        { text: "She took a deep breath, let it out slowly, and let her shoulders drop.", question: "How is she feeling?", answers: ["relaxed", "calm", "relieved"] },
+        { text: "He curled up under the heavy blanket, shivering even though the heater was on.", question: "How is he feeling?", answers: ["cold", "freezing"] },
+        { text: "She wiped the sweat from her forehead and fanned herself with a piece of paper.", question: "How is she feeling?", answers: ["hot", "sweaty", "overheated"] },
+        { text: "He ran as fast as he could, glancing over his shoulder to see if the monster was chasing him.", question: "How is he feeling?", answers: ["panicked", "terrified", "scared", "afraid"] },
+        { text: "She giggled uncontrollably as the puppy licked her face.", question: "How is she feeling?", answers: ["happy", "ticklish", "silly"] },
+        { text: "He sat alone on the bench, wishing his friends had not gone on vacation without him.", question: "How is he feeling?", answers: ["lonely", "sad", "left out"] },
+
+        // Animals (71-85)
+        { text: "It purred softly, rubbed its head against my leg, and chased a ball of string.", question: "What kind of animal is this?", answers: ["cat", "kitten"] },
+        { text: "It wagged its tail, panted happily, and caught the flying frisbee right out of the air.", question: "What kind of animal is this?", answers: ["dog", "puppy"] },
+        { text: "It used its long grey trunk to pick up peanuts and spray water on its back.", question: "What kind of animal is this?", answers: ["elephant"] },
+        { text: "It stretched its long, spotted neck to eat the green leaves at the very top of the tree.", question: "What kind of animal is this?", answers: ["giraffe"] },
+        { text: "It slithered silently through the tall grass and hissed at the mouse.", question: "What kind of animal is this?", answers: ["snake"] },
+        { text: "It hopped off the lily pad, caught a fly with its long sticky tongue, and splashed into the pond.", question: "What kind of animal is this?", answers: ["frog", "toad"] },
+        { text: "It buzzed from flower to flower, collecting nectar to take back to the hive.", question: "What kind of animal is this?", answers: ["bee", "bumblebee"] },
+        { text: "It galloped across the field, shaking its mane as the rider held the reins.", question: "What kind of animal is this?", answers: ["horse", "pony"] },
+        { text: "It swung from branch to branch using its long tail and stopped to peel a banana.", question: "What kind of animal is this?", answers: ["monkey", "ape", "chimpanzee"] },
+        { text: "It waddled across the ice, sliding on its belly before diving into the freezing ocean.", question: "What kind of animal is this?", answers: ["penguin"] },
+        { text: "It spun a sticky, silky web between two branches to catch a fly.", question: "What kind of animal is this?", answers: ["spider"] },
+        { text: "It hopped on two strong back legs, carrying its baby safely in a pouch on its stomach.", question: "What kind of animal is this?", answers: ["kangaroo"] },
+        { text: "It swam through the ocean showing its sharp teeth and a fin sticking out of the water.", question: "What kind of animal is this?", answers: ["shark"] },
+        { text: "It rolled in the mud, snorting and eating slop out of a trough.", question: "What kind of animal is this?", answers: ["pig", "hog"] },
+        { text: "It grazed on the grass and let out a loud 'moo' when the farmer came near.", question: "What kind of animal is this?", answers: ["cow"] },
+
+        // Events & Actions (86-100)
+        { text: "Amanda blew out all the candles on the cake as everyone clapped and cheered.", question: "What event is Amanda celebrating?", answers: ["birthday", "party"] },
+        { text: "The crowd cheered wildly as he swung the bat and the ball flew right over the fence.", question: "What sport are they playing?", answers: ["baseball", "softball"] },
+        { text: "She put on her ghost costume, grabbed her orange bucket, and knocked on the door.", question: "What holiday is it?", answers: ["halloween"] },
+        { text: "We carved the giant roasted bird, passed the mashed potatoes, and gave thanks.", question: "What holiday is it?", answers: ["thanksgiving"] },
+        { text: "I studied my flashcards for an hour. Today, the teacher put a big A+ on my paper.", question: "How did the student prepare for the test?", answers: ["studied", "study", "flashcards", "practice"] },
+        { text: "The man yawned, stretched his arms, and poured milk into a bowl of cereal.", question: "What meal is he eating?", answers: ["breakfast"] },
+        { text: "Students quickly ate their sandwiches, drank their juice boxes, and talked to their friends.", question: "What time of day is it?", answers: ["lunch", "lunchtime", "noon"] },
+        { text: "The bell rang. Kids grabbed their backpacks, rushed out the door, and ran toward the big yellow vehicles.", question: "What are the yellow vehicles?", answers: ["bus", "buses", "school bus"] },
+        { text: "He packed a suitcase, printed his plane ticket, and put on his sunglasses.", question: "What is he about to do?", answers: ["travel", "vacation", "trip", "fly"] },
+        { text: "The bride walked down the aisle in a white dress while music played.", question: "What event is this?", answers: ["wedding", "marriage"] },
+        { text: "They wore square hats, moved their tassels, and held up their diplomas.", question: "What event is this?", answers: ["graduation", "graduating"] },
+        { text: "We hid colorful plastic eggs in the grass and told the kids to go find them.", question: "What holiday is this?", answers: ["easter"] },
+        { text: "Sparks lit up the night sky in bright red, white, and blue colors.", question: "What event is this?", answers: ["fireworks", "fourth of july", "4th of july", "independence day"] },
+        { text: "He blew a loud whistle, threw the orange ball in the air, and the tall players jumped for it.", question: "What sport are they playing?", answers: ["basketball"] },
+        { text: "The players kicked the black and white ball past the goalie and into the net.", question: "What sport are they playing?", answers: ["soccer"] }
+    ];
+
+    let currentScenarioIndex = 0;
+    let score = 0;
+    let casesSolved = 0;
+    let attemptsOnCurrent = 0;
+
+    const passageDiv = document.getElementById('passage');
+    const questionDiv = document.getElementById('question');
+    const inputField = document.getElementById('student-answer');
+    const feedbackDiv = document.getElementById('feedback');
+    const casesDisplay = document.getElementById('cases-solved');
+    const scoreDisplay = document.getElementById('total-score');
+
+    // Shuffle the array so it's a new test every time
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function loadScenario() {
+        if (currentScenarioIndex >= scenarios.length) {
+            passageDiv.innerText = "Case Closed! You solved all 100 mysteries. You are a Master Detective!";
+            questionDiv.innerText = "";
+            inputField.style.display = 'none';
+            feedbackDiv.style.display = 'none';
+            return;
+        }
+
+        const current = scenarios[currentScenarioIndex];
+        passageDiv.innerText = current.text;
+        questionDiv.innerText = current.question;
+        inputField.value = '';
+        feedbackDiv.innerText = '';
+        feedbackDiv.className = '';
+        attemptsOnCurrent = 0; 
+        inputField.focus();
+    }
+
+    function checkAnswer() {
+        const studentGuess = inputField.value.trim().toLowerCase();
+        
+        if (studentGuess === "") {
+            feedbackDiv.innerText = "Please type an answer!";
+            feedbackDiv.className = "incorrect";
+            return;
+        }
+
+        attemptsOnCurrent++;
+        const validAnswers = scenarios[currentScenarioIndex].answers.map(a => a.toLowerCase());
+        
+        // UPGRADED LOGIC: Checks if the student's string CONTAINS the target word as a standalone word.
+        // This allows them to type sentences like "He is going to the dentist" and still get it right.
+        let isCorrect = validAnswers.some(answer => {
+            const regex = new RegExp(`\\b${answer}\\b`, 'i');
+            return regex.test(studentGuess);
+        });
+        
+        if (isCorrect) {
+            casesSolved++;
+            
+            if (attemptsOnCurrent === 1) {
+                score += 10;
+            } else {
+                score += 5;
+            }
+            
+            casesDisplay.innerText = casesSolved;
+            scoreDisplay.innerText = score;
+
+            feedbackDiv.innerText = "✓ Correct deduction, Inspector!";
+            feedbackDiv.className = "correct";
+            inputField.disabled = true; 
+            
+            setTimeout(() => {
+                currentScenarioIndex++;
+                inputField.disabled = false;
+                loadScenario();
+            }, 1500); 
+        } else {
+            feedbackDiv.innerText = "✗ Not quite. Look closer at the clues and try again!";
+            feedbackDiv.className = "incorrect";
+            inputField.value = '';
+            inputField.focus();
+        }
+    }
+
+    inputField.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            checkAnswer();
+        }
+    });
+
+    shuffle(scenarios);
+    loadScenario();
+</script>
+
+</body>
+</html>

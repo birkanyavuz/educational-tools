@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sílabas en Español</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+  #app { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding: 14px 12px 20px; }
+  h1 { margin: 2px 0 10px; font-size: clamp(26px, 5vw, 38px); color: #1565c0; text-align: center; }
+  #levels { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 820px; margin-bottom: 8px; }
+  .lvl { border: 2px solid #1565c0; background: #ffffff; color: #1565c0; font-size: 15px; font-weight: bold;
+         padding: 8px 13px; border-radius: 999px; cursor: pointer; }
+  .lvl.on { background: #1565c0; color: #ffffff; }
+  #stars { font-size: 20px; font-weight: bold; color: #ef6c00; min-height: 26px; }
+  #say { font-size: clamp(17px, 3.4vw, 21px); color: #37474f; margin: 8px 0 4px; text-align: center; }
+  #frame { display: flex; gap: 8px; justify-content: center; align-items: center; min-height: 74px; margin: 6px 0 2px; flex-wrap: wrap; }
+  .chip { font-size: clamp(34px, 8vw, 52px); font-weight: bold; color: #263238; background: #e3f2fd;
+          border-radius: 14px; padding: 6px 16px; letter-spacing: 1px; }
+  .chip.miss { background: #fff3e0; color: #ef6c00; min-width: 96px; text-align: center; }
+  #listen { margin: 10px 0 6px; background: #ef6c00; color: #ffffff; border: none; font-size: clamp(20px, 4.4vw, 26px);
+            font-weight: bold; padding: 14px 30px; border-radius: 999px; cursor: pointer; box-shadow: 0 3px 0 #bf5600; }
+  #listen:active { transform: translateY(2px); box-shadow: none; }
+  #tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: min(560px, 94vw); margin-top: 14px; }
+  .tile { border: 3px solid #90caf9; background: #ffffff; border-radius: 18px; padding: 20px 6px; cursor: pointer;
+          font-size: clamp(36px, 9vw, 54px); font-weight: bold; color: #1565c0; letter-spacing: 1px; }
+  .tile:hover { background: #e3f2fd; }
+  .tile.good { background: #c8e6c9; border-color: #43a047; color: #2e7d32; }
+  .tile.bad { background: #ffcdd2; border-color: #e53935; color: #b71c1c; animation: shake .3s; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }
+  #msg { font-size: clamp(19px, 4vw, 24px); font-weight: bold; color: #2e7d32; min-height: 32px; margin-top: 14px; text-align: center; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Sílabas en Español</h1>
+  <div id="levels"></div>
+  <div id="stars">⭐ 0</div>
+  <div id="say">Escucha y toca la sílaba correcta.</div>
+  <div id="frame"></div>
+  <button id="listen" type="button">🔊 Escuchar</button>
+  <div id="tiles"></div>
+  <div id="msg"></div>
+</div>
+<script>
+"use strict";
+var LEVELS = [{"name": "Nivel 1 · Simples", "type": "syl", "pool": ["ma", "me", "mi", "mo", "mu", "pa", "pe", "pi", "po", "pu", "la", "le", "li", "lo", "lu", "sa", "se", "si", "so", "su", "ta", "te", "ti", "to", "tu"]}, {"name": "Nivel 2 · Simples", "type": "syl", "pool": ["na", "ne", "ni", "no", "nu", "da", "de", "di", "do", "du", "ba", "be", "bi", "bo", "bu", "fa", "fe", "fi", "fo", "fu", "ra", "re", "ri", "ro", "ru", "ña", "ñe", "ñi", "ño", "ñu", "ya", "ye", "yi", "yo", "yu", "cha", "che", "chi", "cho", "chu", "lla", "lle", "lli", "llo", "llu"]}, {"name": "Nivel 3 · Especiales", "type": "syl", "pool": ["ca", "co", "cu", "que", "qui", "ga", "go", "gu", "gue", "gui", "ge", "gi", "ce", "ci", "za", "zo", "zu", "ja", "je", "ji", "jo", "ju", "ha", "he", "hi", "ho", "hu", "va", "ve", "vi", "vo", "vu"]}, {"name": "Nivel 4 · Inversas", "type": "syl", "pool": ["as", "es", "is", "os", "us", "ar", "er", "ir", "or", "ur", "al", "el", "il", "ol", "ul", "an", "en", "in", "on", "un", "am", "em", "im", "om", "um"]}, {"name": "Nivel 5 · Trabadas", "type": "syl", "pool": ["bla", "ble", "bli", "blo", "blu", "pla", "ple", "pli", "plo", "plu", "cla", "cle", "cli", "clo", "clu", "fla", "fle", "fli", "flo", "flu", "gla", "gle", "gli", "glo", "glu", "bra", "bre", "bri", "bro", "bru", "pra", "pre", "pri", "pro", "pru", "cra", "cre", "cri", "cro", "cru", "dra", "dre", "dri", "dro", "dru", "fra", "fre", "fri", "fro", "fru", "gra", "gre", "gri", "gro", "gru", "tra", "tre", "tri", "tro", "tru"]}, {"name": "Nivel 6 · Palabras", "type": "word", "pool": [{"s": ["lu", "na"], "m": 0}, {"s": ["sa", "po"], "m": 1}, {"s": ["me", "sa"], "m": 0}, {"s": ["pa", "to"], "m": 1}, {"s": ["nu", "be"], "m": 0}, {"s": ["pe", "lo", "ta"], "m": 2}, {"s": ["ca", "sa"], "m": 1}, {"s": ["so", "pa"], "m": 0}, {"s": ["man", "za", "na"], "m": 1}, {"s": ["ma", "ri", "po", "sa"], "m": 2}, {"s": ["e", "le", "fan", "te"], "m": 1}, {"s": ["za", "pa", "to"], "m": 1}, {"s": ["ca", "ra", "col"], "m": 2}, {"s": ["li", "bro"], "m": 1}, {"s": ["ti", "gre"], "m": 0}, {"s": ["es", "cue", "la"], "m": 1}, {"s": ["cie", "lo"], "m": 0}, {"s": ["a", "gua"], "m": 1}, {"s": ["bue", "no"], "m": 0}, {"s": ["tie", "rra"], "m": 1}, {"s": ["pia", "no"], "m": 0}, {"s": ["ár", "bol"], "m": 1}, {"s": ["te", "lé", "fo", "no"], "m": 2}, {"s": ["ba", "lle", "na"], "m": 1}, {"s": ["ga", "lle", "ta"], "m": 2}]}];
+var SYLPOOL = [];
+LEVELS.forEach(function (L) { if (L.type === "syl") SYLPOOL = SYLPOOL.concat(L.pool); });
+
+var level = 0, bag = [], current = null, stars = 0, heard = false, advancing = false;
+
+function shuffle(a) {
+  a = a.slice();
+  for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+}
+function pickVoice() {
+  var vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  var es = vs.filter(function (v) { return /^es/i.test(v.lang); });
+  var order = ["es-MX", "es-US", "es-ES"];
+  for (var k = 0; k < order.length; k++) {
+    var hit = es.filter(function (v) { return v.lang.replace("_", "-").toLowerCase() === order[k].toLowerCase(); });
+    if (hit.length) return hit[0];
+  }
+  return es.length ? es[0] : null;
+}
+function speak(text, slow) {
+  if (!window.speechSynthesis) return;
+  try {
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    var v = pickVoice();
+    if (v) { u.voice = v; u.lang = v.lang; } else { u.lang = "es-MX"; }
+    u.rate = slow ? 0.65 : 0.8;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+if (window.speechSynthesis) { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () {}; }
+
+function buildLevels() {
+  var box = document.getElementById("levels");
+  box.innerHTML = "";
+  LEVELS.forEach(function (L, i) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "lvl" + (i === level ? " on" : ""); b.textContent = L.name;
+    b.addEventListener("click", function () { level = i; bag = []; heard = true; buildLevels(); newRound(); b.blur(); });
+    box.appendChild(b);
+  });
+}
+function refill() {
+  var pool = LEVELS[level].pool;
+  bag = shuffle(pool.map(function (_, i) { return i; }));
+}
+function nextItem() {
+  if (!bag.length) refill();
+  var idx = bag.pop();
+  if (bag.length === 0 && LEVELS[level].pool.length > 1) {
+    // avoid the same item twice in a row across refills
+    refill();
+    if (LEVELS[level].pool[bag[bag.length - 1]] === LEVELS[level].pool[idx]) { bag.push(bag.shift()); }
+  }
+  return LEVELS[level].pool[idx];
+}
+function distractors(correct, avoid) {
+  var all = shuffle(SYLPOOL.filter(function (s) {
+    return s !== correct && avoid.indexOf(s) < 0;
+  }));
+  return all.slice(0, 3);
+}
+function newRound() {
+  advancing = false;
+  var L = LEVELS[level];
+  var item = nextItem();
+  var tilesBox = document.getElementById("tiles");
+  var frame = document.getElementById("frame");
+  var say = document.getElementById("say");
+  var msg = document.getElementById("msg");
+  msg.textContent = "";
+  tilesBox.innerHTML = "";
+  frame.innerHTML = "";
+  var correct, options, speakText;
+  if (L.type === "syl") {
+    correct = item; speakText = item;
+    say.textContent = "Escucha y toca la sílaba correcta.";
+    options = shuffle([correct].concat(distractors(correct, [correct])));
+  } else {
+    correct = item.s[item.m]; speakText = item.s.join("");
+    say.textContent = "Escucha la palabra y toca la sílaba que falta.";
+    item.s.forEach(function (s, i) {
+      var c = document.createElement("span");
+      c.className = "chip" + (i === item.m ? " miss" : "");
+      c.textContent = (i === item.m) ? "· · ·" : s;
+      frame.appendChild(c);
+    });
+    options = shuffle([correct].concat(distractors(correct, item.s)));
+  }
+  current = { correct: correct, speakText: speakText };
+  options.forEach(function (op) {
+    var t = document.createElement("button");
+    t.type = "button"; t.className = "tile"; t.textContent = op;
+    t.addEventListener("click", function () { choose(t, op); });
+    tilesBox.appendChild(t);
+  });
+  if (heard) speak(speakText, L.type === "syl");
+}
+function choose(tile, op) {
+  if (advancing || tile.classList.contains("bad")) return;
+  if (op === current.correct) {
+    advancing = true;
+    tile.classList.add("good");
+    stars++;
+    document.getElementById("stars").textContent = "⭐ " + stars;
+    document.getElementById("msg").textContent = "¡Muy bien! 🎉";
+    speak(current.speakText, LEVELS[level].type === "syl");
+    setTimeout(newRound, 1500);
+  } else {
+    tile.classList.add("bad");
+    document.getElementById("msg").textContent = "Inténtalo otra vez.";
+    document.getElementById("msg").style.color = "#b71c1c";
+    setTimeout(function () { document.getElementById("msg").style.color = "#2e7d32"; }, 400);
+  }
+  tile.blur();
+}
+document.getElementById("listen").addEventListener("click", function () {
+  heard = true;
+  if (current) speak(current.speakText, LEVELS[level].type === "syl");
+  this.blur();
+});
+buildLevels();
+newRound();
+</script>
+</body>
+</html>

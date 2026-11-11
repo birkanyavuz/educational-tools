@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3rd Grade Math: 2-Step Word Problems</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .container {
+            background: white;
+            max-width: 650px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        #problem-text {
+            font-size: 22px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #eef2f5;
+            border-left: 6px solid #8e44ad;
+            border-radius: 8px;
+            text-align: left;
+        }
+        input[type="number"] {
+            font-size: 24px;
+            padding: 10px;
+            width: 140px;
+            text-align: center;
+            border: 3px solid #bdc3c7;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: #8e44ad;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            margin: 5px;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        #check-btn { background-color: #27ae60; }
+        #check-btn:hover { background-color: #219150; }
+        #next-btn { background-color: #3498db; display: none; }
+        #next-btn:hover { background-color: #2980b9; }
+        
+        #feedback {
+            font-size: 26px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 35px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .correct { color: #1e8449; background-color: #d5f5e3; }
+        .incorrect { color: #922b21; background-color: #f9ebea; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Word Problem Challenge</h1>
+        <div id="problem-text">Loading problem...</div>
+        
+        <div>
+            <input type="number" id="answer-input" placeholder="Answer" autocomplete="off">
+        </div>
+        
+        <div>
+            <button id="check-btn" onclick="checkAnswer()">Check Answer</button>
+            <button id="next-btn" onclick="generateProblem()">Next Problem</button>
+        </div>
+        
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        const names = ["Aiden", "Mia", "Jackson", "Sophia", "Lucas", "Emma", "Oliver", "Isabella", "Amir", "Fatima", "Carlos", "Maya"];
+        let currentAnswer = 0;
+        let appState = "answering";
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateProblem() {
+            appState = "answering";
+            
+            const answerInput = document.getElementById('answer-input');
+            answerInput.value = '';
+            answerInput.disabled = false;
+            answerInput.focus();
+            
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.textContent = '';
+            feedbackEl.className = '';
+            
+            document.getElementById('check-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+
+            const name1 = getRandomElement(names);
+            let name2 = getRandomElement(names);
+            while (name1 === name2) name2 = getRandomElement(names); 
+            
+            const templateType = getRandomInt(1, 17);
+            let problemText = "";
+
+            if (templateType === 1) {
+                let start = getRandomInt(25, 50);
+                let checkOut = getRandomInt(5, 20);
+                let returnBooks = getRandomInt(2, 15);
+                problemText = `The school library had ${start} books about space. ${name1} and their classmates checked out ${checkOut} of them. The next day, ${name2} returned ${returnBooks} space books. How many space books are in the library now?`;
+                currentAnswer = start - checkOut + returnBooks;
+            } 
+            else if (templateType === 2) {
+                let batch1 = getRandomInt(12, 24);
+                let batch2 = getRandomInt(12, 24);
+                let eaten = getRandomInt(6, 18);
+                problemText = `${name1} baked ${batch1} chocolate chip cookies and ${batch2} sugar cookies. ${name1}'s family ate ${eaten} cookies after dinner. How many cookies are left?`;
+                currentAnswer = batch1 + batch2 - eaten;
+            } 
+            else if (templateType === 3) {
+                let start = getRandomInt(30, 60);
+                let spent = getRandomInt(10, 25);
+                let earned = getRandomInt(10, 20);
+                problemText = `${name1} had $${start} saved up. ${name1} spent $${spent} on a new toy. Later, ${name1} earned $${earned} by doing chores for a neighbor. How much money does ${name1} have now?`;
+                currentAnswer = start - spent + earned;
+            }
+            else if (templateType === 4) {
+                let game1 = getRandomInt(20, 50);
+                let game2 = getRandomInt(20, 50);
+                let totalTickets = game1 + game2;
+                let spent = getRandomInt(15, totalTickets - 5); 
+                problemText = `${name1} won ${game1} tickets playing skee-ball and ${game2} tickets playing air hockey. ${name1} spent ${spent} tickets on a prize. How many tickets does ${name1} have left?`;
+                currentAnswer = totalTickets - spent;
+            }
+            else if (templateType === 5) {
+                let start = getRandomInt(50, 90);
+                let giveAway = getRandomInt(10, 25);
+                let lost = getRandomInt(5, 15);
+                problemText = `${name1} had a collection of ${start} seashells. ${name1} gave ${giveAway} of them to ${name2}. Later, ${name1} lost ${lost} seashells at the beach. How many seashells does ${name1} still have?`;
+                currentAnswer = start - giveAway - lost;
+            }
+            else if (templateType === 6) {
+                let planted = getRandomInt(15, 35);
+                let more = getRandomInt(10, 25);
+                let bugsAte = getRandomInt(5, 15);
+                problemText = `${name1} planted ${planted} tomato seeds. ${name2} planted ${more} seeds. Unfortunately, bugs ate ${bugsAte} of the little plants as they grew. How many tomato plants are left?`;
+                currentAnswer = planted + more - bugsAte;
+            }
+            else if (templateType === 7) {
+                let total = getRandomInt(15, 35);
+                let stripes = getRandomInt(Math.floor(total / 2) + 2, total - 2); 
+                let noStripes = total - stripes;
+                problemText = `There are ${total} fish in a tank. ${stripes} have stripes and the rest do not. How many more striped fish are there than fish without stripes?`;
+                currentAnswer = stripes - noStripes;
+            }
+            else if (templateType === 8) {
+                let totalPages = getRandomInt(60, 100);
+                let read1 = getRandomInt(15, 30);
+                let read2 = getRandomInt(15, 30);
+                problemText = `${name1} is reading a book with ${totalPages} pages. ${name1} read ${read1} pages on Monday and ${read2} pages on Tuesday. How many pages does ${name1} have left to read?`;
+                currentAnswer = totalPages - read1 - read2;
+            }
+            else if (templateType === 9) {
+                let age1 = getRandomInt(8, 15);
+                let diff1 = getRandomInt(2, 10);
+                let diff2 = getRandomInt(2, 5);
+                problemText = `${name1} is ${age1} years old. ${name2} is ${diff1} years older than ${name1}. Their cousin is ${diff2} years younger than ${name2}. How old is their cousin?`;
+                currentAnswer = (age1 + diff1) - diff2;
+            }
+            else if (templateType === 10) {
+                let totalMiles = getRandomInt(70, 120);
+                let leg1 = getRandomInt(20, 40);
+                let leg2 = getRandomInt(20, 40);
+                problemText = `${name1}'s family is going on a road trip that is ${totalMiles} miles long. They drove ${leg1} miles before lunch and ${leg2} miles after lunch. How many miles do they still need to drive?`;
+                currentAnswer = totalMiles - leg1 - leg2;
+            }
+            else if (templateType === 11) {
+                let startMoney = getRandomInt(50, 100);
+                let item1 = getRandomInt(10, 25);
+                let item2 = getRandomInt(10, 25);
+                problemText = `${name1} went to the store with $${startMoney}. ${name1} bought a shirt for $${item1} and a hat for $${item2}. How much money does ${name1} have left?`;
+                currentAnswer = startMoney - item1 - item2;
+            }
+            else if (templateType === 12) {
+                let goal = getRandomInt(80, 150);
+                let has1 = getRandomInt(20, 40);
+                let has2 = getRandomInt(20, 40);
+                problemText = `The class needs ${goal} points to earn a pizza party. ${name1} earned ${has1} points and ${name2} earned ${has2} points. How many more points does the class need to reach their goal?`;
+                currentAnswer = goal - (has1 + has2);
+            }
+            else if (templateType === 13) {
+                let totalDist = getRandomInt(60, 100);
+                let driven = getRandomInt(15, Math.floor(totalDist / 2) - 5); 
+                let remaining = totalDist - driven;
+                problemText = `The beach is ${totalDist} miles away. ${name1}'s family has driven ${driven} miles so far. How many MORE miles do they have left to drive than they have already driven?`;
+                currentAnswer = remaining - driven;
+            }
+            else if (templateType === 14) {
+                // Revised Template 14: Strict 2-Step (Start - Left + Arrived)
+                let startKids = getRandomInt(30, 60);
+                let leftPark = getRandomInt(10, 20);
+                let arrivedPark = getRandomInt(5, 15);
+                problemText = `There were ${startKids} kids playing at the park. Later, ${leftPark} kids went home for dinner. After that, ${arrivedPark} more kids arrived at the park. How many kids are at the park now?`;
+                currentAnswer = startKids - leftPark + arrivedPark;
+            }
+            else if (templateType === 15) {
+                let finalAmt = getRandomInt(30, 60);
+                let lost = getRandomInt(10, 20);
+                let found = getRandomInt(5, 15);
+                problemText = `${name1} had some marbles in a bag. ${name1} lost ${lost} of them, but later bought ${found} new ones. Now ${name1} has ${finalAmt} marbles. How many marbles did ${name1} start with?`;
+                currentAnswer = finalAmt + lost - found;
+            }
+            else if (templateType === 16) {
+                let totalFruits = getRandomInt(40, 70);
+                let apples = getRandomInt(15, 25);
+                let oranges = getRandomInt(10, 20);
+                let bananas = totalFruits - apples - oranges;
+                problemText = `${name1} has a basket of ${totalFruits} fruits. ${apples} are apples, ${oranges} are oranges, and the rest are bananas. How many bananas are in the basket?`;
+                currentAnswer = bananas;
+            }
+            else if (templateType === 17) {
+                let totalCost = getRandomInt(75, 120);
+                let saved = getRandomInt(Math.floor(totalCost / 2) + 5, totalCost - 10); 
+                let needed = totalCost - saved;
+                problemText = `${name1} wants to buy a video game that costs $${totalCost}. ${name1} has already saved $${saved}. How much MORE money has ${name1} saved than what is still needed to buy the game?`;
+                currentAnswer = saved - needed;
+            }
+
+            document.getElementById('problem-text').textContent = problemText;
+        }
+
+        function checkAnswer() {
+            if (appState !== "answering") return;
+
+            const inputEl = document.getElementById('answer-input');
+            const userInput = parseInt(inputEl.value);
+            const feedbackEl = document.getElementById('feedback');
+            const checkBtn = document.getElementById('check-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (isNaN(userInput)) {
+                feedbackEl.textContent = "Please enter a number!";
+                feedbackEl.className = "incorrect";
+                return;
+            }
+
+            if (userInput === currentAnswer) {
+                appState = "correct";
+                feedbackEl.textContent = "Your answer is correct!";
+                feedbackEl.className = "correct";
+                checkBtn.style.display = 'none';
+                nextBtn.style.display = 'inline-block';
+                inputEl.disabled = true; 
+            } else {
+                feedbackEl.textContent = "Your answer is wrong!";
+                feedbackEl.className = "incorrect";
+                inputEl.focus(); 
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (appState === "answering") {
+                    checkAnswer();
+                } else if (appState === "correct") {
+                    generateProblem();
+                }
+            }
+        });
+
+        window.onload = generateProblem;
+    </script>
+</body>
+</html>

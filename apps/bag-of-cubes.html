@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body { 
+    font-family: sans-serif; 
+    text-align: center; 
+    background: #f0f8ff; 
+    padding: 20px; 
+  }
+  
+  /* Pushes the title, bag, and button down the page */
+  h1 { margin-top: 50px; } 
+  
+  #bag-icon { 
+    font-size: 80px; 
+    margin: 10px; 
+    user-select: none; 
+  }
+  
+  button { 
+    padding: 15px 40px; 
+    font-size: 24px; 
+    font-weight: bold; 
+    background: #ff8c00; 
+    color: white; 
+    border: none; 
+    border-radius: 15px; 
+    cursor: pointer; 
+    margin-bottom: 20px;
+  }
+  
+  button:active { transform: translateY(5px); }
+  
+  #current-pull { 
+    min-height: 160px; 
+    margin: 20px auto; 
+    font-size: 28px; 
+    font-weight: bold; 
+  }
+  
+  .cube { 
+    width: 60px; 
+    height: 60px; 
+    display: inline-block; 
+    margin: 10px; /* 60px width + 20px total margin = 80px per cube */
+    border-radius: 8px; 
+    border: 3px solid #333; 
+    box-sizing: border-box;
+  }
+  
+  .red { background: #ff4c4c; }
+  .yellow { background: #ffd700; }
+  .blue { background: #4169e1; }
+  
+  /* Widened to 860px to perfectly fit ten 80px cubes per row */
+  #pulled-area { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    width: 860px; 
+    max-width: 100%; 
+    margin: 0 auto; 
+    border: 4px dashed #ccc; 
+    padding: 20px; 
+    min-height: 150px; 
+    background: white; 
+    box-sizing: border-box; 
+  }
+</style>
+</head>
+<body>
+
+  <h1>The Magic Cube Bag!</h1>
+  <div id="bag-icon">🛍️</div>
+  <button onclick="pullCube()" id="pull-btn">Pull a Cube!</button>
+  <div id="current-pull"><p>Click the button!</p></div>
+  <h2>Cubes We Pulled:</h2>
+  <div id="pulled-area"></div>
+
+  <script>
+    let bag = [];
+    let colors = ['red', 'yellow', 'blue'];
+
+    for (let c = 0; c < colors.length; c++) {
+      let count = Math.floor(Math.random() * 10) + 1;
+      for (let i = 0; i < count; i++) {
+        bag.push(colors[c]);
+      }
+    }
+
+    for (let i = bag.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      let temp = bag[i];
+      bag[i] = bag[j];
+      bag[j] = temp;
+    }
+
+    let totalCubes = bag.length;
+
+    function pullCube() {
+      let currentPullDiv = document.getElementById('current-pull');
+      let pulledArea = document.getElementById('pulled-area');
+      let btn = document.getElementById('pull-btn');
+
+      // Pull the cube out of the bag
+      let cubeColor = bag.pop();
+      
+      // Show the pulled cube big in the center
+      currentPullDiv.innerHTML = "<p>We pulled a <strong>" + cubeColor.toUpperCase() + "</strong> cube!</p>";
+      
+      let bigCube = document.createElement('div');
+      bigCube.className = 'cube ' + cubeColor;
+      bigCube.style.transform = "scale(1.5)"; 
+      bigCube.style.margin = "20px";
+      currentPullDiv.appendChild(bigCube);
+
+      // Add the normal sized cube to the bottom area
+      let smallCube = document.createElement('div');
+      smallCube.className = 'cube ' + cubeColor;
+      pulledArea.appendChild(smallCube);
+
+      // BUG FIX: Check if the bag is empty immediately AFTER the pull
+      if (bag.length === 0) {
+        currentPullDiv.innerHTML += "<p>🎉 That was the last one! The bag is empty. We pulled " + totalCubes + " cubes total.</p>";
+        btn.style.display = 'none'; // Hide the button immediately
+      }
+    }
+  </script>
+</body>
+</html>

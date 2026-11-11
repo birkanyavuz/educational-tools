@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ultimate Tessellation Explorer</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body { 
+    font-family: 'Comic Sans MS', sans-serif; 
+    background: #e0f7fa; 
+    margin: 0;
+    padding: 10px;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    border: 4px solid #00838f;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 { margin: 0 0 15px 0; font-size: clamp(1.5rem, 4vw, 2.2rem); color: #00838f; text-align: center; } 
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    background: #e0f2f1;
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid #b2dfdb;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+    min-width: 150px;
+  }
+
+  label { font-weight: bold; font-size: 1rem; color: #00695c; }
+
+  select {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 2px solid #00838f;
+    font-family: 'Comic Sans MS', sans-serif;
+    cursor: pointer;
+    background: white;
+  }
+
+  /* CUSTOM SLIDER STYLING (Edge-to-Edge Fix) */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: transparent;
+    padding: 0;
+    margin: 10px 0;
+  }
+  input[type="range"]:focus { outline: none; }
+  
+  input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: #00838f;
+    border-radius: 4px;
+    border: none;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: #ff7043;
+    cursor: pointer;
+    margin-top: -8px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  input[type="range"]::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    background: #00838f;
+    border-radius: 4px;
+    border: none;
+  }
+  input[type="range"]::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: #ff7043;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .btn {
+    padding: 10px 20px; 
+    font-size: 1rem; 
+    font-weight: bold; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+    background: #ff7043;
+    width: 100%;
+    height: 100%;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn-blue { background: #0288d1; }
+
+  /* DISPLAY AREA */
+  .display-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .canvas-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  h2 { font-size: 1.2rem; margin: 0 0 5px 0; color: #424242; }
+
+  canvas {
+    background: #fafafa;
+    border: 3px solid #333;
+    border-radius: 8px;
+    width: 100%;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  #tileCanvas { max-width: 250px; aspect-ratio: 1/1; }
+  #patternCanvas { max-width: 800px; aspect-ratio: 4/3; }
+
+  @media (min-width: 768px) {
+    .display-area { flex-direction: row; align-items: stretch; }
+    .canvas-container { justify-content: flex-start; }
+    #tileContainer { width: 30%; }
+    #patternContainer { width: 70%; }
+    #tileCanvas { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1>Tessellation Explorer</h1>
+
+  <div class="controls">
+    <div class="control-group">
+      <label for="shapeSelect">Shape Type</label>
+      <select id="shapeSelect" onchange="handleShapeChange()">
+        <optgroup label="Standard 2D">
+          <option value="square">Square</option>
+          <option value="hexagon">Hexagon</option>
+          <option value="triangle">Triangle</option>
+          <option value="rhombus">Rhombus</option>
+          <option value="chevron">Chevron</option>
+        </optgroup>
+        <optgroup label="Complex 2D">
+          <option value="arrows">Interlocking Arrows</option>
+          <option value="cross">Plus Sign</option>
+          <option value="scales">Dragon Scales</option>
+          <option value="houndstooth">Houndstooth</option>
+          <option value="jigsaw">Crazy Jigsaw</option>
+        </optgroup>
+        <optgroup label="Optical Illusions (3D)">
+          <option value="isometric">Isometric Cube</option>
+      
+          <option value="pyramids">Top-Down Pyramids</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="scaleSlider">Zoom Pattern</label>
+      <input type="range" id="scaleSlider" min="20" max="150" value="70" oninput="drawAll()">
+    </div>
+
+    <div class="control-group">
+      <button class="btn" onclick="randomizeColors()">🎨 Random Colors</button>
+    </div>
+    
+    <div class="control-group" id="jigsaw-btn-group" style="display:none;">
+      <button class="btn btn-blue" onclick="generateRandomJigsaw()">🧩 Randomize Shape</button>
+    </div>
+  </div>
+
+  <div class="display-area">
+    <div class="canvas-container" id="tileContainer">
+      <h2>The Single Tile</h2>
+      <canvas id="tileCanvas" width="300" height="300"></canvas>
+    </div>
+
+    <div class="canvas-container" id="patternContainer">
+      <h2>The Interlocking Pattern</h2>
+      <canvas id="patternCanvas" width="800" height="600"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  const tileCtx = document.getElementById('tileCanvas').getContext('2d');
+  const patCtx = document.getElementById('patternCanvas').getContext('2d');
+  
+  let jx1 = 0, jy1 = 0, jx2 = 0, jy2 = 0;
+  let colors = ['#ef5350', '#42a5f5', '#ffee58', '#66bb6a', '#ab47bc'];
+
+  function randomizeColors() {
+    const palettes = [
+      ['#ff9a9e', '#fecfef', '#a1c4fd', '#c2e9fb', '#ffb3ba'], 
+      ['#ff512f', '#dd2476', '#ffb75e', '#ed8f03', '#9c27b0'], 
+      ['#00c6ff', '#0072ff', '#1D976C', '#93F9B9', '#00bcd4'], 
+      ['#8E2DE2', '#4A00E0', '#f12711', '#f5af19', '#ffeb3b'], 
+      ['#11998e', '#38ef7d', '#FDC830', '#F37335', '#8bc34a'],
+      ['#4527a0', '#283593', '#0277bd', '#00838f', '#00695c']
+    ];
+    colors = palettes[Math.floor(Math.random() * palettes.length)];
+    colors = colors.sort(() => Math.random() - 0.5);
+    drawAll();
+  }
+
+  function generateRandomJigsaw() {
+    jx1 = (Math.random() - 0.5) * 0.8;
+    jy1 = (Math.random() - 0.5) * 0.8;
+    jx2 = (Math.random() - 0.5) * 0.8;
+    jy2 = (Math.random() - 0.5) * 0.8;
+    drawAll();
+  }
+
+  function handleShapeChange() {
+    const shape = document.getElementById('shapeSelect').value;
+    const btnGroup = document.getElementById('jigsaw-btn-group');
+    
+    if (shape === 'jigsaw') {
+      btnGroup.style.display = 'flex';
+      generateRandomJigsaw(); 
+    } else {
+      btnGroup.style.display = 'none';
+      drawAll();
+    }
+  }
+
+  // --- 3D SHADING HELPER FUNCTIONS ---
+  function drawIsometricCube(ctx, size, baseColor, isOpenBox) {
+    let r = size / 2;
+    let hw = (Math.sqrt(3) * r) / 2;
+    
+    // Top Face
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-hw, -r/2); ctx.lineTo(0, -r); ctx.lineTo(hw, -r/2); ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill();
+    ctx.fillStyle = isOpenBox ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.5)'; ctx.fill(); ctx.stroke();
+    
+    // Left Face
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-hw, -r/2); ctx.lineTo(-hw, r/2); ctx.lineTo(0, r); ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill();
+    ctx.fillStyle = isOpenBox ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.15)'; ctx.fill(); ctx.stroke();
+    
+    // Right Face
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(hw, -r/2); ctx.lineTo(hw, r/2); ctx.lineTo(0, r); ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill();
+    ctx.fillStyle = isOpenBox ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.5)'; ctx.fill(); ctx.stroke();
+  }
+
+  function drawTopDownPyramid(ctx, size, baseColor) {
+    // Top Triangle
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(size, 0); ctx.lineTo(size/2, size/2); ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill(); ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; ctx.fill(); ctx.stroke();
+    // Right Triangle
+    ctx.beginPath(); ctx.moveTo(size,0); ctx.lineTo(size, size); ctx.lineTo(size/2, size/2); ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill(); ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; ctx.fill(); ctx.stroke();
+    // Bottom Triangle
+    ctx.beginPath(); ctx.moveTo(size,size); ctx.lineTo(0, size); ctx.lineTo(size/2, size/2); ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill(); ctx.fillStyle = 'rgba(0, 0, 0, 0.6)'; ctx.fill(); ctx.stroke();
+    // Left Triangle
+    ctx.beginPath(); ctx.moveTo(0,size); ctx.lineTo(0, 0); ctx.lineTo(size/2, size/2); ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill(); ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; ctx.fill(); ctx.stroke();
+  }
+
+  function drawDragonScale(ctx, size, baseColor) {
+    ctx.beginPath();
+    // Draws a semicircular dome
+    ctx.arc(size/2, size/2, size/2, Math.PI, 0, false);
+    ctx.lineTo(size, size);
+    ctx.lineTo(0, size);
+    ctx.closePath();
+    ctx.fillStyle = baseColor; ctx.fill(); ctx.stroke();
+  }
+
+  // --- 2D PATHS ---
+  function traceShape(ctx, size, shape) {
+    ctx.beginPath();
+    
+    if (shape === 'square' || shape === 'pyramids') {
+      ctx.rect(0, 0, size, size);
+    } 
+    else if (shape === 'hexagon') {
+      const r = size / 2; 
+      for (let i = 0; i < 6; i++) {
+        let angle = (Math.PI / 3) * i - (Math.PI / 6);
+        ctx[i===0 ? 'moveTo' : 'lineTo'](r * Math.cos(angle), r * Math.sin(angle));
+      }
+      ctx.closePath();
+    }
+    else if (shape === 'triangle') {
+      const h = size * (Math.sqrt(3)/2);
+      ctx.moveTo(0, -h/2); ctx.lineTo(size/2, h/2); ctx.lineTo(-size/2, h/2); ctx.closePath();
+    }
+    else if (shape === 'rhombus') {
+      ctx.moveTo(size/2, 0); ctx.lineTo(size, size/2); ctx.lineTo(size/2, size); ctx.lineTo(0, size/2); ctx.closePath();
+    }
+    else if (shape === 'chevron') {
+      ctx.moveTo(0, 0); ctx.lineTo(size/2, size/3); ctx.lineTo(size, 0); ctx.lineTo(size, size*2/3); ctx.lineTo(size/2, size); ctx.lineTo(0, size*2/3); ctx.closePath();
+    }
+    else if (shape === 'arrows') {
+      ctx.moveTo(0, size/4); ctx.lineTo(size/2, 0); ctx.lineTo(size, size/4); 
+      ctx.lineTo(size, size); ctx.lineTo(size/2, size - size/4); ctx.lineTo(0, size); ctx.closePath();
+    }
+    else if (shape === 'cross') {
+      let a = size / 3;
+      ctx.moveTo(a, 0); ctx.lineTo(2*a, 0); ctx.lineTo(2*a, a); ctx.lineTo(3*a, a);
+      ctx.lineTo(3*a, 2*a); ctx.lineTo(2*a, 2*a); ctx.lineTo(2*a, 3*a); ctx.lineTo(a, 3*a);
+      ctx.lineTo(a, 2*a); ctx.lineTo(0, 2*a); ctx.lineTo(0, a); ctx.lineTo(a, a); ctx.closePath();
+    }
+    else if (shape === 'houndstooth') {
+      ctx.moveTo(0, 0); ctx.lineTo(size/2, 0); ctx.lineTo(size/2, -size/2); ctx.lineTo(size, -size/2); 
+      ctx.lineTo(size, size/2); ctx.lineTo(size/2, size/2); ctx.lineTo(size/2, size); ctx.lineTo(0, size); ctx.closePath();
+    }
+    else if (shape === 'jigsaw') {
+      ctx.moveTo(0, 0);
+      ctx.lineTo(size/2 + jx1*size, jy1*size); ctx.lineTo(size, 0);
+      ctx.lineTo(size + jx2*size, size/2 + jy2*size); ctx.lineTo(size, size);
+      ctx.lineTo(size/2 + jx1*size, size + jy1*size); ctx.lineTo(0, size);
+      ctx.lineTo(jx2*size, size/2 + jy2*size); ctx.lineTo(0, 0); ctx.closePath();
+    }
+  }
+
+  function drawAll() {
+    const shape = document.getElementById('shapeSelect').value;
+    const patSize = parseInt(document.getElementById('scaleSlider').value);
+    
+    tileCtx.clearRect(0, 0, 300, 300);
+    patCtx.clearRect(0, 0, 800, 600);
+
+    // --- 1. SINGLE TILE ---
+    tileCtx.save();
+    tileCtx.translate(150, 150); 
+    tileCtx.lineWidth = 4;
+    tileCtx.strokeStyle = "#333";
+
+    if (shape === 'isometric' || shape === 'openbox') { 
+      drawIsometricCube(tileCtx, 150, colors[0], shape === 'openbox'); 
+    }
+    else if (shape === 'scales') {
+      tileCtx.translate(-75, -75);
+      drawDragonScale(tileCtx, 150, colors[0]);
+    }
+    else {
+      if (['square', 'pyramids', 'jigsaw', 'rhombus', 'chevron', 'arrows', 'houndstooth', 'cross'].includes(shape)) {
+        tileCtx.translate(-75, -75);
+      }
+      
+      if (shape === 'pyramids') {
+        drawTopDownPyramid(tileCtx, 150, colors[0]);
+      } else {
+        traceShape(tileCtx, 150, shape);
+        tileCtx.fillStyle = colors[0];
+        tileCtx.fill();
+        tileCtx.stroke();
+      }
+    }
+    tileCtx.restore();
+
+    // --- 2. PATTERN GRID ---
+    patCtx.lineWidth = 2;
+    patCtx.strokeStyle = "#222";
+
+    const cols = Math.ceil(800 / patSize) + 5;
+    const rows = Math.ceil(600 / patSize) + 5;
+
+    if (['square', 'jigsaw', 'houndstooth', 'pyramids'].includes(shape)) {
+      for (let r = -5; r <= rows; r++) {
+        for (let c = -5; c <= cols; c++) {
+          patCtx.save();
+          patCtx.translate(c * patSize, r * patSize);
+          
+          let baseColor = colors[(Math.abs(r) + Math.abs(c)) % colors.length];
+          
+          if (shape === 'pyramids') {
+            drawTopDownPyramid(patCtx, patSize, baseColor);
+          } else {
+            traceShape(patCtx, patSize, shape);
+            patCtx.fillStyle = baseColor; patCtx.fill(); patCtx.stroke();
+          }
+          patCtx.restore();
+        }
+      }
+    } 
+    else if (['hexagon', 'isometric', 'openbox'].includes(shape)) {
+      const r = patSize / 2;
+      const w = Math.sqrt(3) * r;
+      const h = 2 * r;
+      const hexCols = Math.ceil(800 / w) + 5;
+      const hexRows = Math.ceil(600 / (h * 0.75)) + 5;
+
+      for (let row = -5; row <= hexRows; row++) {
+        for (let col = -5; col <= hexCols; col++) {
+          patCtx.save();
+          let x = col * w + (Math.abs(row) % 2 !== 0 ? w/2 : 0);
+          let y = row * (h * 0.75);
+          patCtx.translate(x, y);
+          
+          let baseColor = colors[(Math.abs(col) + Math.abs(row)) % colors.length];
+          
+          if (shape === 'isometric' || shape === 'openbox') {
+            drawIsometricCube(patCtx, patSize, baseColor, shape === 'openbox');
+          } else {
+            traceShape(patCtx, patSize, shape);
+            patCtx.fillStyle = baseColor; patCtx.fill(); patCtx.stroke(); 
+          }
+          patCtx.restore();
+        }
+      }
+    }
+    else if (shape === 'triangle') {
+      const h = patSize * (Math.sqrt(3)/2);
+      const triCols = Math.ceil(800 / (patSize/2)) + 5;
+      const triRows = Math.ceil(600 / h) + 5;
+
+      for (let row = -5; row <= triRows; row++) {
+        for (let col = -5; col <= triCols; col++) {
+          patCtx.save();
+          let x = col * (patSize / 2);
+          let y = row * h;
+          patCtx.translate(x, y);
+          
+          let isFlipped = (Math.abs(row) + Math.abs(col)) % 2 !== 0;
+          if (isFlipped) patCtx.scale(1, -1);
+          
+          traceShape(patCtx, patSize, shape);
+          patCtx.fillStyle = colors[(isFlipped ? 1 : 0) % colors.length]; 
+          patCtx.fill(); patCtx.stroke(); patCtx.restore();
+        }
+      }
+    }
+    else if (shape === 'rhombus') {
+      for (let r = -5; r <= rows * 2; r++) {
+        for (let c = -5; c <= cols; c++) {
+          patCtx.save();
+          let x = c * patSize + (Math.abs(r) % 2 !== 0 ? patSize/2 : 0);
+          let y = r * (patSize / 2);
+          patCtx.translate(x, y);
+          traceShape(patCtx, patSize, shape);
+          patCtx.fillStyle = colors[(Math.abs(r) + Math.abs(c)) % colors.length]; 
+          patCtx.fill(); patCtx.stroke(); patCtx.restore();
+        }
+      }
+    }
+    else if (shape === 'chevron') {
+      for (let r = -5; r <= rows * 1.5; r++) {
+        for (let c = -5; c <= cols; c++) {
+          patCtx.save();
+          let x = c * patSize;
+          let y = r * (patSize * 2/3);
+          patCtx.translate(x, y);
+          traceShape(patCtx, patSize, shape);
+          patCtx.fillStyle = colors[(Math.abs(r) + Math.abs(c)) % colors.length]; 
+          patCtx.fill(); patCtx.stroke(); patCtx.restore();
+        }
+      }
+    }
+    else if (shape === 'arrows') {
+      // FIXED GAP: The arrows row math is now multiplied by 0.75 so the bottom notches overlap
+      for (let r = -5; r <= rows * 1.5; r++) {
+        for (let c = -5; c <= cols; c++) {
+          patCtx.save();
+          let x = c * patSize;
+          let y = r * (patSize * 0.75); 
+          patCtx.translate(x, y);
+          traceShape(patCtx, patSize, shape);
+          patCtx.fillStyle = colors[(Math.abs(r) + Math.abs(c)) % colors.length]; 
+          patCtx.fill(); patCtx.stroke(); patCtx.restore();
+        }
+      }
+    }
+    else if (shape === 'cross') {
+      let a = patSize / 3;
+      for (let r = -5; r <= rows * 1.5; r++) {
+        for (let c = -5; c <= cols * 1.5; c++) {
+          patCtx.save();
+          // Greek Cross Diagonal Tessellation Math
+          let x = c * (2*a) + r * a;
+          let y = c * (-a) + r * (2*a);
+          patCtx.translate(x, y);
+          traceShape(patCtx, patSize, shape);
+          patCtx.fillStyle = colors[(Math.abs(r) + Math.abs(c)) % colors.length]; 
+          patCtx.fill(); patCtx.stroke(); patCtx.restore();
+        }
+      }
+    }
+    else if (shape === 'scales') {
+      // Intentional Overlap to create fish scales
+      for (let r = -5; r <= rows * 2.5; r++) {
+        for (let c = -5; c <= cols; c++) {
+          patCtx.save();
+          let x = c * patSize + (Math.abs(r) % 2 !== 0 ? patSize/2 : 0);
+          let y = r * (patSize / 3); 
+          patCtx.translate(x, y);
+          drawDragonScale(patCtx, patSize, colors[(Math.abs(r) + Math.abs(c)) % colors.length]);
+          patCtx.restore();
+        }
+      }
+    }
+  }
+
+  // Initialize
+  randomizeColors();
+</script>
+</body>
+</html>
