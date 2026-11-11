@@ -655,18 +655,6 @@
    "standard_codes": []
   },
   {
-   "identifier": "projectile-cannon-simulator",
-   "name": "Projectile Cannon Simulator",
-   "subject": "science",
-   "gradeMin": 9,
-   "gradeMax": 12,
-   "gradeLevel": "Grades 9-12",
-   "objective": "Simulate projectile motion with a cannon",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
    "identifier": "virtual-circuit-sandbox",
    "name": "Virtual Circuit Sandbox",
    "subject": "science",
@@ -674,30 +662,6 @@
    "gradeMax": 12,
    "gradeLevel": "Grades 6-12",
    "objective": "Build and test virtual electric circuits",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "molecule-builder",
-   "name": "Molecule Builder",
-   "subject": "science",
-   "gradeMin": 6,
-   "gradeMax": 12,
-   "gradeLevel": "Grades 6-12",
-   "objective": "Build molecules from atoms",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "food-chain",
-   "name": "Food Chain",
-   "subject": "science",
-   "gradeMin": 3,
-   "gradeMax": 6,
-   "gradeLevel": "Grades 3-6",
-   "objective": "Explore food chains and who eats whom",
    "creator": "Birkan Yavuz",
    "kind": "interactive classroom activity",
    "standard_codes": []
