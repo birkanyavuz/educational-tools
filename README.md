@@ -51,9 +51,9 @@ list with `has_more: false`, never an error.
 
 ## Verify the data
 
-Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `7cc62c652260f9bc247fee4c632bc8a1ea8f7987` — check out this commit to see the exact code that serves v1.7.4.
+Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `4e8d2939606ac1e193d93d1eecc1b7c9603af1c4` — check out this commit to see the exact code that serves v1.8.0.
 
-Expected hashes (v1.7.4):
+Expected hashes (v1.8.0):
 
 - `birkanyavuz:dolch-sight-words-220:v1` — Dolch Sight Words (220, by level) — `content_hash: 4b1b92ee1d3e7e774ecbb8ef4c5e4715c9626824e143d0d35502b5b69d3b37be`
 - `birkanyavuz:dolch-nouns-94:v1` — Dolch Nouns (94) — `content_hash: 92fd7e572cd2b6d435fbcf0b3f55e48696b8769806ce2bd94a5179baa819ae67`
