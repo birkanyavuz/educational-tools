@@ -51,9 +51,9 @@ list with `has_more: false`, never an error.
 
 ## Verify the data
 
-Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `83e6e0ccd9cacbeebe1057c2fd9e5a9f15c5dd4d` — check out this commit to see the exact code that serves v1.7.3.
+Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `83e6e0ccd9cacbeebe1057c2fd9e5a9f15c5dd4d` — check out this commit to see the exact code that serves v1.7.4.
 
-Expected hashes (v1.7.3):
+Expected hashes (v1.7.4):
 
 - `birkanyavuz:dolch-sight-words-220:v1` — Dolch Sight Words (220, by level) — `content_hash: 4b1b92ee1d3e7e774ecbb8ef4c5e4715c9626824e143d0d35502b5b69d3b37be`
 - `birkanyavuz:dolch-nouns-94:v1` — Dolch Nouns (94) — `content_hash: 92fd7e572cd2b6d435fbcf0b3f55e48696b8769806ce2bd94a5179baa819ae67`
@@ -64,6 +64,20 @@ Expected hashes (v1.7.3):
 - `birkanyavuz:turkish-english-animals:v1` — Turkish-English Animals (Hazel's flashcards) — `content_hash: 47241e179f39d77c8263c74454a6310176591272771ac5817b2a57014c64663a`
 - `birkanyavuz:turkish-english-colors:v1` — Turkish-English Colors (Hazel's flashcards) — `content_hash: 3b4ea6dee2dd3576ad852a61ed22b4beb395fcaa5ff870bc42fdd67f0b04f91a`
 - `birkanyavuz:turkish-english-objects:v1` — Turkish-English Everyday Objects (Hazel's flashcards) — `content_hash: 29c9a6798423c49a61f366b50591686decaf064c330efc12a223e0ab5143f23e`
+
+## Where each list comes from
+
+Every dataset response carries a `source_note` with one of two prefixes, so a calling agent can tell provenance at a glance: `Standard corpus:` for a published list, `Original classroom set:` for Birkan Yavuz's own classroom material.
+
+- `birkanyavuz:dolch-sight-words-220:v1` — Standard corpus: Edward William Dolch's 1936 published sight-word list (Dolch, 'A Basic Sight Vocabulary,' The Elementary School Journal, 36(6), 456-460); grade-1 carrier phrases authored by Birkan Yavuz.
+- `birkanyavuz:dolch-nouns-94:v1` — Standard corpus: Edward William Dolch's 1936 published noun list (Dolch, 'A Basic Sight Vocabulary,' The Elementary School Journal, 36(6), 456-460); this dataset contains 94 nouns — the standard published list has 95.
+- `birkanyavuz:cvc-word-families-75:v1` — Original classroom set: CVC word-family practice list compiled by Birkan Yavuz (CC-BY-4.0).
+- `birkanyavuz:digraph-words-21:v1` — Original classroom set: Digraph word practice list compiled by Birkan Yavuz (CC-BY-4.0).
+- `birkanyavuz:spanish-syllables-core:v1` — Original classroom set: Spanish syllable practice list compiled by Birkan Yavuz (CC-BY-4.0).
+- `birkanyavuz:turkish-english-early-words:v1` — Original classroom set: Bilingual Turkish-English flashcards with example sentences, created by Birkan Yavuz (CC-BY-4.0).
+- `birkanyavuz:turkish-english-animals:v1` — Original classroom set: Bilingual Turkish-English animal vocabulary pairs compiled by Birkan Yavuz (CC-BY-4.0).
+- `birkanyavuz:turkish-english-colors:v1` — Original classroom set: Bilingual Turkish-English flashcards with example sentences, created by Birkan Yavuz (CC-BY-4.0).
+- `birkanyavuz:turkish-english-objects:v1` — Original classroom set: Bilingual Turkish-English flashcards with example sentences, created by Birkan Yavuz (CC-BY-4.0).
 
 One-line citation for the Dolch list, ready to copy:
 
