@@ -50,7 +50,7 @@ list with `has_more: false`, never an error.
 
 ## Verify the data
 
-Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response.
+Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `83e6e0ccd9cacbeebe1057c2fd9e5a9f15c5dd4d` — check out this commit to see the exact code that serves v1.7.3.
 
 Expected hashes (v1.7.3):
 
