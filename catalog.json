@@ -1,670 +1,705 @@
 {
- "tools": [
-  {
-   "identifier": "number-bonds",
-   "name": "Number Bonds",
-   "subject": "math",
-   "gradeMin": 0,
-   "gradeMax": 1,
-   "gradeLevel": "Kindergarten-Grade 1",
-   "objective": "Understand the parts that make a whole number (number bonds)",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.K.OA.A.3",
-    "CCSS.Math.Content.1.OA.C.6",
-    "K.OA.A.3",
-    "1.OA.C.6"
-   ]
-  },
-  {
-   "identifier": "bag-of-cubes",
-   "name": "Bag of Cubes",
-   "subject": "math",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Counting and making numbers with cubes",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.K.CC.B.4",
-    "CCSS.Math.Content.1.NBT.A.1",
-    "K.CC.B.4",
-    "1.NBT.A.1"
-   ]
-  },
-  {
-   "identifier": "base-10-counter",
-   "name": "Base 10 Counter",
-   "subject": "math",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Place value: tens and ones with base-10 blocks",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.1.NBT.B.2",
-    "1.NBT.B.2"
-   ]
-  },
-  {
-   "identifier": "math-mountains",
-   "name": "Math Mountains",
-   "subject": "math",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Addition and subtraction partners on a math mountain",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.1.OA.A.1",
-    "CCSS.Math.Content.1.OA.C.6",
-    "1.OA.A.1",
-    "1.OA.C.6"
-   ]
-  },
-  {
-   "identifier": "ten-frame-addition-builder",
-   "name": "Ten-Frame Addition Builder",
-   "subject": "math",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Add with a ten-frame and make 10",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.1.OA.C.6",
-    "CCSS.Math.Content.K.OA.A.4",
-    "1.OA.C.6",
-    "K.OA.A.4"
-   ]
-  },
-  {
-   "identifier": "count-on-missing-addends",
-   "name": "Count on Missing Addends",
-   "subject": "math",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Count on to find the missing addend",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.1.OA.D.8",
-    "1.OA.D.8"
-   ]
-  },
-  {
-   "identifier": "perimeter-and-area",
-   "name": "Perimeter and Area",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Find the perimeter and area of rectangles",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.3.MD.D.8",
-    "CCSS.Math.Content.3.MD.C.7",
-    "3.MD.D.8",
-    "3.MD.C.7"
-   ]
-  },
-  {
-   "identifier": "fractions-grade-3",
-   "name": "Fractions",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Understand fractions as parts of a whole",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.3.NF.A.1",
-    "3.NF.A.1"
-   ]
-  },
-  {
-   "identifier": "coins-and-money",
-   "name": "Coins",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Identify coins and count money",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.2.MD.C.8",
-    "2.MD.C.8"
-   ]
-  },
-  {
-   "identifier": "analog-clock",
-   "name": "Analog Clock",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Read time on an analog clock",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.1.MD.B.3",
-    "CCSS.Math.Content.3.MD.A.1",
-    "1.MD.B.3",
-    "3.MD.A.1"
-   ]
-  },
-  {
-   "identifier": "math-word-problems",
-   "name": "Math Problems",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Solve grade-3 math word problems",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.3.OA.D.8",
-    "3.OA.D.8"
-   ]
-  },
-  {
-   "identifier": "improper-fractions-to-mixed-numbers",
-   "name": "Improper Fractions to Mixed Numbers",
-   "subject": "math",
-   "gradeMin": 4,
-   "gradeMax": 5,
-   "gradeLevel": "Grades 4-5",
-   "objective": "Convert improper fractions to mixed numbers",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "file": "improper-to-mixed.html",
-   "standard_codes": [
-    "CCSS.Math.Content.4.NF.B.3",
-    "4.NF.B.3"
-   ]
-  },
-  {
-   "identifier": "decimal-numbers",
-   "name": "Decimal Numbers",
-   "subject": "math",
-   "gradeMin": 4,
-   "gradeMax": 4,
-   "gradeLevel": "Grade 4",
-   "objective": "Understand and compare decimal numbers",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.4.NF.C.6",
-    "CCSS.Math.Content.4.NF.C.7",
-    "4.NF.C.6",
-    "4.NF.C.7"
-   ]
-  },
-  {
-   "identifier": "rounding-decimals",
-   "name": "Rounding Decimals",
-   "subject": "math",
-   "gradeMin": 4,
-   "gradeMax": 5,
-   "gradeLevel": "Grades 4-5",
-   "objective": "Round decimal numbers to a given place",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "file": "rounding-decimals.html",
-   "standard_codes": [
-    "CCSS.Math.Content.5.NBT.A.4",
-    "5.NBT.A.4"
-   ]
-  },
-  {
-   "identifier": "coordinate-plane",
-   "name": "Coordinate Plane",
-   "subject": "math",
-   "gradeMin": 5,
-   "gradeMax": 6,
-   "gradeLevel": "Grades 5-6",
-   "objective": "Plot and read points on the coordinate plane",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.Math.Content.5.G.A.1",
-    "CCSS.Math.Content.6.NS.C.6",
-    "5.G.A.1",
-    "6.NS.C.6"
-   ]
-  },
-  {
-   "identifier": "sight-words-first-grade",
-   "name": "Sight Words",
-   "subject": "reading",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Recognize and read first-grade sight words (41 Dolch words)",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "file": "tools-sight-words-first-grade.html",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.RF.1.3",
-    "CCSS.ELA-Literacy.RF.1.3g",
-    "RF.1.3",
-    "RF.1.3g"
-   ]
-  },
-  {
-   "identifier": "cvc-word-builder",
-   "name": "CVC Word Builder",
-   "subject": "reading",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Build consonant-vowel-consonant (CVC) words by word family",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "file": "cvc-word-builder.html",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.RF.1.3",
-    "CCSS.ELA-Literacy.RF.1.3b",
-    "RF.1.3",
-    "RF.1.3b"
-   ]
-  },
-  {
-   "identifier": "digraph-word-builder",
-   "name": "Digraph Word Builder",
-   "subject": "reading",
-   "gradeMin": 0,
-   "gradeMax": 1,
-   "gradeLevel": "Kindergarten-Grade 1",
-   "objective": "Build words with digraphs sh, ch, th, wh",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "file": "digraph-word-builder.html",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.RF.1.3",
-    "CCSS.ELA-Literacy.RF.1.3a",
-    "RF.1.3",
-    "RF.1.3a"
-   ]
-  },
-  {
-   "identifier": "middle-sound-builder",
-   "name": "Middle Sound Builder",
-   "subject": "reading",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Identify the middle vowel sound in CVC words",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "file": "middle-sound-builder.html",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.RF.1.2",
-    "CCSS.ELA-Literacy.RF.1.2c",
-    "RF.1.2",
-    "RF.1.2c"
-   ]
-  },
-  {
-   "identifier": "reading-comprehension-grade-3",
-   "name": "Reading Comprehension",
-   "subject": "reading",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Read passages and answer comprehension questions",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.RL.3.1",
-    "CCSS.ELA-Literacy.RI.3.1",
-    "RL.3.1",
-    "RI.3.1"
-   ]
-  },
-  {
-   "identifier": "grammar-grade-3",
-   "name": "Grammar",
-   "subject": "reading",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Practice grade-3 grammar and language skills",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.L.3.1",
-    "L.3.1"
-   ]
-  },
-  {
-   "identifier": "spelling-bee-grade-3",
-   "name": "Spelling Bee",
-   "subject": "reading",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Practice spelling grade-3 words",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.L.3.2",
-    "L.3.2"
-   ]
-  },
-  {
-   "identifier": "silabas-en-espanol",
-   "name": "Silabas en Espanol",
-   "subject": "spanish",
-   "gradeMin": 1,
-   "gradeMax": 3,
-   "gradeLevel": "Grades 1-3",
-   "objective": "Read and practice Spanish syllables (silabas) for early Spanish reading",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "file": "silabas-en-espanol.html",
-   "standard_codes": []
-  },
-  {
-   "identifier": "tessellations",
-   "name": "Tessellations",
-   "subject": "art",
-   "gradeMin": 9,
-   "gradeMax": 9,
-   "gradeLevel": "Grade 9",
-   "objective": "Create and explore tessellation art patterns",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": [
-    "CCSS.ELA-Literacy.8.G.A.3",
-    "8.G.A.3"
-   ]
-  },
-  {
-   "identifier": "nonsense-words",
-   "name": "Nonsense Words",
-   "subject": "reading",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Read made-up words by sounding them out, one card at a time",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "word-segmenting",
-   "name": "Word Segmenting",
-   "subject": "reading",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Listen to a word and tap its sounds in order",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "number-sequence",
-   "name": "Number Sequence",
-   "subject": "math",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Find the missing number in a sequence (counting up, down, and by 10s)",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "picture-graphs",
-   "name": "Picture Graphs",
-   "subject": "math",
-   "gradeMin": 2,
-   "gradeMax": 2,
-   "gradeLevel": "Grade 2",
-   "objective": "Read and interpret picture graphs",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "bar-graphs",
-   "name": "Bar Graphs",
-   "subject": "math",
-   "gradeMin": 2,
-   "gradeMax": 2,
-   "gradeLevel": "Grade 2",
-   "objective": "Read and interpret bar graphs",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "counting-coins",
-   "name": "Counting Coins",
-   "subject": "math",
-   "gradeMin": 2,
-   "gradeMax": 3,
-   "gradeLevel": "Grades 2-3",
-   "objective": "Count coins and find their total value",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "coin-addition",
-   "name": "Coin Addition",
-   "subject": "math",
-   "gradeMin": 2,
-   "gradeMax": 3,
-   "gradeLevel": "Grades 2-3",
-   "objective": "Add coin values together",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "fraction-pie",
-   "name": "Pie",
-   "subject": "math",
-   "gradeMin": 2,
-   "gradeMax": 3,
-   "gradeLevel": "Grades 2-3",
-   "objective": "Show fractions as slices of a pie",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "identifying-fractions-1",
-   "name": "Identifying Fractions 1",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Identify fractions from models and pictures (level 1)",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "identifying-fractions-2",
-   "name": "Identifying Fractions 2",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Identify fractions from models and pictures (level 2)",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "comparing-fractions-1",
-   "name": "Comparing Fractions 1",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Compare two fractions (level 1)",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "comparing-fractions-2",
-   "name": "Comparing Fractions 2",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Compare two fractions (level 2)",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "scaling-fractions",
-   "name": "Scaling Fractions",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Practice scaling fractions",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "rectangle-generator",
-   "name": "Rectangle Generator",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Generate rectangles for perimeter and area practice",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "draw-rectangles",
-   "name": "Draw Rectangles",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Draw rectangles and explore their perimeter and area",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "decomposing-shapes-rectangles",
-   "name": "Decomposing Shapes into Rectangles",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Split shapes into rectangles to find their area",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "two-step-problems",
-   "name": "Two-Step Problems",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Solve word problems in two steps",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "decimal-translator",
-   "name": "Decimal Translator",
-   "subject": "math",
-   "gradeMin": 4,
-   "gradeMax": 4,
-   "gradeLevel": "Grade 4",
-   "objective": "Work with decimal numbers in different forms",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "doubles-addition",
-   "name": "Doubles - Addition",
-   "subject": "math",
-   "gradeMin": 1,
-   "gradeMax": 1,
-   "gradeLevel": "Grade 1",
-   "objective": "Add with doubles and near doubles facts",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "algebraic-thinking",
-   "name": "Algebraic Thinking",
-   "subject": "math",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Early algebraic thinking with patterns and unknowns",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "grammar-gremlin",
-   "name": "Grammar Gremlin",
-   "subject": "reading",
-   "gradeMin": 3,
-   "gradeMax": 3,
-   "gradeLevel": "Grade 3",
-   "objective": "Find and fix grammar mistakes",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "linear-equation-explorer",
-   "name": "Linear Equation Explorer",
-   "subject": "math",
-   "gradeMin": 8,
-   "gradeMax": 8,
-   "gradeLevel": "Grade 8",
-   "objective": "Explore linear equations and functions",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  },
-  {
-   "identifier": "virtual-circuit-sandbox",
-   "name": "Virtual Circuit Sandbox",
-   "subject": "science",
-   "gradeMin": 6,
-   "gradeMax": 12,
-   "gradeLevel": "Grades 6-12",
-   "objective": "Build and test virtual electric circuits",
-   "creator": "Birkan Yavuz",
-   "kind": "interactive classroom activity",
-   "standard_codes": []
-  }
- ]
+  "tools": [
+    {
+      "identifier": "number-bonds",
+      "name": "Number Bonds",
+      "subject": "math",
+      "gradeMin": 0,
+      "gradeMax": 1,
+      "gradeLevel": "Kindergarten-Grade 1",
+      "objective": "Understand the parts that make a whole number (number bonds)",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.K.OA.A.3",
+        "CCSS.Math.Content.1.OA.C.6",
+        "K.OA.A.3",
+        "1.OA.C.6"
+      ],
+      "file": "apps/number-bonds.html"
+    },
+    {
+      "identifier": "bag-of-cubes",
+      "name": "Bag of Cubes",
+      "subject": "math",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Counting and making numbers with cubes",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.K.CC.B.4",
+        "CCSS.Math.Content.1.NBT.A.1",
+        "K.CC.B.4",
+        "1.NBT.A.1"
+      ],
+      "file": "apps/bag-of-cubes.html"
+    },
+    {
+      "identifier": "base-10-counter",
+      "name": "Base 10 Counter",
+      "subject": "math",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Place value: tens and ones with base-10 blocks",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.1.NBT.B.2",
+        "1.NBT.B.2"
+      ],
+      "file": "apps/base-10-counter.html"
+    },
+    {
+      "identifier": "math-mountains",
+      "name": "Math Mountains",
+      "subject": "math",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Addition and subtraction partners on a math mountain",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.1.OA.A.1",
+        "CCSS.Math.Content.1.OA.C.6",
+        "1.OA.A.1",
+        "1.OA.C.6"
+      ],
+      "file": "apps/math-mountains.html"
+    },
+    {
+      "identifier": "ten-frame-addition-builder",
+      "name": "Ten-Frame Addition Builder",
+      "subject": "math",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Add with a ten-frame and make 10",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.1.OA.C.6",
+        "CCSS.Math.Content.K.OA.A.4",
+        "1.OA.C.6",
+        "K.OA.A.4"
+      ],
+      "file": "apps/ten-frame-addition-builder.html"
+    },
+    {
+      "identifier": "count-on-missing-addends",
+      "name": "Count on Missing Addends",
+      "subject": "math",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Count on to find the missing addend",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.1.OA.D.8",
+        "1.OA.D.8"
+      ],
+      "file": "apps/count-on-missing-addends.html"
+    },
+    {
+      "identifier": "perimeter-and-area",
+      "name": "Perimeter and Area",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Find the perimeter and area of rectangles",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.3.MD.D.8",
+        "CCSS.Math.Content.3.MD.C.7",
+        "3.MD.D.8",
+        "3.MD.C.7"
+      ],
+      "file": "apps/perimeter-and-area.html"
+    },
+    {
+      "identifier": "fractions-grade-3",
+      "name": "Fractions",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Understand fractions as parts of a whole",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.3.NF.A.1",
+        "3.NF.A.1"
+      ]
+    },
+    {
+      "identifier": "coins-and-money",
+      "name": "Coins",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Identify coins and count money",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.2.MD.C.8",
+        "2.MD.C.8"
+      ]
+    },
+    {
+      "identifier": "analog-clock",
+      "name": "Analog Clock",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Read time on an analog clock",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.1.MD.B.3",
+        "CCSS.Math.Content.3.MD.A.1",
+        "1.MD.B.3",
+        "3.MD.A.1"
+      ],
+      "file": "apps/analog-clock.html"
+    },
+    {
+      "identifier": "math-word-problems",
+      "name": "Math Problems",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Solve grade-3 math word problems",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.3.OA.D.8",
+        "3.OA.D.8"
+      ]
+    },
+    {
+      "identifier": "improper-fractions-to-mixed-numbers",
+      "name": "Improper Fractions to Mixed Numbers",
+      "subject": "math",
+      "gradeMin": 4,
+      "gradeMax": 5,
+      "gradeLevel": "Grades 4-5",
+      "objective": "Convert improper fractions to mixed numbers",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "file": "apps/improper-fractions-to-mixed-numbers.html",
+      "standard_codes": [
+        "CCSS.Math.Content.4.NF.B.3",
+        "4.NF.B.3"
+      ]
+    },
+    {
+      "identifier": "decimal-numbers",
+      "name": "Decimal Numbers",
+      "subject": "math",
+      "gradeMin": 4,
+      "gradeMax": 4,
+      "gradeLevel": "Grade 4",
+      "objective": "Understand and compare decimal numbers",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.4.NF.C.6",
+        "CCSS.Math.Content.4.NF.C.7",
+        "4.NF.C.6",
+        "4.NF.C.7"
+      ]
+    },
+    {
+      "identifier": "rounding-decimals",
+      "name": "Rounding Decimals",
+      "subject": "math",
+      "gradeMin": 4,
+      "gradeMax": 5,
+      "gradeLevel": "Grades 4-5",
+      "objective": "Round decimal numbers to a given place",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "file": "apps/rounding-decimals.html",
+      "standard_codes": [
+        "CCSS.Math.Content.5.NBT.A.4",
+        "5.NBT.A.4"
+      ]
+    },
+    {
+      "identifier": "coordinate-plane",
+      "name": "Coordinate Plane",
+      "subject": "math",
+      "gradeMin": 5,
+      "gradeMax": 6,
+      "gradeLevel": "Grades 5-6",
+      "objective": "Plot and read points on the coordinate plane",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.Math.Content.5.G.A.1",
+        "CCSS.Math.Content.6.NS.C.6",
+        "5.G.A.1",
+        "6.NS.C.6"
+      ],
+      "file": "apps/coordinate-plane.html"
+    },
+    {
+      "identifier": "sight-words-first-grade",
+      "name": "Sight Words",
+      "subject": "reading",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Recognize and read first-grade sight words (41 Dolch words)",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "file": "apps/sight-words-first-grade.html",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.RF.1.3",
+        "CCSS.ELA-Literacy.RF.1.3g",
+        "RF.1.3",
+        "RF.1.3g"
+      ]
+    },
+    {
+      "identifier": "cvc-word-builder",
+      "name": "CVC Word Builder",
+      "subject": "reading",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Build consonant-vowel-consonant (CVC) words by word family",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "file": "apps/cvc-word-builder.html",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.RF.1.3",
+        "CCSS.ELA-Literacy.RF.1.3b",
+        "RF.1.3",
+        "RF.1.3b"
+      ]
+    },
+    {
+      "identifier": "digraph-word-builder",
+      "name": "Digraph Word Builder",
+      "subject": "reading",
+      "gradeMin": 0,
+      "gradeMax": 1,
+      "gradeLevel": "Kindergarten-Grade 1",
+      "objective": "Build words with digraphs sh, ch, th, wh",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "file": "apps/digraph-word-builder.html",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.RF.1.3",
+        "CCSS.ELA-Literacy.RF.1.3a",
+        "RF.1.3",
+        "RF.1.3a"
+      ]
+    },
+    {
+      "identifier": "middle-sound-builder",
+      "name": "Middle Sound Builder",
+      "subject": "reading",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Identify the middle vowel sound in CVC words",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "file": "apps/middle-sound-builder.html",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.RF.1.2",
+        "CCSS.ELA-Literacy.RF.1.2c",
+        "RF.1.2",
+        "RF.1.2c"
+      ]
+    },
+    {
+      "identifier": "reading-comprehension-grade-3",
+      "name": "Reading Comprehension",
+      "subject": "reading",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Read passages and answer comprehension questions",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.RL.3.1",
+        "CCSS.ELA-Literacy.RI.3.1",
+        "RL.3.1",
+        "RI.3.1"
+      ],
+      "file": "apps/reading-comprehension-grade-3.html"
+    },
+    {
+      "identifier": "grammar-grade-3",
+      "name": "Grammar",
+      "subject": "reading",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Practice grade-3 grammar and language skills",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.L.3.1",
+        "L.3.1"
+      ]
+    },
+    {
+      "identifier": "spelling-bee-grade-3",
+      "name": "Spelling Bee",
+      "subject": "reading",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Practice spelling grade-3 words",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.L.3.2",
+        "L.3.2"
+      ],
+      "file": "apps/spelling-bee-grade-3.html"
+    },
+    {
+      "identifier": "silabas-en-espanol",
+      "name": "Silabas en Espanol",
+      "subject": "spanish",
+      "gradeMin": 1,
+      "gradeMax": 3,
+      "gradeLevel": "Grades 1-3",
+      "objective": "Read and practice Spanish syllables (silabas) for early Spanish reading",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "file": "apps/silabas-en-espanol.html",
+      "standard_codes": []
+    },
+    {
+      "identifier": "tessellations",
+      "name": "Tessellations",
+      "subject": "art",
+      "gradeMin": 9,
+      "gradeMax": 9,
+      "gradeLevel": "Grade 9",
+      "objective": "Create and explore tessellation art patterns",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [
+        "CCSS.ELA-Literacy.8.G.A.3",
+        "8.G.A.3"
+      ],
+      "file": "apps/tessellations.html"
+    },
+    {
+      "identifier": "nonsense-words",
+      "name": "Nonsense Words",
+      "subject": "reading",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Read made-up words by sounding them out, one card at a time",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/nonsense-words.html"
+    },
+    {
+      "identifier": "word-segmenting",
+      "name": "Word Segmenting",
+      "subject": "reading",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Listen to a word and tap its sounds in order",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/word-segmenting.html"
+    },
+    {
+      "identifier": "number-sequence",
+      "name": "Number Sequence",
+      "subject": "math",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Find the missing number in a sequence (counting up, down, and by 10s)",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/number-sequence.html"
+    },
+    {
+      "identifier": "picture-graphs",
+      "name": "Picture Graphs",
+      "subject": "math",
+      "gradeMin": 2,
+      "gradeMax": 2,
+      "gradeLevel": "Grade 2",
+      "objective": "Read and interpret picture graphs",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/picture-graphs.html"
+    },
+    {
+      "identifier": "bar-graphs",
+      "name": "Bar Graphs",
+      "subject": "math",
+      "gradeMin": 2,
+      "gradeMax": 2,
+      "gradeLevel": "Grade 2",
+      "objective": "Read and interpret bar graphs",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/bar-graphs.html"
+    },
+    {
+      "identifier": "counting-coins",
+      "name": "Counting Coins",
+      "subject": "math",
+      "gradeMin": 2,
+      "gradeMax": 3,
+      "gradeLevel": "Grades 2-3",
+      "objective": "Count coins and find their total value",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/counting-coins.html"
+    },
+    {
+      "identifier": "coin-addition",
+      "name": "Coin Addition",
+      "subject": "math",
+      "gradeMin": 2,
+      "gradeMax": 3,
+      "gradeLevel": "Grades 2-3",
+      "objective": "Add coin values together",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/coin-addition.html"
+    },
+    {
+      "identifier": "fraction-pie",
+      "name": "Pie",
+      "subject": "math",
+      "gradeMin": 2,
+      "gradeMax": 3,
+      "gradeLevel": "Grades 2-3",
+      "objective": "Show fractions as slices of a pie",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/fraction-pie.html"
+    },
+    {
+      "identifier": "identifying-fractions-1",
+      "name": "Identifying Fractions 1",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Identify fractions from models and pictures (level 1)",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/identifying-fractions-1.html"
+    },
+    {
+      "identifier": "identifying-fractions-2",
+      "name": "Identifying Fractions 2",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Identify fractions from models and pictures (level 2)",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/identifying-fractions-2.html"
+    },
+    {
+      "identifier": "comparing-fractions-1",
+      "name": "Comparing Fractions 1",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Compare two fractions (level 1)",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/comparing-fractions-1.html"
+    },
+    {
+      "identifier": "comparing-fractions-2",
+      "name": "Comparing Fractions 2",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Compare two fractions (level 2)",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/comparing-fractions-2.html"
+    },
+    {
+      "identifier": "scaling-fractions",
+      "name": "Scaling Fractions",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Practice scaling fractions",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/scaling-fractions.html"
+    },
+    {
+      "identifier": "rectangle-generator",
+      "name": "Rectangle Generator",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Generate rectangles for perimeter and area practice",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/rectangle-generator.html"
+    },
+    {
+      "identifier": "draw-rectangles",
+      "name": "Draw Rectangles",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Draw rectangles and explore their perimeter and area",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/draw-rectangles.html"
+    },
+    {
+      "identifier": "decomposing-shapes-rectangles",
+      "name": "Decomposing Shapes into Rectangles",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Split shapes into rectangles to find their area",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/decomposing-shapes-rectangles.html"
+    },
+    {
+      "identifier": "two-step-problems",
+      "name": "Two-Step Problems",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Solve word problems in two steps",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/two-step-problems.html"
+    },
+    {
+      "identifier": "decimal-translator",
+      "name": "Decimal Translator",
+      "subject": "math",
+      "gradeMin": 4,
+      "gradeMax": 4,
+      "gradeLevel": "Grade 4",
+      "objective": "Work with decimal numbers in different forms",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/decimal-translator.html"
+    },
+    {
+      "identifier": "doubles-addition",
+      "name": "Doubles - Addition",
+      "subject": "math",
+      "gradeMin": 1,
+      "gradeMax": 1,
+      "gradeLevel": "Grade 1",
+      "objective": "Add with doubles and near doubles facts",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/doubles-addition.html"
+    },
+    {
+      "identifier": "algebraic-thinking",
+      "name": "Algebraic Thinking",
+      "subject": "math",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Early algebraic thinking with patterns and unknowns",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/algebraic-thinking.html"
+    },
+    {
+      "identifier": "grammar-gremlin",
+      "name": "Grammar Gremlin",
+      "subject": "reading",
+      "gradeMin": 3,
+      "gradeMax": 3,
+      "gradeLevel": "Grade 3",
+      "objective": "Find and fix grammar mistakes",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/grammar-gremlin.html"
+    },
+    {
+      "identifier": "linear-equation-explorer",
+      "name": "Linear Equation Explorer",
+      "subject": "math",
+      "gradeMin": 8,
+      "gradeMax": 8,
+      "gradeLevel": "Grade 8",
+      "objective": "Explore linear equations and functions",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/linear-equation-explorer.html"
+    },
+    {
+      "identifier": "virtual-circuit-sandbox",
+      "name": "Virtual Circuit Sandbox",
+      "subject": "science",
+      "gradeMin": 6,
+      "gradeMax": 12,
+      "gradeLevel": "Grades 6-12",
+      "objective": "Build and test virtual electric circuits",
+      "creator": "Birkan Yavuz",
+      "kind": "interactive classroom activity",
+      "standard_codes": [],
+      "file": "apps/virtual-circuit-sandbox.html"
+    }
+  ]
 }
