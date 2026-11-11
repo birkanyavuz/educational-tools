@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Rectangle Resizer</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+    text-align: center;
+    background: #fdf5e6;
+    padding: 5px; 
+    margin: 0;
+    color: #333;
+    user-select: none; 
+  }
+  .container {
+    background: white;
+    border-radius: 20px;
+    padding: 12px; /* Tightened slightly more */
+    max-width: 650px;
+    margin: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 5px solid #ff9800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 { color: #e65100; margin: 0; font-size: 1.5rem; } 
+  
+  /* The Scoreboard - Forced to one row */
+  .stats-board {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; /* Forces one single row */
+    justify-content: space-evenly; /* Spreads them out evenly */
+    align-items: center;
+    gap: 10px; 
+    margin: 8px 0; 
+    font-size: 0.9rem; /* Smaller font to fit full words */
+    font-weight: bold;
+    background: #fff3e0;
+    padding: 8px 5px; 
+    border-radius: 12px;
+    border: 2px dashed #ffb74d;
+    width: 98%;
+    box-sizing: border-box;
+  }
+  .stat-item { color: #555; white-space: nowrap; }
+  .stat-item span { color: #e65100; font-size: 1.1rem; margin-left: 2px; }
+
+  /* The Graph Paper Area */
+  .workspace {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    height: 280px; /* Shrunk slightly more to ensure zero scrolling */
+    background-color: #fafafa;
+    background-image: 
+      linear-gradient(to right, #e0e0e0 1px, transparent 1px),
+      linear-gradient(to bottom, #e0e0e0 1px, transparent 1px);
+    background-size: 20px 20px;
+    border: 3px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    touch-action: none; 
+  }
+
+  .rectangle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(33, 150, 243, 0.3);
+    border: 3px solid #1E88E5;
+    box-sizing: border-box;
+  }
+
+  .resize-handle {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 12px;
+    height: 12px;
+    background-color: #ff3d00;
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: nwse-resize;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    z-index: 10;
+  }
+  
+  .resize-handle::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Stretch the Rectangle!</h1>
+    <p style="color: #666; font-size: 0.9rem; margin: 2px 0;">Drag the orange circle to see the math change.</p>
+    
+    <div class="stats-board">
+      <div class="stat-item">Width:<span id="valW">5</span></div>
+      <div class="stat-item">Height:<span id="valH">5</span></div>
+      <div class="stat-item">Area:<span id="valA">25</span></div>
+      <div class="stat-item">Perimeter:<span id="valP">20</span></div>
+    </div>
+
+    <div class="workspace" id="workspace">
+      <div class="rectangle" id="rect">
+        <div class="resize-handle" id="handle"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const handle = document.getElementById('handle');
+    const rect = document.getElementById('rect');
+    const workspace = document.getElementById('workspace');
+    
+    const valW = document.getElementById('valW');
+    const valH = document.getElementById('valH');
+    const valA = document.getElementById('valA');
+    const valP = document.getElementById('valP');
+
+    let isDragging = false;
+    const GRID_SIZE = 20; 
+
+    function updateStats(widthPx, heightPx) {
+      let wUnits = Math.max(1, Math.round(widthPx / GRID_SIZE));
+      let hUnits = Math.max(1, Math.round(heightPx / GRID_SIZE));
+
+      rect.style.width = (wUnits * GRID_SIZE) + 'px';
+      rect.style.height = (hUnits * GRID_SIZE) + 'px';
+
+      valW.innerText = wUnits;
+      valH.innerText = hUnits;
+      valA.innerText = wUnits * hUnits;
+      valP.innerText = 2 * (wUnits + hUnits);
+    }
+
+    function startDrag(e) {
+      e.preventDefault();
+      isDragging = true;
+    }
+
+    function doDrag(e) {
+      if (!isDragging) return;
+
+      let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      let clientY = e.clientY || (e.touches && e.touches[0].clientY);
+
+      let workspaceRect = workspace.getBoundingClientRect();
+      
+      let newWidth = clientX - workspaceRect.left;
+      let newHeight = clientY - workspaceRect.top;
+
+      if (newWidth > workspaceRect.width) newWidth = workspaceRect.width;
+      if (newHeight > workspaceRect.height) newHeight = workspaceRect.height;
+      
+      updateStats(newWidth, newHeight);
+    }
+
+    function stopDrag() {
+      isDragging = false;
+    }
+
+    handle.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', doDrag);
+    document.addEventListener('mouseup', stopDrag);
+
+    handle.addEventListener('touchstart', startDrag, {passive: false});
+    document.addEventListener('touchmove', doDrag, {passive: false});
+    document.addEventListener('touchend', stopDrag);
+    
+    updateStats(100, 100);
+  </script>
+</body>
+</html>

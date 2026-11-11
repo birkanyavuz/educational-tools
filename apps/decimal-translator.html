@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Decimal Translator</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body { 
+    font-family: 'Comic Sans MS', sans-serif; 
+    background: #ede7f6; 
+    margin: 0;
+    padding: 10px;
+    color: #333;
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    border: 4px solid #5e35b1;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 { margin: 0 0 15px 0; font-size: clamp(1.4rem, 4vw, 1.8rem); color: #9575cd; text-align: center; text-transform: uppercase; letter-spacing: 2px;} 
+  
+  .problem-text {
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    font-weight: bold;
+    color: #4527a0;
+    margin: 10px 0 25px 0;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .input-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fafafa;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 15px;
+    width: 100%;
+  }
+
+  .input-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #5e35b1;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .fraction-ui {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .whole-num-box {
+    width: 70px;
+    height: 80px;
+    font-size: 2.2rem;
+    text-align: center;
+    border: 3px solid #333;
+    border-radius: 8px;
+    font-family: 'Comic Sans MS', sans-serif;
+  }
+
+  .fraction-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .frac-box {
+    width: 80px;
+    height: 50px;
+    font-size: 1.8rem;
+    text-align: center;
+    border: 3px solid #333;
+    border-radius: 6px;
+    font-family: 'Comic Sans MS', sans-serif;
+  }
+
+  .fraction-line {
+    width: 90px;
+    height: 5px;
+    background: #000;
+    border-radius: 2px;
+  }
+
+  .dec-box {
+    width: 180px;
+    height: 70px;
+    font-size: 2.2rem;
+    text-align: center;
+    border: 3px solid #333;
+    border-radius: 8px;
+    font-family: 'Comic Sans MS', sans-serif;
+  }
+
+  .controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .btn {
+    padding: 12px 25px; 
+    font-size: clamp(1.1rem, 4vw, 1.3rem); 
+    font-weight: bold; 
+    color: white; 
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn-check { background: #4caf50; }
+  .btn-new { background: #0288d1; }
+
+  #feedback {
+    font-size: clamp(1.2rem, 4vw, 1.4rem);
+    font-weight: bold;
+    min-height: 35px;
+    margin-top: 15px;
+    text-align: center;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  @media (min-width: 600px) {
+    .input-grid { flex-direction: row; }
+    .whole-num-box { width: 90px; height: 100px; font-size: 2.8rem; }
+    .frac-box { width: 100px; height: 60px; font-size: 2.2rem; }
+    .fraction-line { width: 110px; }
+    .dec-box { width: 220px; height: 80px; font-size: 2.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1>Decimal Translator</h1>
+
+  <h2 class="problem-text" id="problem-text">Loading...</h2>
+
+  <div class="input-grid">
+    <div class="input-section">
+      <div class="input-label">As a Fraction</div>
+      <div class="fraction-ui">
+        <input type="number" id="in-whole" class="whole-num-box" placeholder="?">
+        <div class="fraction-stack">
+          <input type="number" id="in-num" class="frac-box" placeholder="?">
+          <div class="fraction-line"></div>
+          <input type="number" id="in-den" class="frac-box" placeholder="?">
+        </div>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <div class="input-label">As a Decimal</div>
+      <input type="text" id="in-dec" class="dec-box" placeholder="0.00" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-check" onclick="checkAnswer()">✔️ Check Answer</button>
+    <button class="btn btn-new" onclick="generateProblem()">🔄 New Problem</button>
+  </div>
+
+  <div id="feedback"></div>
+</div>
+
+<script>
+  let currentWhole = 0;
+  let currentNum = 0;
+  let currentDenom = 10;
+  let currentDecimalString = "";
+
+  function numberToWords(n) {
+    if (n === 0) return "zero";
+    const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    
+    let word = "";
+    if (n >= 100) {
+      word += ones[Math.floor(n / 100)] + " hundred ";
+      n %= 100;
+    }
+    if (n > 0) {
+      if (n < 20) {
+        word += ones[n];
+      } else {
+        word += tens[Math.floor(n / 10)];
+        if (n % 10 > 0) {
+          word += "-" + ones[n % 10];
+        }
+      }
+    }
+    return word.trim();
+  }
+
+  function generateProblem() {
+    document.getElementById('in-whole').value = '';
+    document.getElementById('in-num').value = '';
+    document.getElementById('in-den').value = '';
+    document.getElementById('in-dec').value = '';
+    
+    const feedback = document.getElementById('feedback');
+    feedback.innerText = "";
+    document.getElementById('in-whole').style.borderColor = "#333";
+    document.getElementById('in-num').style.borderColor = "#333";
+    document.getElementById('in-den').style.borderColor = "#333";
+    document.getElementById('in-dec').style.borderColor = "#333";
+
+    let places = Math.floor(Math.random() * 3) + 1; 
+    currentDenom = Math.pow(10, places);
+    
+    do {
+      currentNum = Math.floor(Math.random() * (currentDenom - 1)) + 1;
+    } while (currentNum % 10 === 0 && currentDenom > 10);
+
+    currentWhole = Math.floor(Math.random() * 21);
+
+    let numWord = numberToWords(currentNum);
+    let placeWord = places === 1 ? "tenths" : (places === 2 ? "hundredths" : "thousandths");
+    let fullWordStr = "";
+
+    if (currentWhole === 0) {
+      fullWordStr = `${numWord} ${placeWord}`;
+    } else {
+      let wholeWord = numberToWords(currentWhole);
+      fullWordStr = `${wholeWord} and ${numWord} ${placeWord}`;
+    }
+
+    fullWordStr = fullWordStr.charAt(0).toUpperCase() + fullWordStr.slice(1);
+
+    let decPart = currentNum.toString().padStart(places, '0');
+    currentDecimalString = `${currentWhole}.${decPart}`;
+
+    document.getElementById('problem-text').innerText = fullWordStr;
+  }
+
+  function checkAnswer() {
+    const wBox = document.getElementById('in-whole');
+    const nBox = document.getElementById('in-num');
+    const dBox = document.getElementById('in-den');
+    const decBox = document.getElementById('in-dec');
+    const feedback = document.getElementById('feedback');
+
+    let userW = parseInt(wBox.value);
+    if (isNaN(userW)) userW = 0; 
+    let userN = parseInt(nBox.value);
+    let userD = parseInt(dBox.value);
+    
+    let userDecString = decBox.value.trim();
+    let userDecFloat = parseFloat(userDecString);
+    let targetDecFloat = parseFloat(currentDecimalString);
+
+    let fracCorrect = (userW === currentWhole && userN === currentNum && userD === currentDenom);
+    let decCorrect = (!isNaN(userDecFloat) && userDecFloat === targetDecFloat);
+
+    wBox.style.borderColor = (userW === currentWhole) ? "#4caf50" : "#d32f2f";
+    nBox.style.borderColor = (userN === currentNum) ? "#4caf50" : "#d32f2f";
+    dBox.style.borderColor = (userD === currentDenom) ? "#4caf50" : "#d32f2f";
+    
+    if (currentWhole === 0 && wBox.value === "") { wBox.style.borderColor = "#4caf50"; }
+
+    decBox.style.borderColor = decCorrect ? "#4caf50" : "#d32f2f";
+
+    if (isNaN(userN) || isNaN(userD) || userDecString === "") {
+      feedback.innerText = "Please fill in the fraction and the decimal! 🤔";
+      feedback.style.color = "#f57c00";
+      return;
+    }
+
+    if (fracCorrect && decCorrect) {
+      feedback.innerText = "🎉 Brilliant! You translated it perfectly! 🎉";
+      feedback.style.color = "#4caf50";
+    } else if (fracCorrect && !decCorrect) {
+      feedback.innerText = "Fraction is right, but check your decimal! 🔍";
+      feedback.style.color = "#f57c00";
+    } else if (!fracCorrect && decCorrect) {
+      feedback.innerText = "Decimal is right, but check your fraction! 🔍";
+      feedback.style.color = "#f57c00";
+    } else {
+      feedback.innerText = "Not quite! Read the place value words carefully. 💪";
+      feedback.style.color = "#d32f2f";
+    }
+  }
+
+  // LISTEN FOR THE ENTER KEY
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      checkAnswer();
+    }
+  });
+
+  window.onload = generateProblem;
+</script>
+</body>
+</html>

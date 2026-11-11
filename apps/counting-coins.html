@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Coin Counter</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+    text-align: center;
+    background: #e0f2f1;
+    padding: 20px;
+    color: #333;
+    user-select: none;
+  }
+  .container {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 800px;
+    margin: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 5px solid #009688;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 { color: #00796b; margin-top: 0; font-size: 2.5rem; margin-bottom: 10px; }
+
+  /* The Scoreboard */
+  .scoreboard {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    background: #e8f5e9;
+    padding: 20px;
+    border-radius: 15px;
+    border: 3px dashed #4caf50;
+    margin-bottom: 25px;
+    font-size: 2rem;
+    font-weight: bold;
+    box-sizing: border-box;
+  }
+  .score-cents { color: #e65100; }
+  .score-dollars { color: #2e7d32; }
+
+  /* Coin Dispenser Buttons */
+  .dispenser {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end; 
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid #ccc;
+  }
+  
+  .btn-coin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    background: white;
+    border: 2px solid #bbb;
+    border-radius: 15px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    min-width: 80px;
+  }
+  .btn-coin:active { transform: scale(0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .btn-coin:hover { background: #f0f8ff; }
+  
+  .btn-label { font-size: 1.1rem; font-weight: bold; margin-top: 8px; color: #555; }
+
+  /* Hybrid Coin Styles */
+  .coin {
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset -3px -3px 6px rgba(0,0,0,0.4), 
+                inset 3px 3px 6px rgba(255,255,255,0.6), 
+                2px 4px 5px rgba(0,0,0,0.3);
+  }
+  
+  .penny-fallback { background: radial-gradient(circle at 30% 30%, #e69d71, #b56535 60%, #7a3a18); }
+  .silver-fallback { background: radial-gradient(circle at 30% 30%, #f0f0f0, #c4c4c4 60%, #8c8c8c); }
+
+  .coin img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    z-index: 2;
+  }
+
+  .coin span {
+    position: relative;
+    z-index: 1; 
+    color: rgba(0,0,0,0.7);
+    font-weight: 900;
+    text-shadow: 1px 1px 0px rgba(255,255,255,0.4), -1px -1px 0px rgba(0,0,0,0.2);
+    opacity: 0; 
+  }
+  
+  /* MATHEMATICALLY PERFECT REAL-WORLD SIZES */
+  .quarter { width: 90px; height: 90px; font-size: 1.6rem; }
+  .nickel { width: 79px; height: 79px; font-size: 1.4rem; }
+  .penny { width: 71px; height: 71px; font-size: 1.3rem; }
+  .dime { width: 66px; height: 66px; font-size: 1.2rem; }
+
+  /* The Sorting Mat */
+  .workspace {
+    width: 100%;
+    min-height: 250px;
+    background-color: #fce4ec;
+    border: 4px solid #f06292;
+    border-radius: 15px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 10px; 
+  }
+
+  /* Clear Button */
+  .btn-clear {
+    margin-top: 25px;
+    font-size: 1.2rem;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background-color: #f44336;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+  .btn-clear:active { transform: scale(0.95); }
+
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Coin Counter!</h1>
+    
+    <div class="scoreboard">
+      <div class="score-cents" id="display-cents">0¢</div>
+      <div class="score-dollars" id="display-dollars">$0.00</div>
+    </div>
+
+    <div class="dispenser">
+      <div class="btn-coin" onclick="addCoin('penny penny-fallback', 1, 'https://commons.wikimedia.org/wiki/Special:FilePath/US_One_Cent_Obv.png?width=200')">
+        <div class="coin penny penny-fallback">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/US_One_Cent_Obv.png?width=200" onerror="this.style.opacity=0; this.parentElement.querySelector('span').style.opacity=1;" alt="Penny">
+          <span>1¢</span>
+        </div>
+        <div class="btn-label">Penny</div>
+      </div>
+      
+      <div class="btn-coin" onclick="addCoin('nickel silver-fallback', 5, 'https://commons.wikimedia.org/wiki/Special:FilePath/Jefferson-Nickel-Unc-Obv.jpg?width=200')">
+        <div class="coin nickel silver-fallback">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Jefferson-Nickel-Unc-Obv.jpg?width=200" onerror="this.style.opacity=0; this.parentElement.querySelector('span').style.opacity=1;" alt="Nickel">
+          <span>5¢</span>
+        </div>
+        <div class="btn-label">Nickel</div>
+      </div>
+      
+      <div class="btn-coin" onclick="addCoin('dime silver-fallback', 10, 'https://commons.wikimedia.org/wiki/Special:FilePath/Dime_Obverse_13.png?width=200')">
+        <div class="coin dime silver-fallback">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Dime_Obverse_13.png?width=200" onerror="this.style.opacity=0; this.parentElement.querySelector('span').style.opacity=1;" alt="Dime">
+          <span>10¢</span>
+        </div>
+        <div class="btn-label">Dime</div>
+      </div>
+      
+      <div class="btn-coin" onclick="addCoin('quarter silver-fallback', 25, 'https://commons.wikimedia.org/wiki/Special:FilePath/2006_Quarter_Proof.png?width=200')">
+        <div class="coin quarter silver-fallback">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/2006_Quarter_Proof.png?width=200" onerror="this.style.opacity=0; this.parentElement.querySelector('span').style.opacity=1;" alt="Quarter">
+          <span>25¢</span>
+        </div>
+        <div class="btn-label">Quarter</div>
+      </div>
+    </div>
+
+    <div class="workspace" id="mat">
+      </div>
+
+    <button class="btn-clear" onclick="clearMat()">🗑️ Clear the Mat</button>
+  </div>
+
+  <script>
+    let totalCents = 0;
+    const mat = document.getElementById('mat');
+    const displayCents = document.getElementById('display-cents');
+    const displayDollars = document.getElementById('display-dollars');
+
+    function updateScoreboard() {
+      displayCents.innerText = totalCents + '¢';
+      let dollars = (totalCents / 100).toFixed(2);
+      displayDollars.innerText = '$' + dollars;
+    }
+
+    function addCoin(coinClass, value, imgUrl) {
+      totalCents += value;
+      updateScoreboard();
+
+      let newCoin = document.createElement('div');
+      newCoin.className = `coin ${coinClass}`;
+      
+      let img = document.createElement('img');
+      img.src = imgUrl;
+      img.alt = value + " cent coin";
+      
+      let text = document.createElement('span');
+      text.innerText = value + '¢';
+
+      img.onerror = function() { 
+        this.style.opacity = 0; 
+        text.style.opacity = 1;
+      };
+      
+      newCoin.appendChild(img);
+      newCoin.appendChild(text);
+
+      newCoin.style.transform = 'scale(0)';
+      newCoin.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      
+      mat.appendChild(newCoin);
+
+      setTimeout(() => {
+        newCoin.style.transform = 'scale(1)';
+      }, 10);
+    }
+
+    function clearMat() {
+      totalCents = 0;
+      mat.innerHTML = '';
+      updateScoreboard();
+    }
+
+    updateScoreboard();
+  </script>
+</body>
+</html>

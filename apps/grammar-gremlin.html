@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Gremlin Fixer</title>
+<style>
+  body { 
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; 
+    background-color: #e0f7fa; 
+    color: #333; 
+    text-align: center; 
+    padding: 5px 20px;
+  }
+  
+  .container { 
+    max-width: 800px; 
+    margin: 0 auto; 
+    background: white; 
+    padding: 25px 40px 40px 40px; 
+    border-radius: 15px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+    border-top: 10px solid #00bcd4;
+  }
+  
+  h1 { 
+    color: #00838f; 
+    font-size: 2.5rem; 
+    margin-top: 0;
+  }
+
+  .scoreboard {
+    display: flex;
+    justify-content: space-around;
+    background: #00838f;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 25px;
+  }
+
+  .score-highlight { color: #ffeb3b; }
+
+  .instructions {
+    color: #555;
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+  }
+  
+  .gremlin-box {
+    background: #e8f5e9;
+    border: 3px dashed #4caf50;
+    padding: 25px;
+    border-radius: 10px;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: #2e7d32;
+    position: relative;
+  }
+
+  .gremlin-icon {
+    font-size: 3rem;
+    position: absolute;
+    top: -25px;
+    left: -20px;
+  }
+  
+  input[type="text"] {
+    width: 90%;
+    max-width: 600px;
+    padding: 15px;
+    font-size: 1.5rem;
+    border: 4px solid #b2ebf2;
+    border-radius: 10px;
+    text-align: center;
+    transition: border-color 0.2s;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; 
+  }
+  
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #00bcd4;
+  }
+  
+  #feedback {
+    font-size: 1.4rem;
+    font-weight: bold;
+    min-height: 40px;
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  
+  .correct { background-color: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+  .incorrect { background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Grammar Gremlin Fixer</h1>
+    
+    <div class="scoreboard">
+        <div>Sentences Fixed: <span id="cases-solved" class="score-highlight">0</span> / <span id="total-cases">0</span></div>
+    </div>
+
+    <div class="instructions">
+        The Grammar Gremlin stole our capitals and punctuation!<br>
+        Fix the sentence, then press <strong>Enter</strong> to trap him.
+    </div>
+    
+    <div class="gremlin-box">
+        <div class="gremlin-icon">👾</div>
+        <div id="broken-sentence">Loading...</div>
+    </div>
+    
+    <input type="text" id="student-answer" placeholder="Type the fixed sentence here..." autofocus autocomplete="off">
+    
+    <div id="feedback"></div>
+</div>
+
+<script>
+    // 200 Sentences for 3rd Grade (Capitals, End Marks, Proper Nouns)
+    const sentences = [
+        { broken: "the dog ran fast", fixed: "The dog ran fast." },
+        { broken: "can we go to the park", fixed: "Can we go to the park?" },
+        { broken: "my friend sarah likes apples", fixed: "My friend Sarah likes apples." },
+        { broken: "i have a test on friday", fixed: "I have a test on Friday." },
+        { broken: "what time is it", fixed: "What time is it?" },
+        { broken: "we live in minnesota", fixed: "We live in Minnesota." },
+        { broken: "look at that huge bug", fixed: "Look at that huge bug!" },
+        { broken: "mr smith is my teacher", fixed: "Mr. Smith is my teacher." },
+        { broken: "did you finish your homework", fixed: "Did you finish your homework?" },
+        { broken: "she was born in october", fixed: "She was born in October." },
+        { broken: "the bus arrives at noon", fixed: "The bus arrives at noon." },
+        { broken: "is today monday", fixed: "Is today Monday?" },
+        { broken: "wow that was a great jump", fixed: "Wow that was a great jump!" },
+        { broken: "dr brown works at the hospital", fixed: "Dr. Brown works at the hospital." },
+        { broken: "i love playing soccer", fixed: "I love playing soccer." },
+        { broken: "we are going to chicago", fixed: "We are going to Chicago." },
+        { broken: "where did you put my shoes", fixed: "Where did you put my shoes?" },
+        { broken: "the cat slept on the rug", fixed: "The cat slept on the rug." },
+        { broken: "i saw a movie with david", fixed: "I saw a movie with David." },
+        { broken: "we celebrate thanksgiving in november", fixed: "We celebrate Thanksgiving in November." },
+        { broken: "that is the best book ever", fixed: "That is the best book ever!" },
+        { broken: "can i have some water", fixed: "Can I have some water?" },
+        { broken: "mrs jones baked a cake", fixed: "Mrs. Jones baked a cake." },
+        { broken: "the sun is very hot today", fixed: "The sun is very hot today." },
+        { broken: "are you going to the party", fixed: "Are you going to the party?" },
+        { broken: "my favorite day is saturday", fixed: "My favorite day is Saturday." },
+        { broken: "she went to florida for vacation", fixed: "She went to Florida for vacation." },
+        { broken: "i lost my red pencil", fixed: "I lost my red pencil." },
+        { broken: "watch out for the bee", fixed: "Watch out for the bee!" },
+        { broken: "dr lee is a good dentist", fixed: "Dr. Lee is a good dentist." },
+        { broken: "do you like pizza", fixed: "Do you like pizza?" },
+        { broken: "my birthday is in august", fixed: "My birthday is in August." },
+        { broken: "he plays baseball on wednesday", fixed: "He plays baseball on Wednesday." },
+        { broken: "the bird flew into the tree", fixed: "The bird flew into the tree." },
+        { broken: "what is your favorite color", fixed: "What is your favorite color?" },
+        { broken: "i read a book about texas", fixed: "I read a book about Texas." },
+        { broken: "this is so much fun", fixed: "This is so much fun!" },
+        { broken: "miss clark read us a story", fixed: "Miss Clark read us a story." },
+        { broken: "the snow started falling early", fixed: "The snow started falling early." },
+        { broken: "who is at the door", fixed: "Who is at the door?" },
+        { broken: "i visit my grandma on sunday", fixed: "I visit my grandma on Sunday." },
+        { broken: "december is a cold month", fixed: "December is a cold month." },
+        { broken: "lucy has a pet rabbit", fixed: "Lucy has a pet rabbit." },
+        { broken: "can you help me read this", fixed: "Can you help me read this?" },
+        { broken: "we went swimming in the lake", fixed: "We went swimming in the lake." },
+        { broken: "we won the big game", fixed: "We won the big game!" },
+        { broken: "did jack eat his lunch", fixed: "Did Jack eat his lunch?" },
+        { broken: "mr white drives the bus", fixed: "Mr. White drives the bus." },
+        { broken: "the library is closed on tuesday", fixed: "The library is closed on Tuesday." },
+        { broken: "i want to visit new york", fixed: "I want to visit New York." },
+        { broken: "my sister is very tall", fixed: "My sister is very tall." },
+        { broken: "when is the science fair", fixed: "When is the science fair?" },
+        { broken: "january is the first month", fixed: "January is the first month." },
+        { broken: "stop running in the hall", fixed: "Stop running in the hall!" },
+        { broken: "emily and tom are playing outside", fixed: "Emily and Tom are playing outside." },
+        { broken: "do you know how to swim", fixed: "Do you know how to swim?" },
+        { broken: "we bought apples at the store", fixed: "We bought apples at the store." },
+        { broken: "i have practice on thursday", fixed: "I have practice on Thursday." },
+        { broken: "dr green gave me a sticker", fixed: "Dr. Green gave me a sticker." },
+        { broken: "where did the dog go", fixed: "Where did the dog go?" },
+        { broken: "i love eating strawberries", fixed: "I love eating strawberries." },
+        { broken: "my favorite month is july", fixed: "My favorite month is July." },
+        { broken: "that was a scary movie", fixed: "That was a scary movie!" },
+        { broken: "maria is a fast runner", fixed: "Maria is a fast runner." },
+        { broken: "why is the sky blue", fixed: "Why is the sky blue?" },
+        { broken: "we went to the zoo yesterday", fixed: "We went to the zoo yesterday." },
+        { broken: "mrs davis has a green car", fixed: "Mrs. Davis has a green car." },
+        { broken: "school starts in september", fixed: "School starts in September." },
+        { broken: "the frogs jumped in the pond", fixed: "The frogs jumped in the pond." },
+        { broken: "can i borrow your marker", fixed: "Can I borrow your marker?" },
+        { broken: "i went to california last year", fixed: "I went to California last year." },
+        { broken: "hurry up or we will be late", fixed: "Hurry up or we will be late!" },
+        { broken: "my dog likes to chase cars", fixed: "My dog likes to chase cars." },
+        { broken: "do you want to play chess", fixed: "Do you want to play chess?" },
+        { broken: "john has a blue backpack", fixed: "John has a blue backpack." },
+        { broken: "we have art class on monday", fixed: "We have art class on Monday." },
+        { broken: "the wind blew my hat away", fixed: "The wind blew my hat away." },
+        { broken: "what did you eat for breakfast", fixed: "What did you eat for breakfast?" },
+        { broken: "i hope it snows in february", fixed: "I hope it snows in February." },
+        { broken: "the alarm clock is so loud", fixed: "The alarm clock is so loud!" },
+        { broken: "dr smith checked my eyes", fixed: "Dr. Smith checked my eyes." },
+        { broken: "is that your new jacket", fixed: "Is that your new jacket?" },
+        { broken: "the stars look pretty tonight", fixed: "The stars look pretty tonight." },
+        { broken: "we go to the park on fridays", fixed: "We go to the park on Fridays." },
+        { broken: "i have a doctor appointment in april", fixed: "I have a doctor appointment in April." },
+        { broken: "the elephant is very big", fixed: "The elephant is very big." },
+        { broken: "where is the closest bathroom", fixed: "Where is the closest bathroom?" },
+        { broken: "michael won the spelling bee", fixed: "Michael won the spelling bee." },
+        { broken: "that was a loud thunder crash", fixed: "That was a loud thunder crash!" },
+        { broken: "mrs hall teaches math", fixed: "Mrs. Hall teaches math." },
+        { broken: "did you see the rainbow", fixed: "Did you see the rainbow?" },
+        { broken: "the train goes very fast", fixed: "The train goes very fast." },
+        { broken: "i love visiting london", fixed: "I love visiting London." },
+        { broken: "march is a windy month", fixed: "March is a windy month." },
+        { broken: "can we make cookies", fixed: "Can we make cookies?" },
+        { broken: "the baby is sleeping", fixed: "The baby is sleeping." },
+        { broken: "happy birthday to you", fixed: "Happy birthday to you!" },
+        { broken: "my dad works in saint paul", fixed: "My dad works in Saint Paul." },
+        { broken: "who left the door open", fixed: "Who left the door open?" },
+        { broken: "we learned about frogs today", fixed: "We learned about frogs today." },
+        { broken: "i am excited for saturday", fixed: "I am excited for Saturday." },
+        { broken: "may has lots of flowers", fixed: "May has lots of flowers." },
+        { broken: "look at that cute puppy", fixed: "Look at that cute puppy!" },
+        { broken: "miss evans is nice", fixed: "Miss Evans is nice." },
+        { broken: "do you like chocolate milk", fixed: "Do you like chocolate milk?" },
+        { broken: "the robot walked across the room", fixed: "The robot walked across the room." },
+        { broken: "daniel built a tall tower", fixed: "Daniel built a tall tower." },
+        { broken: "we play games on wednesday", fixed: "We play games on Wednesday." },
+        { broken: "the plane landed safely", fixed: "The plane landed safely." },
+        { broken: "what is your favorite animal", fixed: "What is your favorite animal?" },
+        { broken: "november is in the fall", fixed: "November is in the fall." },
+        { broken: "i caught a big fish", fixed: "I caught a big fish!" },
+        { broken: "mrs king read a poem", fixed: "Mrs. King read a poem." },
+        { broken: "how did you build that", fixed: "How did you build that?" },
+        { broken: "the apples are very sweet", fixed: "The apples are very sweet." },
+        { broken: "we went camping in june", fixed: "We went camping in June." },
+        { broken: "sophia draws beautiful pictures", fixed: "Sophia draws beautiful pictures." },
+        { broken: "can you jump high", fixed: "Can you jump high?" },
+        { broken: "the boat sailed on the water", fixed: "The boat sailed on the water." },
+        { broken: "we have a trip on tuesday", fixed: "We have a trip on Tuesday." },
+        { broken: "wow you are fast", fixed: "Wow you are fast!" },
+        { broken: "dr taylor gave me medicine", fixed: "Dr. Taylor gave me medicine." },
+        { broken: "where did you find that shell", fixed: "Where did you find that shell?" },
+        { broken: "the turtle walks slowly", fixed: "The turtle walks slowly." },
+        { broken: "we live in the united states", fixed: "We live in the United States." },
+        { broken: "august is a summer month", fixed: "August is a summer month." },
+        { broken: "chloe has a new bike", fixed: "Chloe has a new bike." },
+        { broken: "do you want to play tag", fixed: "Do you want to play tag?" },
+        { broken: "the guitar sounds nice", fixed: "The guitar sounds nice." },
+        { broken: "mr adams brought snacks", fixed: "Mr. Adams brought snacks." },
+        { broken: "i saw a bear in the woods", fixed: "I saw a bear in the woods!" },
+        { broken: "when does the movie start", fixed: "When does the movie start?" },
+        { broken: "i have piano lessons on thursday", fixed: "I have piano lessons on Thursday." },
+        { broken: "december has cold weather", fixed: "December has cold weather." },
+        { broken: "the rocket went into space", fixed: "The rocket went into space." },
+        { broken: "will you sit with me", fixed: "Will you sit with me?" },
+        { broken: "we saw monkeys at the zoo", fixed: "We saw monkeys at the zoo." },
+        { broken: "peter loves to eat pizza", fixed: "Peter loves to eat pizza." },
+        { broken: "i got a new toy", fixed: "I got a new toy!" },
+        { broken: "miss baker showed us a video", fixed: "Miss Baker showed us a video." },
+        { broken: "how old are you", fixed: "How old are you?" },
+        { broken: "the leaves fall in october", fixed: "The leaves fall in October." },
+        { broken: "we watched tv on friday", fixed: "We watched tv on Friday." },
+        { broken: "the castle is very old", fixed: "The castle is very old." },
+        { broken: "where is the magic trick", fixed: "Where is the magic trick?" },
+        { broken: "emma won the race", fixed: "Emma won the race." },
+        { broken: "this cake is delicious", fixed: "This cake is delicious!" },
+        { broken: "dr nelson works hard", fixed: "Dr. Nelson works hard." },
+        { broken: "can you spell that word", fixed: "Can you spell that word?" },
+        { broken: "the spider spun a web", fixed: "The spider spun a web." },
+        { broken: "my family went to canada", fixed: "My family went to Canada." },
+        { broken: "february is a short month", fixed: "February is a short month." },
+        { broken: "liam likes to read books", fixed: "Liam likes to read books." },
+        { broken: "did you hear that noise", fixed: "Did you hear that noise?" },
+        { broken: "the bread smells so good", fixed: "The bread smells so good." },
+        { broken: "we love going to the park", fixed: "We love going to the park!" },
+        { broken: "mrs wright is my neighbor", fixed: "Mrs. Wright is my neighbor." },
+        { broken: "what game are you playing", fixed: "What game are you playing?" },
+        { broken: "i went to sleep early on sunday", fixed: "I went to sleep early on Sunday." },
+        { broken: "march brings a lot of rain", fixed: "March brings a lot of rain." },
+        { broken: "the kitten is so fluffy", fixed: "The kitten is so fluffy." },
+        { broken: "how far can you throw", fixed: "How far can you throw?" },
+        { broken: "the farmer fed the pigs", fixed: "The farmer fed the pigs." },
+        { broken: "i cannot wait for summer", fixed: "I cannot wait for summer!" },
+        { broken: "william has a green shirt", fixed: "William has a green shirt." },
+        { broken: "is your house near the school", fixed: "Is your house near the school?" },
+        { broken: "we fly kites in the spring", fixed: "We fly kites in the spring." },
+        { broken: "i visited texas in april", fixed: "I visited Texas in April." },
+        { broken: "the horse runs fast", fixed: "The horse runs fast." },
+        { broken: "where do penguins live", fixed: "Where do penguins live?" },
+        { broken: "olivia painted a rainbow", fixed: "Olivia painted a rainbow." },
+        { broken: "that was a huge splash", fixed: "That was a huge splash!" },
+        { broken: "mr turner fixed the car", fixed: "Mr. Turner fixed the car." },
+        { broken: "can i have an apple", fixed: "Can I have an apple?" },
+        { broken: "the moon is bright tonight", fixed: "The moon is bright tonight." },
+        { broken: "we eat lunch on monday", fixed: "We eat lunch on Monday." },
+        { broken: "june is a warm month", fixed: "June is a warm month." },
+        { broken: "noah found a shiny coin", fixed: "Noah found a shiny coin." },
+        { broken: "do you like funny jokes", fixed: "Do you like funny jokes?" },
+        { broken: "the squirrel hid a nut", fixed: "The squirrel hid a nut." },
+        { broken: "we won the grand prize", fixed: "We won the grand prize!" },
+        { broken: "dr foster smiled at me", fixed: "Dr. Foster smiled at me." },
+        { broken: "when is dinner ready", fixed: "When is dinner ready?" },
+        { broken: "i saw a parade in november", fixed: "I saw a parade in November." },
+        { broken: "we visited florida last winter", fixed: "We visited Florida last winter." },
+        { broken: "the ducks swam in the river", fixed: "The ducks swam in the river." },
+        { broken: "what time does the store close", fixed: "What time does the store close?" },
+        { broken: "mia has a beautiful singing voice", fixed: "Mia has a beautiful singing voice." },
+        { broken: "watch out for the hot stove", fixed: "Watch out for the hot stove!" },
+        { broken: "mrs scott loves flowers", fixed: "Mrs. Scott loves flowers." },
+        { broken: "did you make your bed", fixed: "Did you make your bed?" },
+        { broken: "the wind is blowing hard", fixed: "The wind is blowing hard." },
+        { broken: "i have a game on saturday", fixed: "I have a game on Saturday." },
+        { broken: "september brings cooler weather", fixed: "September brings cooler weather." },
+        { broken: "james likes to play outside", fixed: "James likes to play outside." },
+        { broken: "can you tie your shoes", fixed: "Can you tie your shoes?" },
+        { broken: "the butterfly has colorful wings", fixed: "The butterfly has colorful wings." },
+        { broken: "i am so proud of you", fixed: "I am so proud of you!" },
+        { broken: "miss parker is reading", fixed: "Miss Parker is reading." },
+        { broken: "where did you go today", fixed: "Where did you go today?" },
+        { broken: "i sleep late on sunday", fixed: "I sleep late on Sunday." },
+        { broken: "july is perfect for swimming", fixed: "July is perfect for swimming." },
+        { broken: "the tiger is sleeping", fixed: "The tiger is sleeping." }
+    ];
+
+    let currentIndex = 0;
+    let sentencesFixed = 0;
+
+    const sentenceDiv = document.getElementById('broken-sentence');
+    const inputField = document.getElementById('student-answer');
+    const feedbackDiv = document.getElementById('feedback');
+    const casesDisplay = document.getElementById('cases-solved');
+    const totalCasesDisplay = document.getElementById('total-cases');
+
+    // Dynamically set the total cases display based on array length
+    totalCasesDisplay.innerText = sentences.length;
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function loadSentence() {
+        if (currentIndex >= sentences.length) {
+            sentenceDiv.innerText = "All sentences fixed! The Gremlin is trapped!";
+            inputField.style.display = 'none';
+            feedbackDiv.style.display = 'none';
+            return;
+        }
+
+        sentenceDiv.innerText = sentences[currentIndex].broken;
+        inputField.value = '';
+        feedbackDiv.innerText = '';
+        feedbackDiv.className = '';
+        inputField.focus();
+    }
+
+    // Helper function to sanitize input (removes accidental double spaces)
+    function cleanString(str) {
+        return str.replace(/\s+/g, ' ').trim();
+    }
+
+    function checkAnswer() {
+        const studentGuess = cleanString(inputField.value);
+        const correctSentence = sentences[currentIndex].fixed;
+        
+        if (studentGuess === "") {
+            feedbackDiv.innerText = "You have to type something!";
+            feedbackDiv.className = "incorrect";
+            return;
+        }
+
+        if (studentGuess === correctSentence) {
+            sentencesFixed++;
+            casesDisplay.innerText = sentencesFixed;
+
+            feedbackDiv.innerText = "✓ Perfect! Gremlin trapped!";
+            feedbackDiv.className = "correct";
+            inputField.disabled = true; 
+            
+            setTimeout(() => {
+                currentIndex++;
+                inputField.disabled = false;
+                loadSentence();
+            }, 1500); 
+        } else {
+            // Targeted Hint Logic
+            let hint = "✗ Not quite. ";
+            
+            // Check starting capital
+            if (studentGuess.charAt(0) !== correctSentence.charAt(0)) {
+                hint += "Check your starting capital letter! ";
+            }
+            
+            // Check end punctuation (looking for . ? or !)
+            const lastChar = studentGuess.charAt(studentGuess.length - 1);
+            if (lastChar !== '.' && lastChar !== '?' && lastChar !== '!') {
+                hint += "Did you forget your ending punctuation? ";
+            } else if (lastChar !== correctSentence.charAt(correctSentence.length - 1)) {
+                hint += "You used the wrong ending punctuation mark. ";
+            }
+
+            // Check if they missed a proper noun in the middle (if start and end are fine)
+            if (hint === "✗ Not quite. ") {
+                hint += "Look closely for missing capital letters on names or places, or check your spelling.";
+            }
+
+            feedbackDiv.innerText = hint;
+            feedbackDiv.className = "incorrect";
+            inputField.focus();
+        }
+    }
+
+    // ENTER KEY VALIDATION ONLY
+    inputField.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            checkAnswer();
+        }
+    });
+
+    shuffle(sentences);
+    loadSentence();
+</script>
+
+</body>
+</html>

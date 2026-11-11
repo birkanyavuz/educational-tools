@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Area & Perimeter Rectangle Explorer</title>
+<style>
+  body { 
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; 
+    text-align: center; 
+    background: #e3f2fd; 
+    padding: 20px; 
+    color: #333;
+  }
+  .container { 
+    background: white; 
+    border-radius: 20px; 
+    padding: 30px; 
+    max-width: 900px; 
+    margin: auto; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    border: 5px solid #2196f3;
+  }
+  
+  h1 { color: #1565c0; margin-top: 0; font-size: 2.5rem; }
+
+  .controls {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    border: 2px dashed #90caf9;
+  }
+
+  select, input[type="number"] {
+    font-size: 1.5rem;
+    padding: 10px;
+    border-radius: 10px;
+    border: 3px solid #64b5f6;
+    outline: none;
+    font-family: inherit;
+  }
+  
+  input[type="number"] { width: 100px; text-align: center; }
+
+  button {
+    font-size: 1.5rem;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    background-color: #ff9800;
+    transition: transform 0.1s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+  button:active { transform: scale(0.95); }
+  button:hover { background-color: #f57c00; }
+
+  /* Output Area */
+  #message {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #d32f2f;
+    margin-bottom: 20px;
+    min-height: 35px;
+  }
+
+  #results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .rect-card {
+    background: #fafafa;
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  }
+
+  .svg-container {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+  }
+
+  .rect-label {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #1565c0;
+    background: #e3f2fd;
+    padding: 5px 15px;
+    border-radius: 20px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Dot Grid Rectangle Explorer</h1>
+    
+    <div class="controls">
+      <label style="font-size: 1.5rem; font-weight: bold;">I want to find the</label>
+      <select id="mode">
+        <option value="area">Area</option>
+        <option value="perimeter">Perimeter</option>
+      </select>
+      <label style="font-size: 1.5rem; font-weight: bold;">of</label>
+      <input type="number" id="valInput" value="12" min="1" max="100">
+      <button onclick="calculateRectangles()">Draw It!</button>
+    </div>
+
+    <div id="message"></div>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    function calculateRectangles() {
+      const mode = document.getElementById('mode').value;
+      const val = parseInt(document.getElementById('valInput').value);
+      const messageDiv = document.getElementById('message');
+      const resultsDiv = document.getElementById('results');
+      
+      resultsDiv.innerHTML = '';
+      messageDiv.innerText = '';
+
+      if (isNaN(val) || val <= 0) {
+        messageDiv.innerText = "Please enter a number bigger than zero!";
+        return;
+      }
+      if (val > 100) {
+        messageDiv.innerText = "Whoa there! Let's keep the number under 100 so it fits on the screen.";
+        return;
+      }
+
+      let results = [];
+
+      if (mode === 'area') {
+        // Find factors for Area (Width * Height = Area)
+        for (let i = 1; i <= Math.sqrt(val); i++) {
+          if (val % i === 0) {
+            results.push({ w: i, h: val / i });
+          }
+        }
+        messageDiv.innerText = `Found ${results.length} possible rectangle(s) with an Area of ${val} sq units!`;
+        messageDiv.style.color = "#2e7d32";
+
+      } else {
+        // Find dimensions for Perimeter (2*W + 2*H = Perimeter)
+        if (val % 2 !== 0) {
+          messageDiv.innerText = "Oops! To draw a rectangle on the dots, the Perimeter must be an EVEN number!";
+          messageDiv.style.color = "#d32f2f";
+          return;
+        }
+        
+        let halfPerimeter = val / 2;
+        for (let i = 1; i <= halfPerimeter / 2; i++) {
+          results.push({ w: i, h: halfPerimeter - i });
+        }
+        
+        if (results.length === 0) {
+          messageDiv.innerText = "That perimeter is too small to make a rectangle!";
+          messageDiv.style.color = "#d32f2f";
+        } else {
+          messageDiv.innerText = `Found ${results.length} possible rectangle(s) with a Perimeter of ${val} units!`;
+          messageDiv.style.color = "#2e7d32";
+        }
+      }
+
+      // Draw each rectangle
+      results.forEach(rect => {
+        resultsDiv.innerHTML += generateRectCard(rect.w, rect.h);
+      });
+    }
+
+    function generateRectCard(w, h) {
+      // Base scale: 30 pixels per unit
+      let scaleDot = 30; 
+      
+      // If the rectangle is huge, scale the dots down so it fits on the screen nicely
+      if (w > 15 || h > 15) scaleDot = 20;
+      if (w > 30 || h > 30) scaleDot = 10;
+
+      // Add a 1-unit padding border around the rectangle so we can see the outside dots
+      const cols = w + 2;
+      const rows = h + 2;
+      const widthPx = cols * scaleDot;
+      const heightPx = rows * scaleDot;
+
+      let dots = '';
+      // Draw the grid of dots
+      for(let i = 1; i < cols; i++) {
+        for(let j = 1; j < rows; j++) {
+          dots += `<circle cx="${i * scaleDot}" cy="${j * scaleDot}" r="${scaleDot > 15 ? 3 : 1.5}" fill="#bbb"/>`;
+        }
+      }
+
+      // Draw the faint grid lines to show the individual unit squares
+      let gridLines = '';
+      for (let i = 1; i < w; i++) {
+        gridLines += `<line x1="${scaleDot + i * scaleDot}" y1="${scaleDot}" x2="${scaleDot + i * scaleDot}" y2="${scaleDot + h * scaleDot}" stroke="rgba(21, 101, 192, 0.25)" stroke-width="${scaleDot > 15 ? 2 : 1}" />`;
+      }
+      for (let j = 1; j < h; j++) {
+        gridLines += `<line x1="${scaleDot}" y1="${scaleDot + j * scaleDot}" x2="${scaleDot + w * scaleDot}" y2="${scaleDot + j * scaleDot}" stroke="rgba(21, 101, 192, 0.25)" stroke-width="${scaleDot > 15 ? 2 : 1}" />`;
+      }
+
+      // Draw the transparent colored rectangle snapping perfectly to the dots
+      let rectHTML = `<rect 
+        x="${scaleDot}" 
+        y="${scaleDot}" 
+        width="${w * scaleDot}" 
+        height="${h * scaleDot}" 
+        fill="rgba(33, 150, 243, 0.15)" 
+        stroke="#1E88E5" 
+        stroke-width="${scaleDot > 15 ? 4 : 2}" 
+        stroke-linejoin="round"
+      />`;
+
+      return `
+      <div class="rect-card">
+        <div class="svg-container">
+          <svg width="${widthPx}" height="${heightPx}" xmlns="http://www.w3.org/2000/svg">
+            ${dots}
+            ${rectHTML}
+            ${gridLines}
+          </svg>
+        </div>
+        <div class="rect-label">${w} × ${h}</div>
+      </div>
+      `;
+    }
+
+    // Run automatically on load with the default value of Area 12
+    calculateRectangles();
+  </script>
+</body>
+</html>

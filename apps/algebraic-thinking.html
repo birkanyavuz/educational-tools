@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Missing Factor Machine</title>
+<style>
+  * { box-sizing: border-box; }
+  body { 
+    font-family: sans-serif; 
+    text-align: center; 
+    margin: 0; 
+    padding: 0; 
+    background: #eef2f5; 
+    overflow: hidden; 
+  }
+  h1 { 
+    margin: 4px 0; 
+    font-size: 1.8rem; 
+    color: #2c3e50; 
+  }
+  #machine {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    background: #2c3e50; 
+    margin: 4px auto; 
+    padding: 10px; 
+    border-radius: 8px; 
+    width: 95%; 
+    max-width: 700px;
+    height: 160px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    border: 4px solid #7f8c8d;
+  }
+  .equation { 
+    font-size: 5rem; 
+    font-weight: bold; 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    color: white;
+  }
+  input { 
+    font-size: 4.5rem; 
+    width: 140px; 
+    text-align: center; 
+    padding: 0; 
+    border: 4px solid #f39c12; 
+    border-radius: 8px; 
+    background: white; 
+    color: #2c3e50;
+    font-weight: bold;
+  }
+  input:focus {
+    outline: none;
+    border-color: #e67e22;
+  }
+  
+  /* Hide arrows in Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  /* Hide arrows in Firefox */
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  #feedback { 
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    margin-top: 4px; 
+    min-height: 28px; 
+    color: #34495e;
+  }
+  .correct { color: #27ae60 !important; }
+  .incorrect { color: #c0392b !important; }
+</style>
+</head>
+<body>
+  <h1>Missing Factor Machine</h1>
+  <div id="machine">
+    <div class="equation" id="equation-display"></div>
+  </div>
+  <div id="feedback">Type the missing number and press "Enter"</div>
+
+<script>
+  let expectedAnswer = 0;
+  const display = document.getElementById('equation-display');
+  const feedback = document.getElementById('feedback');
+  let currentInput = null;
+
+  function generateProblem() {
+    // 3rd grade CCSS parameters: factors 1 through 10
+    const factor1 = Math.floor(Math.random() * 10) + 1;
+    const factor2 = Math.floor(Math.random() * 10) + 1;
+    const product = factor1 * factor2;
+    
+    // Randomly select problem type: 0 = ? x A = C, 1 = A x ? = C, 2 = C ÷ ? = A
+    const problemType = Math.floor(Math.random() * 3);
+    
+    let equationHtml = '';
+    
+    if (problemType === 0) {
+      expectedAnswer = factor1;
+      equationHtml = `<input type="number" id="answer-input" autofocus> <span>× ${factor2} = ${product}</span>`;
+    } else if (problemType === 1) {
+      expectedAnswer = factor2;
+      equationHtml = `<span>${factor1} ×</span> <input type="number" id="answer-input" autofocus> <span>= ${product}</span>`;
+    } else {
+      expectedAnswer = factor2;
+      equationHtml = `<span>${product} ÷</span> <input type="number" id="answer-input" autofocus> <span>= ${factor1}</span>`;
+    }
+    
+    display.innerHTML = equationHtml;
+    currentInput = document.getElementById('answer-input');
+    
+    currentInput.addEventListener('keypress', handleKeyPress);
+    
+    feedback.innerText = 'Type the missing number and press "Enter"';
+    feedback.className = '';
+    currentInput.focus();
+  }
+
+  function handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      const val = parseInt(currentInput.value, 10);
+      if (val === expectedAnswer) {
+        feedback.innerText = '✓ Correct!';
+        feedback.className = 'correct';
+        currentInput.disabled = true;
+        setTimeout(generateProblem, 1000);
+      } else {
+        feedback.innerText = '✗ Try again!';
+        feedback.className = 'incorrect';
+        currentInput.value = '';
+      }
+    }
+  }
+
+  generateProblem();
+</script>
+</body>
+</html>

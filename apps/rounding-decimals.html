@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rounding Decimals</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+         background: linear-gradient(180deg,#fef9e7,#e8f6ff); color:#21303e;
+         display:flex; justify-content:center; }
+  .app { width:100%; max-width:640px; padding:16px 14px 26px; text-align:center; }
+  h1 { font-size:34px; margin:6px 0 2px; }
+  .sub { font-size:18px; color:#5a6b7a; margin-bottom:12px; }
+  .stars { font-size:22px; min-height:30px; letter-spacing:2px; }
+  .card { background:#fff; border-radius:22px; box-shadow:0 6px 18px rgba(30,60,90,.13);
+          padding:22px 12px 18px; margin-top:8px; }
+  .num { font-size:66px; font-weight:bold; letter-spacing:2px; margin:8px 0 2px; line-height:1; min-height:66px; }
+  .num .d { display:inline-block; transition: opacity .45s ease, width .45s ease; vertical-align:bottom; }
+  .num .target { text-decoration: underline; text-decoration-color:#4aa3ff; text-decoration-thickness:5px; color:#14507e; }
+  .num .decide { color:#f39c12; }
+  .num .gone { opacity:0; }
+  .num .final { color:#27ae60; }
+  .roll { display:inline-block; height:1em; overflow:hidden; vertical-align:bottom; }
+  .roll .strip { display:flex; flex-direction:column; line-height:1; transition: transform .65s cubic-bezier(.25,.8,.3,1); }
+  .roll .strip span { height:1em; display:block; }
+  .pop { animation: pop .45s ease; }
+  @keyframes pop { 0%{ transform:scale(.3); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  .say { font-size:22px; color:#5a6b7a; min-height:26px; margin-top:10px; }
+  .answerrow { display:flex; justify-content:center; gap:10px; margin:16px 0 4px; flex-wrap:wrap; }
+  #answer { font-size:38px; font-weight:bold; text-align:center; width:230px; padding:8px 10px;
+            border:4px solid #4aa3ff; border-radius:16px; color:#21303e; outline:none;
+            font-family:inherit; background:#f7fbff; }
+  #answer.bad { border-color:#e74c3c; animation:shake .3s; }
+  #answer.good { border-color:#27ae60; background:#eafaf1; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .row { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .btn { font-size:21px; font-weight:bold; border:none; border-radius:999px; padding:12px 22px;
+         cursor:pointer; background:#ffb020; color:#4a3200; box-shadow:0 4px 0 #d18d06; font-family:inherit; }
+  .btn:active { transform:translateY(3px); box-shadow:0 1px 0 #d18d06; }
+  .btn.green { background:#27ae60; color:#fff; box-shadow:0 4px 0 #1e8449; }
+  .btn.blue { background:#d6ecff; color:#14507e; box-shadow:0 4px 0 #a8cdea; }
+  .fam { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:16px; }
+  .fam button { font-size:20px; font-weight:bold; border:3px solid #4aa3ff; background:#fff; color:#14507e;
+                border-radius:999px; padding:7px 14px; cursor:pointer; font-family:inherit; }
+  .fam button.on { background:#4aa3ff; color:#fff; }
+  .hint { font-size:17px; color:#8a9ba8; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🎯 Rounding Decimals</h1>
+  <div class="sub">Round the number to the place asked — type your answer!</div>
+  <div class="stars" id="stars"></div>
+  <div class="card">
+    <div class="num" id="num"></div>
+    <div class="say" id="say"></div>
+    <div class="answerrow">
+      <input id="answer" type="text" inputmode="decimal" autocomplete="off" placeholder="?">
+      <button class="btn green" id="check">✓ Check</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="next">Next Number ➜</button>
+    </div>
+    <div class="hint">The <span style="color:#14507e;text-decoration:underline;text-decoration-color:#4aa3ff;text-decoration-thickness:3px;">underlined</span> digit is the place you round to. Look at the <span style="color:#f39c12;font-weight:bold;">orange</span> digit next to it: 5 or more, round up!</div>
+  </div>
+  <div class="fam" id="fam"></div>
+</div>
+<script>
+  const PLACES = {
+    whole:      { label: "Whole Number", p: 0 },
+    tenth:      { label: "Tenth",        p: 1 },
+    hundredth:  { label: "Hundredth",    p: 2 },
+    thousandth: { label: "Thousandth",   p: 3 }
+  };
+  let mode = "tenth";
+  let cur = null, stars = 0, locked = false;
+  let lastNum = "";
+  const $ = id => document.getElementById(id);
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  function roundTo(x, p){ const f = Math.pow(10, p); return Math.round(x * f) / f; }
+  function canonical(x, p){
+    let s = x.toFixed(p);
+    if (s.indexOf(".") >= 0) s = s.replace(/0+$/, "").replace(/\.$/, "");
+    return s;
+  }
+
+  function genNumber(p){
+    const extra = 2 + Math.floor(Math.random() * 2);
+    const digits = p + extra;
+    const whole = Math.floor(Math.random() * 90) + 1;
+    let frac = "";
+    for (let i = 0; i < digits; i++) frac += Math.floor(Math.random() * 10);
+    if (/^0+$/.test(frac)) frac = frac.slice(0, -1) + "5";
+    return { str: whole + "." + frac, val: parseFloat(whole + "." + frac) };
+  }
+
+  function renderNumber(str, p){
+    const dot = str.indexOf(".");
+    const wholePart = str.slice(0, dot), fracPart = str.slice(dot + 1);
+    let out = "";
+    for (let i = 0; i < wholePart.length; i++) {
+      const fromRight = wholePart.length - 1 - i;
+      const cls = (p === 0 && fromRight === 0) ? "d target" : "d";
+      out += '<span class="' + cls + '" data-w="' + fromRight + '">' + wholePart[i] + '</span>';
+    }
+    out += '<span class="d" data-dot="1">.</span>';
+    for (let i = 0; i < fracPart.length; i++) {
+      const pos = i + 1;
+      let cls = "d";
+      if (pos === p) cls += " target";
+      else if (pos === p + 1) cls += " decide";
+      out += '<span class="' + cls + '" data-f="' + pos + '">' + fracPart[i] + '</span>';
+    }
+    return out;
+  }
+
+  async function fadeSpan(span){
+    if (!span) return;
+    span.style.width = span.offsetWidth + "px";
+    span.getBoundingClientRect();
+    span.classList.add("gone");
+    span.style.width = "0px";
+    await sleep(430);
+    span.style.display = "none";
+  }
+
+  function spinSpan(span, seq, dur, delay, dir){
+    // Roll a digit through the given sequence of values (e.g. [8,9,0] up, or
+    // [4,3,2,1,0] down). dir "up": the reel rolls upward; dir "down": the reel
+    // physically rolls downward, like a slot machine spinning the other way.
+    const steps = seq.length - 1;
+    const cells = (dir === "down") ? [...seq].reverse() : seq;
+    let inner = "";
+    cells.forEach(d => { inner += "<span>" + d + "</span>"; });
+    span.innerHTML = '<span class="roll"><span class="strip">' + inner + '</span></span>';
+    const strip = span.querySelector(".strip");
+    strip.style.transitionDuration = (dur || 400) + "ms";
+    strip.style.transitionTimingFunction = "cubic-bezier(.3,.6,.35,1)";
+    strip.style.transitionDelay = (delay || 0) + "ms";
+    if (dir === "down") {
+      strip.style.transform = "translateY(-" + steps + "em)";
+      requestAnimationFrame(() => requestAnimationFrame(() => { strip.style.transform = "translateY(0em)"; }));
+    } else {
+      requestAnimationFrame(() => requestAnimationFrame(() => { strip.style.transform = "translateY(-" + steps + "em)"; }));
+    }
+  }
+
+  async function animateResult(){
+    const p = cur.p;
+    const numEl = $("num");
+    // Step 1: digits past the deciding digit disappear, rightmost first (the "3" in 76.783)
+    const tail = [...numEl.querySelectorAll("[data-f]")].filter(s => +s.dataset.f > p + 1).reverse();
+    for (const s of tail) { fadeSpan(s); await sleep(200); }
+    await sleep(300);
+    // Step 2: the deciding (orange) digit counts UP to 0 when rounding up
+    // (8 -> 9 -> 0) or DOWN to 0 when rounding down (4 -> 3 -> 2 -> 1 -> 0)
+    const decSpan = numEl.querySelector("[data-f='" + (p + 1) + "']");
+    const d = parseInt(cur.str.split(".")[1][p], 10);
+    const up = d >= 5;
+    let spinDur = 0;
+    if (decSpan && d !== 0) {
+      const seq = [];
+      if (up) { for (let x = d; x <= 9; x++) seq.push(x); seq.push(0); }
+      else    { for (let x = d; x >= 0; x--) seq.push(x); }
+      spinDur = (seq.length - 1) * 320;
+      spinSpan(decSpan, seq, spinDur, 0, up ? "up" : "down");
+    }
+    // Step 3: EVERY kept place that changes LANDS at the same moment the
+    // orange digit lands on 0 (82.969 -> tenths 9 rolls to 0 and ones 2 rolls
+    // to 3, both clicking into place together with the orange 0). Places right
+    // of the orange digit never animate — they only fade away in Step 1.
+    let carryWait = 0;
+    if (up) {
+      const startAt = Math.max(0, spinDur - 280);   // carries LAND at the same moment the orange digit lands on 0
+      const [sw, sf = ""] = cur.str.split(".");
+      const oldFixed = p === 0 ? sw : sw + "." + (sf + "0000").slice(0, p);  // ORIGINAL digits, not re-rounded
+      const newFixed = cur.correct.toFixed(p);
+      const [ow, of = ""] = oldFixed.split("."), [nw, nf = ""] = newFixed.split(".");
+      const jobs = [];   // every changed place switches at the SAME time, when the orange digit lands on 0
+      for (let i = nf.length; i >= 1; i--) {
+        if (of[i - 1] !== nf[i - 1]) {
+          const span = numEl.querySelector("[data-f='" + i + "']");
+          if (span) jobs.push({ span: span, a: +of[i - 1], b: +nf[i - 1] });
+        }
+      }
+      for (let r = 0; r < Math.max(ow.length, nw.length); r++) {
+        const oc = ow[ow.length - 1 - r], nc = nw[nw.length - 1 - r];
+        if (nc === undefined) continue;
+        if (oc === undefined) {
+          jobs.push({ pop: nc, beforeR: r - 1 });   // new leading digit, e.g. 99.9 -> 100
+        } else if (oc !== nc) {
+          const span = numEl.querySelector("[data-w='" + r + "']");
+          if (span) jobs.push({ span: span, a: +oc, b: +nc });
+        }
+      }
+      jobs.forEach((job) => {
+        const delay = startAt;
+        if (job.pop !== undefined) {
+          setTimeout(() => {
+            const first = numEl.querySelector("[data-w='" + job.beforeR + "']") || numEl.firstChild;
+            const ns = document.createElement("span");
+            ns.className = "d pop"; ns.dataset.w = job.beforeR + 1; ns.textContent = job.pop;
+            numEl.insertBefore(ns, first);
+          }, delay);
+          carryWait = Math.max(carryWait, delay + 450);
+        } else {
+          job.span.classList.remove("target");
+          spinSpan(job.span, [job.a, job.b], 280, delay, "up");
+          carryWait = Math.max(carryWait, delay + 280);
+        }
+      });
+    }
+    await sleep(Math.max(spinDur + 420, carryWait + 120));
+    // Step 4: the zeros left on the right fade away (76.80 -> 76.8, 8.00 -> 8)
+    const canon = canonical(cur.correct, p);
+    const canonFracLen = canon.indexOf(".") >= 0 ? canon.split(".")[1].length : 0;
+    const extraZeros = [...numEl.querySelectorAll("[data-f]")].filter(s => +s.dataset.f > canonFracLen).reverse();
+    for (const s of extraZeros) { fadeSpan(s); await sleep(180); }
+    if (canonFracLen === 0) { await fadeSpan(numEl.querySelector("[data-dot]")); }
+    await sleep(300);
+    // Step 5: settle — green final number
+    numEl.querySelectorAll(".d").forEach(s => { s.classList.remove("target", "decide"); s.classList.add("final"); });
+    $("say").textContent = cur.str + " rounds to " + canon + "!";
+    stars++; $("stars").textContent = "⭐".repeat(Math.min(stars, 20));
+  }
+
+  function buildButtons(){
+    $("fam").innerHTML = "";
+    Object.keys(PLACES).forEach(k => {
+      const b = document.createElement("button");
+      b.textContent = PLACES[k].label;
+      if (k === mode) b.className = "on";
+      b.onclick = () => { mode = k; buildButtons(); newRound(); };
+      $("fam").appendChild(b);
+    });
+    const m = document.createElement("button");
+    m.textContent = "🎲 Mix";
+    if (mode === "mix") m.className = "on";
+    m.onclick = () => { mode = "mix"; buildButtons(); newRound(); };
+    $("fam").appendChild(m);
+  }
+
+  function newRound(){
+    locked = false;
+    const key = mode === "mix" ? Object.keys(PLACES)[Math.floor(Math.random() * 4)] : mode;
+    const p = PLACES[key].p;
+    let n = genNumber(p), guard = 0;
+    while (n.str === lastNum && guard++ < 10) n = genNumber(p);
+    lastNum = n.str;
+    cur = { str: n.str, val: n.val, p: p, key: key, correct: roundTo(n.val, p), attempts: 0 };
+    $("num").innerHTML = renderNumber(n.str, p);
+    $("say").textContent = "Round to the nearest " + PLACES[key].label.toLowerCase() + ".";
+    const a = $("answer");
+    a.value = ""; a.className = ""; a.disabled = false;
+    a.focus();
+  }
+
+  function check(){
+    if (locked || !cur) return;
+    const raw = $("answer").value.trim();
+    const typed = parseFloat(raw);
+    if (raw === "" || isNaN(typed)) {
+      $("say").textContent = "Type a number first!";
+      return;
+    }
+    if (Math.abs(typed - cur.correct) < 1e-9) {
+      locked = true;
+      $("answer").className = "good";
+      $("answer").disabled = true;
+      $("say").textContent = "Correct! Watch it round... 👀";
+      animateResult();
+    } else {
+      cur.attempts++;
+      const a = $("answer");
+      a.className = "bad";
+      setTimeout(() => { if (!locked) a.className = ""; }, 350);
+      $("say").textContent = cur.attempts >= 2
+        ? "Not yet. Look at the orange digit: 5 or more, the underlined digit goes up by one. 4 or less, it stays."
+        : "Not quite — try again!";
+    }
+  }
+
+  $("check").onclick = check;
+  $("answer").addEventListener("keydown", e => { if (e.key === "Enter") check(); });
+  $("next").onclick = newRound;
+  buildButtons();
+  newRound();
+</script>
+</body>
+</html>

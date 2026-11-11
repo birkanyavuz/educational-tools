@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Building Fractions</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+    text-align: center;
+    background: #e8f5e9;
+    padding: 10px;
+    margin: 0;
+    color: #333;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+  }
+
+  .container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    width: 100%; 
+    max-width: 800px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 4px solid #2e7d32;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 { color: #2e7d32; margin: 0 0 10px 0; font-size: clamp(1.5rem, 5vw, 2.2rem); } 
+
+  .main-area {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  /* STATIC FRACTION DISPLAY */
+  .fraction-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: #fdfdfd;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 3px solid #333;
+  }
+
+  .frac-num, .frac-den {
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .fraction-line {
+    width: 100%;
+    min-width: 60px;
+    height: 6px;
+    background-color: #000;
+    border-radius: 3px;
+  }
+
+  .equal-sign {
+    font-size: clamp(3rem, 8vw, 4rem);
+    font-weight: bold;
+    color: #333;
+  }
+
+  /* INTERACTIVE BAR AREA */
+  .interactive-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 450px;
+  }
+
+  .bar-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f1f8e9;
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 2px solid #c5e1a5;
+  }
+
+  .slice-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 50%;
+    border: none;
+    background: #2e7d32;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .slice-btn:active { transform: scale(0.9); }
+  .slice-btn:disabled { background: #9e9e9e; cursor: not-allowed; }
+
+  .slice-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  #fraction-bar {
+    display: flex;
+    width: 100%;
+    height: 80px;
+    border: 4px solid #000;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .segment {
+    flex: 1;
+    border-right: 2px solid #000;
+    transition: background 0.2s;
+  }
+  .segment:last-child { border-right: none; }
+  .filled { background-color: #42a5f5; }
+  .segment:hover { background-color: #bbdefb; }
+  .filled:hover { background-color: #1e88e5; }
+
+  #feedback {
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    font-weight: bold;
+    margin-bottom: 15px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+  }
+
+  .controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    font-size: clamp(1.1rem, 4vw, 1.3rem); 
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+  .action-btn:active { transform: scale(0.95); }
+
+  /* States for the single button */
+  .btn-check { background-color: #4caf50; }
+  .btn-next { background-color: #1976d2; }
+
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Building Fractions</h1>
+    
+    <div class="main-area">
+      <div class="fraction-display">
+        <div class="frac-num" id="target-num">?</div>
+        <div class="fraction-line"></div>
+        <div class="frac-den" id="target-den">?</div>
+      </div>
+
+      <div class="equal-sign">=</div>
+
+      <div class="interactive-area">
+        <div class="bar-controls">
+          <button class="slice-btn" id="btn-minus" onclick="changeSegments(-1)">-</button>
+          <div class="slice-label">Total Pieces: <span id="segment-count">1</span></div>
+          <button class="slice-btn" id="btn-plus" onclick="changeSegments(1)">+</button>
+        </div>
+        
+        <div id="fraction-bar"></div>
+      </div>
+    </div>
+
+    <div id="feedback"></div>
+
+    <div class="controls">
+      <button id="main-btn" class="action-btn btn-check" onclick="handleMainAction()">✔️ Check Answer</button>
+    </div>
+  </div>
+
+  <script>
+    let targetNumerator = 0;
+    let targetDenominator = 0;
+    let currentSegments = 1;
+    let isWaitingForNext = false; // State tracker
+
+    function generateFraction() {
+      // Reset State
+      isWaitingForNext = false;
+      const mainBtn = document.getElementById('main-btn');
+      mainBtn.innerText = "✔️ Check Answer";
+      mainBtn.className = "action-btn btn-check";
+
+      const feedback = document.getElementById('feedback');
+      feedback.innerText = "Slice the bar and paint the pieces!";
+      feedback.style.color = "#333";
+
+      // Random Denominator 2-10, Numerator 1-Denominator
+      targetDenominator = Math.floor(Math.random() * 9) + 2;
+      targetNumerator = Math.floor(Math.random() * targetDenominator) + 1;
+
+      document.getElementById('target-num').innerText = targetNumerator;
+      document.getElementById('target-den').innerText = targetDenominator;
+
+      // Reset Bar to 1 whole piece
+      currentSegments = 1;
+      renderBar();
+    }
+
+    function changeSegments(delta) {
+      let newCount = currentSegments + delta;
+      if (newCount >= 1 && newCount <= 12) {
+        currentSegments = newCount;
+        renderBar();
+      }
+    }
+
+    function renderBar() {
+      const bar = document.getElementById('fraction-bar');
+      document.getElementById('segment-count').innerText = currentSegments;
+      
+      // Update button states
+      document.getElementById('btn-minus').disabled = (currentSegments <= 1);
+      document.getElementById('btn-plus').disabled = (currentSegments >= 12);
+
+      bar.innerHTML = "";
+
+      for (let i = 0; i < currentSegments; i++) {
+        const seg = document.createElement('div');
+        seg.className = "segment";
+        
+        // Add click to paint
+        seg.onclick = function() {
+          this.classList.toggle('filled');
+        };
+        
+        bar.appendChild(seg);
+      }
+    }
+
+    function checkAnswer() {
+      const feedback = document.getElementById('feedback');
+      const segments = document.querySelectorAll('.segment');
+      
+      let filledCount = 0;
+      segments.forEach(seg => {
+        if (seg.classList.contains('filled')) {
+          filledCount++;
+        }
+      });
+
+      if (currentSegments !== targetDenominator) {
+        feedback.innerText = `Check your slices! You need ${targetDenominator} total pieces. 🔪`;
+        feedback.style.color = "#f57c00";
+        return;
+      }
+
+      if (filledCount !== targetNumerator) {
+        feedback.innerText = `Check your paint! You need exactly ${targetNumerator} pieces colored. 🎨`;
+        feedback.style.color = "#d32f2f";
+        return;
+      }
+
+      feedback.innerText = "🎉 Perfect! You built the fraction! 🎉";
+      feedback.style.color = "#4caf50";
+
+      // Shift to next question state
+      isWaitingForNext = true;
+      const mainBtn = document.getElementById('main-btn');
+      mainBtn.innerText = "🔄 Next Question";
+      mainBtn.className = "action-btn btn-next";
+    }
+
+    // Logic router for button click or enter key
+    function handleMainAction() {
+      if (isWaitingForNext) {
+        generateFraction();
+      } else {
+        checkAnswer();
+      }
+    }
+
+    // Enter Key event listener
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        handleMainAction();
+      }
+    });
+
+    // Initialize first fraction
+    window.onload = generateFraction;
+  </script>
+</body>
+</html>

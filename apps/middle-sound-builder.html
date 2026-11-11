@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Middle Sound Builder</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+         background: linear-gradient(180deg,#fef9e7,#e8f6ff); color:#21303e;
+         display:flex; justify-content:center; }
+  .app { width:100%; max-width:640px; padding:16px 14px 26px; text-align:center; }
+  h1 { font-size:30px; margin:6px 0 2px; }
+  .sub { font-size:16px; color:#5a6b7a; margin-bottom:12px; }
+  .stars { font-size:22px; min-height:30px; letter-spacing:2px; }
+  .card { background:#fff; border-radius:22px; box-shadow:0 6px 18px rgba(30,60,90,.13);
+          padding:20px 12px 16px; margin-top:8px; }
+  .pic { min-height:190px; display:flex; align-items:center; justify-content:center; }
+  .pic .q { font-size:92px; }
+  .pic img { max-width:100%; max-height:190px; border-radius:16px; object-fit:cover; }
+  .pic .emo { font-size:92px; }
+  .word { font-size:56px; font-weight:bold; letter-spacing:8px; margin:6px 0 2px; }
+  .word .blank { color:#f39c12; }
+  .word .done { color:#27ae60; }
+  .say { font-size:17px; color:#5a6b7a; min-height:22px; }
+  .tiles { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin:16px 0 6px; }
+  .tile { font-size:34px; font-weight:bold; width:70px; height:70px; border:none; border-radius:18px;
+          background:#4aa3ff; color:#fff; cursor:pointer; box-shadow:0 4px 0 #2f7fd6; }
+  .tile:active { transform:translateY(3px); box-shadow:0 1px 0 #2f7fd6; }
+  .tile.wrong { background:#e74c3c; box-shadow:0 4px 0 #b03a2e; animation:shake .3s; }
+  .tile.right { background:#27ae60; box-shadow:0 4px 0 #1e8449; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .row { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .btn { font-size:19px; font-weight:bold; border:none; border-radius:999px; padding:12px 22px;
+         cursor:pointer; background:#ffb020; color:#4a3200; box-shadow:0 4px 0 #d18d06; }
+  .btn:active { transform:translateY(3px); box-shadow:0 1px 0 #d18d06; }
+  .btn.blue { background:#d6ecff; color:#14507e; box-shadow:0 4px 0 #a8cdea; }
+  .fam { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:16px; }
+  .fam button { font-size:19px; font-weight:bold; border:3px solid #4aa3ff; background:#fff; color:#14507e;
+                border-radius:999px; padding:7px 14px; cursor:pointer; }
+  .fam button.on { background:#4aa3ff; color:#fff; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🔤 Middle Sound Builder</h1>
+  <div class="sub">Look at the picture. What sound is in the middle?</div>
+  <div class="stars" id="stars"></div>
+  <div class="card">
+    <div class="pic" id="pic"><span class="q">❓</span></div>
+    <div class="word" id="word"></div>
+    <div class="say" id="say">What is the middle sound?</div>
+    <div class="tiles" id="tiles"></div>
+    <div class="row">
+      <button class="btn blue" id="listen">🔊 Listen</button>
+      <button class="btn" id="next">Next Word ➜</button>
+    </div>
+  </div>
+</div>
+<script>
+  const WORDS = {"bat": ["b", "t", "https://media.baamboozle.com/uploads/images/672767/1648071656_199859.jpeg", "🦇"], "cat": ["c", "t", "https://cdn.omlet.com/images/originals/Cat-Cat_Guide-A_lazy_tabby_cat_lolling_on_the_sofa.jpg", "🐱"], "fat": ["f", "t", "https://cats.com/wp-content/uploads/2022/08/fat-cat-7-compressed.jpg", "🧈"], "hat": ["h", "t", "https://public.readdy.ai/ai/img_res/9c5ca508e6c587f2dd2fb3c18a439a61.webp", "🎩"], "mat": ["m", "t", "https://cdn.prod.website-files.com/621e7ba1d9afced01ad8654a/621e801c7b6f05d5e69a3cbb_Yogamat.jpg", "🧘"], "pat": ["p", "t", "https://i.pinimg.com/originals/45/fe/e7/45fee7f3579b9154fbaeb09799922be9.jpg", "🐕"], "rat": ["r", "t", "https://nobugz.au/wp-content/uploads/2025/02/rat-pic.jpg", "🐀"], "sat": ["s", "t", "https://static-eu.insales.ru/files/1/3738/5893786/original/Как_повысить_усидчивость_у_ребенка_.jpg", "🪑"], "ban": ["b", "n", "https://cdn.crowdpic.net/list-thumb/thumb_l_ED55D52AAEB33BC886AF8380F1C64AF7.png?", "🚫"], "can": ["c", "n", "https://static.vecteezy.com/system/resources/thumbnails/060/034/509/small/empty-silver-tin-can-isolated-metal-food-can-with-transparent-alpha-png.png", "🥫"], "fan": ["f", "n", "https://assets.knowt.com/user-attachments/924be652-8e4f-4112-a7ec-6ccd978f0cdf.jpg", "🌀"], "man": ["m", "n", "https://i.pinimg.com/236x/8a/00/fd/8a00fddeecaf16b7ee6824303adc5d90.jpg", "👨"], "pan": ["p", "n", "https://prudentreviews.com/wp-content/uploads/de-Buyer-Affinity-fry-pan.jpg", "🍳"], "ran": ["r", "n", "https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:2000/https://cdn.gamma.app/tqxsze6t8dhpj0u/generated-images/MI7bzbc1QD8RTlQYCw9F5.jpg", "🏃"], "tan": ["t", "n", "https://www.decentapparel.com/cdn/shop/files/decentapparel-productsilo-lwfp-pants-13_762ea048-bd5c-4c1c-a73f-7a00623c8f6f.jpg?crop=center&height=600&v=1684783283&width=600", "🏖️"], "van": ["v", "n", "https://www.hippoleasing.co.uk/wp-content/uploads/Sprinter-2-min.webp", "🚐"], "den": ["d", "n", "https://static.vecteezy.com/system/resources/thumbnails/079/943/417/small/brown-bear-sleeping-in-a-cave-with-mossy-rocks-and-forest-background-free-photo.jpg", "🦁"], "hen": ["h", "n", "https://foodtruckempire.com/how-to/poultry-farm-names/attachment/hen/", "🐔"], "men": ["m", "n", "https://www.lionsroar.com/wp-content/uploads/2023/11/JM_SOUTHWEST_S05_001_final.png", "👥"], "pen": ["p", "n", "https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2160098405/settings_images/fce5ab-121d-daf6-b7dd-dc03224e5b1_8d28e6-ca-3dc8-3e72-aef82832f53_25-01-30_-_pen_name.png", "🖊️"], "ten": ["t", "n", "https://attic.sh/sovzaob8ttlyso27klncbdk5isy3", "🔟"], "jet": ["j", "t", "https://carmed.co.ke/wp-content/uploads/2015/06/home_jet_aircraft_2.png", "✈️"], "net": ["n", "t", "https://ideogram.ai/assets/image/balanced/response/7tt5URfbTK--QxP3IFSruQ@2k", "🥅"], "pet": ["p", "t", "https://static.vecteezy.com/system/resources/thumbnails/071/841/232/small/a-happy-dog-with-a-joyful-expression-showcasing-a-rich-reddish-brown-coat-and-bright-white-markings-against-a-plain-white-background-photo.jpg", "🐶"], "vet": ["v", "t", "https://vetfamily.com/wp-content/uploads/2026/03/male-vet-with-female-dog-owner2-1600x1067.jpg", "🩺"], "wet": ["w", "t", "https://www.meme-arsenal.com/memes/3864f181ddaf9cb3f2b4b65483d3208f.jpg", "💧"], "big": ["b", "g", "https://media.baamboozle.com/uploads/images/376926/1622294752_133024.jpeg", "🐘"], "dig": ["d", "g", "https://8kkiymgmvkzly01w.public.blob.vercel-storage.com/articles/how-to-stop-a-dog-from-digging.webp", "⛏️"], "fig": ["f", "g", "https://oliveoilandlemons.com/app/uploads/2015/08/Fig.jpg", "🌰"], "jig": ["j", "g", "https://cdn-blog.superprof.com/blog_nl/wp-content/uploads/2021/08/irish-jig-1946x1553.jpg.webp", "💃"], "pig": ["p", "g", "https://media.baamboozle.com/uploads/images/30983/1634201024_29958.jpeg", "🐷"], "rig": ["r", "g", "https://static.vecteezy.com/system/resources/thumbnails/072/312/328/small/sleek-black-and-chrome-semi-truck-rig-commercial-transportation-concept-photo.jpg", "🚛"], "wig": ["w", "g", "https://m.media-amazon.com/images/I/71SqcK7+Z7L.jpg", "💇"], "bin": ["b", "n", "https://cdn.prod.website-files.com/640769b45732a5c68fc3a971/663760c42422f75481e2fbd0_bin.png", "🗑️"], "fin": ["f", "n", "https://www.surfer.com/.image/w_1080,q_auto:good,c_fill,ar_4:3/MjowMDAwMDAwMDAwMTM4MDY4/shark-fin-above-water-closeup-fin-of-a-great-white-shark-carcharodon-carcharias-swimming-at-surface-south-africa-atlantic-ocean-138068.jpg", "🦈"], "pin": ["p", "n", "https://static.vecteezy.com/system/resources/thumbnails/000/147/650/small/bowling-lane-pin-vector.jpg", "🎳"], "tin": ["t", "n", "https://www.manmadediy.com/wp-content/uploads/sites/52/2022/08/Stack-of-Tin-Cans-12520-2048x1262.jpg", "🥫"], "win": ["w", "n", "https://static.vecteezy.com/system/resources/thumbnails/014/829/865/small/cute-happy-boy-holding-golden-trophy-vector.jpg", "🏆"], "dip": ["d", "p", "https://www.tasteofhome.com/wp-content/uploads/2018/06/shutterstock_667674043-696x696.jpg", "🥣"], "lip": ["l", "p", "https://nailsbyrosa.nl/wp-content/uploads/2021/05/1122156047-huge-768x611.jpg", "👄"], "rip": ["r", "p", "https://www.seekpng.com/png/full/7-77295_ripped-paper-png.png", "📄"], "sip": ["s", "p", "https://lh7-rt.googleusercontent.com/docsz/AD_4nXdbUnFM4MFPIW4RB7BwW_LIF3vvqmVgxD3KXDVuz6p1caHE1zl7WFNmxBdcHVSA4foACjoW1njcXUFeOjxMzb-SeAaZtUqfhcWsKBQC4IhDFS_JwvBcjNMup2iiZ-h8La-QvNa2uXGahCbE8JmRXw?key=4v3mcCqteQOMUCOcXuAabbbC", "🧃"], "zip": ["z", "p", "https://www.mh-chine.com/images/blog/hot/two_way_zip-5.webp", "🤐"], "cog": ["c", "g", "https://static.vecteezy.com/system/resources/thumbnails/055/142/926/small_2x/close-up-of-a-single-metallic-gear-with-teeth-visible-isolated-on-a-transparent-background-essential-engineering-component-in-machinery-png.png", "⚙️"], "dog": ["d", "g", "https://site-547756.mozfiles.com/files/547756/medium/Dog2.jpg", "🐶"], "fog": ["f", "g", "https://angelynum.com/wp-content/uploads/2022/06/fog-woods-dark-520x293.jpg", "🌫️"], "hog": ["h", "g", "https://cdn.prod-carehubs.net/n7-mcnn/7bcc9724adf7b803/uploads/2016/10/a-hog-pen-full-of-pigs-and-swine-on-a-farm-16x9.jpg", "🐖"], "jog": ["j", "g", "https://my.youbster.com/wp-content/uploads/2020/07/1-1.jpg", "🏃"], "log": ["l", "g", "https://static.vecteezy.com/system/resources/thumbnails/018/898/098/small/texture-of-chopped-dry-wood-logs-photo.jpg", "🪵"], "cop": ["c", "p", "https://www.evil.news/wp-content/uploads/sites/35/2015/11/Police-Cop.jpg", "👮"], "hop": ["h", "p", "https://api.eurosky.network/img/feed_thumbnail/plain/did:plc:3eatnvb2dim4l7fiwln5wow6/bafkreih7lhx6apwikdwj2wlctbqoxj526agohv3enbvjgrc5i3a6tkpo7m", "🐇"], "mop": ["m", "p", "https://www.story.pl/media/cache/big/uploads/media/default/0001/57/mop.jpg", "🧹"], "pop": ["p", "p", "https://in.hu/site/assets/files/28693/popcorn.1010x0-srcset.webp", "🍿"], "top": ["t", "p", "https://cms-assets.illustrativemathematics.org/1hslrlgh3dltjuyjoldoki5f8jr3-cp-55327-cp-80834", "🌀"], "bot": ["b", "t", "https://i5.walmartimages.com/asr/821bb014-9056-4eaa-8abb-0f9a1fad01b8.6a25f7ab18ebe0341edadea6605298f2.jpeg", "🤖"], "cot": ["c", "t", "https://m.media-amazon.com/images/I/71gABWJtvjL.jpg_BO30,255,255,255_UF900,850_SR1910,1000,0,C_QL100_.jpg", "🛏️"], "dot": ["d", "t", "https://images.creativefabrica.com/products/previews/2024/04/12/KZnM36lUH/2fWzI6LSo1LAj4tCtaaHxFmpZEZ-desktop.jpg", "🔴"], "hot": ["h", "t", "https://beautytruth.com.au/wp-content/uploads/2025/08/21/hot-bowl-of-soup-stk-750x516.jpg", "🍲"], "pot": ["p", "t", "https://i5.walmartimages.com/seo/Cooks-Standard-Multi-Ply-Clad-Stainless-Steel-Stock-Pot-4-Quart-Pasta-Cooking-Soup-Pot-with-Lid-Deep-Stockpot-Induction-Cookware_501bdbcf-46ed-4ad4-9e8b-b13f9a3fb960.395540cb31b59d4d38a3524f60fc548f.jpeg", "🍯"], "cub": ["c", "b", "https://i.pinimg.com/474x/0a/ec/46/0aec465e7cb0c70c38069607ef11b93f.jpg", "🦁"], "rub": ["r", "b", "https://www.hayleyhandcare.com/wp-content/uploads/2024/10/hand-massage-beauty-salon-scaled-1.jpg", "🙌"], "sub": ["s", "b", "https://news.usni.org/wp-content/uploads/2023/08/230804-N-SR275-9002.jpeg", "🚢"], "tub": ["t", "b", "https://s7d1.scene7.com/is/image/kohlergbhcloudprod/Thumbnail-Images-21000-P5-0_PartialRoomView_d2c0072776_rgb", "🛁"], "bug": ["b", "g", "https://www.medialab.org/content/images/ladybug-1.jpg", "🐞"], "hug": ["h", "g", "https://i.pinimg.com/originals/c0/c6/4c/c0c64ceec90df49827934468f3c469bd.jpg", "🤗"], "jug": ["j", "g", "https://static.vecteezy.com/system/resources/thumbnails/069/893/633/small/white-ceramic-milk-jug-blue-background-mockup-free-photo.jpg", "🏺"], "mug": ["m", "g", "https://ueeshop.ly200-cdn.com/u_file/UPAW/UPAW875/2212/photo/a39ce2b4a3.jpg", "☕"], "rug": ["r", "g", "https://i.pinimg.com/originals/7b/c3/33/7bc3337f2ffa56ea3f65a2a9a4bec7f8.png", "🟫"], "tug": ["t", "g", "https://play-lh.googleusercontent.com/UJD8tUk2cKUs2xtVBSUnKKHPUf7_bylUY312idxIb3H1SMZQi4LzauzuUMT_BWniG23R", "🪢"], "bun": ["b", "n", "https://www.joyofbaking.com/images/facebook/softdinnerrolls.jpg", "🍞"], "fun": ["f", "n", "https://pbs.twimg.com/media/F8jlx7EW0AAqHyG.jpg", "🎉"], "gun": ["g", "n", "https://moreaudistribution.be/wp-content/uploads/2023/03/42250.jpg", "🔫"], "nun": ["n", "n", "https://i.etsystatic.com/62137574/r/il/bfcd7a/7885185359/il_1080xN.7885185359_32gs.jpg", "🙏"], "run": ["r", "n", "https://primary.jwwb.nl/public/u/e/i/temp-glmiyftdbihdrxzlrwkk/sprinten-high.webp", "🏃"], "sun": ["s", "n", "https://xras.ru/files/Image/the_sun_sky.jpg", "☀️"]};
+  const VOWELS = ["a", "e", "i", "o", "u"];
+  let cur = null, stars = 0, locked = false;
+  let bag = [], lastWord = "";
+  const $ = id => document.getElementById(id);
+  function speak(text){
+    try { const u = new SpeechSynthesisUtterance(text); u.rate = 0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){}
+  }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  function refill(){
+    bag = shuffle(Object.keys(WORDS));
+    if (bag.length > 1 && bag[bag.length-1] === lastWord) {
+      const t = bag[0]; bag[0] = bag[bag.length-1]; bag[bag.length-1] = t;
+    }
+  }
+  function newWord(){
+    locked = false;
+    if (!bag.length) refill();
+    const word = bag.pop();
+    const w = WORDS[word];
+    cur = { word: word, first: w[0], vowel: word[1], last: w[1], img: w[2], emoji: w[3] };
+    lastWord = word;
+    showPic();
+    $("word").innerHTML = cur.first + '<span class="blank">_</span>' + cur.last;
+    $("say").textContent = "What is the middle sound?";
+    $("tiles").innerHTML = "";
+    VOWELS.forEach(v => {
+      const t = document.createElement("button");
+      t.className = "tile"; t.textContent = v; t.style.width = "58px";
+      t.onclick = () => pick(t, v);
+      $("tiles").appendChild(t);
+    });
+  }
+  function showPic(){
+    if (cur.img) {
+      const im = new Image();
+      im.onload = () => { $("pic").innerHTML = ""; $("pic").appendChild(im); };
+      im.onerror = () => { $("pic").innerHTML = '<span class="emo">' + cur.emoji + '</span>'; };
+      im.src = cur.img; im.alt = cur.word;
+    } else {
+      $("pic").innerHTML = '<span class="emo">' + cur.emoji + '</span>';
+    }
+  }
+  function pick(tile, v){
+    if (locked) return;
+    if (v === cur.vowel) {
+      locked = true;
+      tile.classList.add("right");
+      $("word").innerHTML = cur.first + '<span class="done">' + cur.vowel + '</span>' + cur.last;
+      $("say").textContent = cur.word + "!";
+      stars++; $("stars").textContent = "⭐".repeat(Math.min(stars, 20));
+      speak(cur.word);
+    } else {
+      tile.classList.add("wrong");
+      $("say").textContent = "Try again! Tap Listen and hear the word.";
+      setTimeout(() => tile.classList.remove("wrong"), 350);
+    }
+  }
+  $("next").onclick = newWord;
+  $("listen").onclick = () => speak(cur ? cur.word : "");
+  newWord();
+</script>
+</body>
+</html>

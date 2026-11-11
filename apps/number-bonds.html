@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Number Bonds Explorer</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body { 
+    font-family: 'Comic Sans MS', sans-serif; 
+    text-align: center; 
+    background: #e0f7fa; 
+    padding: 2vw; 
+    margin: 0;
+    overflow-x: hidden; /* Prevents side-scrolling */
+  }
+
+  .container { 
+    background: white; 
+    border-radius: 3vw; 
+    padding: 3vw; 
+    width: 95vw; /* Always 95% of the screen width */
+    max-width: 800px; 
+    margin: 2vh auto; 
+    box-shadow: 0 1vh 3vh rgba(0,0,0,0.1); 
+    border: 0.8vw solid #00bcd4; /* Border thickness scales too */
+  }
+  
+  /* DROPDOWN SCALING */
+  select { 
+    font-size: 12vw; /* Huge on phone, scales down for desktop */
+    font-weight: bold; 
+    padding: 2vw 5vw; 
+    border-radius: 5vw; 
+    border: 0.6vw solid #00bcd4; 
+    color: #0097a7;
+    background-color: #f0fcfd;
+    max-width: 90%;
+  }
+  
+  @media (min-width: 800px) {
+    select { font-size: 5rem; }
+  }
+
+  /* SLIDER SCALING */
+  input[type=range] { 
+    -webkit-appearance: none;
+    width: 90%; 
+    margin: 5vw 0; 
+    background: #b2ebf2;
+    height: 3vw; 
+    max-height: 15px;
+    border-radius: 10px;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10vw; 
+    height: 10vw;
+    max-width: 50px;
+    max-height: 50px;
+    background: #ff9800; 
+    border: 0.8vw solid #e65100; 
+    border-radius: 20%; 
+  }
+
+  /* VISUALS: ONE ROW ONLY */
+  #visuals {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap; /* FORCED ONE ROW */
+    height: 15vw;
+    max-height: 100px;
+    margin: 3vw 0;
+    gap: 1vw; 
+    padding: 2vw;
+    background: #f5f5f5;
+    border-radius: 3vw;
+    width: 100%;
+  }
+
+  /* CIRCLE SIZE: Scales based on width so 10 always fit */
+  .circle { 
+    width: 7vw; 
+    height: 7vw; 
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%; 
+    box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.2);
+    flex-shrink: 1; /* Allows them to shrink to fit the row */
+  }
+  
+  .part1 { background-color: #ff5252; } 
+  .part2 { background-color: #448aff; } 
+  
+  /* EQUATION SCALING */
+  .equation { 
+    font-size: 10vw; /* Scales with screen */
+    font-weight: bold; 
+    margin-top: 2vw; 
+    background: #fff9c4;
+    display: inline-block;
+    padding: 2vw 6vw;
+    border-radius: 4vw;
+    border: 0.5vw dashed #fbc02d;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 800px) {
+    .equation { font-size: 3.5rem; }
+    .circle { width: 50px; height: 50px; }
+  }
+
+  .num1 { color: #ff5252; }
+  .num2 { color: #448aff; }
+  .total { color: #4caf50; }
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="controls">
+      <select id="targetNum" onchange="updateBonds()">
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9" selected>9</option>
+        <option value="10">10</option>
+      </select>
+    </div>
+
+    <input type="range" id="splitter" min="0" max="9" value="4" oninput="updateBonds()">
+
+    <div id="visuals"></div>
+
+    <div class="equation" id="eq">
+      <span class="num1" id="val1">4</span> + <span class="num2" id="val2">5</span> = <span class="total" id="valTotal">9</span>
+    </div>
+  </div>
+
+  <script>
+    function updateBonds() {
+      let total = parseInt(document.getElementById('targetNum').value);
+      let slider = document.getElementById('splitter');
+      slider.max = total; 
+      
+      let part1 = parseInt(slider.value);
+      let part2 = total - part1;
+
+      let vis = document.getElementById('visuals');
+      vis.innerHTML = ''; 
+      
+      for(let i = 0; i < part1; i++) { 
+        vis.innerHTML += '<div class="circle part1"></div>'; 
+      }
+      for(let i = 0; i < part2; i++) { 
+        vis.innerHTML += '<div class="circle part2"></div>'; 
+      }
+
+      document.getElementById('val1').innerText = part1;
+      document.getElementById('val2').innerText = part2;
+      document.getElementById('valTotal').innerText = total;
+    }
+    updateBonds();
+  </script>
+</body>
+</html>

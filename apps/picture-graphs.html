@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Picture Graph Practice</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f4f8;
+    color: #1e293b;
+    text-align: center;
+    /* Pushed up: Changed top padding from 5px to 0 */
+    padding: 0 20px 20px 20px;
+    margin: 0;
+  }
+  .container {
+    max-width: 800px;
+    /* Pushed up: Changed top margin from 10px to 5px */
+    margin: 5px auto;
+    background: white;
+    /* Pushed up: Changed top padding from 20px to 10px */
+    padding: 10px 30px 30px 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  }
+  h1 { 
+    color: #0f172a; 
+    /* Pushed up: Changed top margin from 5px to 0 */
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+  .progress-tracker {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #64748b;
+    /* Pushed up: Tightened space under progress */
+    margin-bottom: 5px;
+  }
+  .graph-container {
+    /* Pushed up: Tightened margins and padding */
+    margin: 5px 0 15px 0;
+    border: 3px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 15px 20px;
+    background: #f8fafc;
+  }
+  .graph-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    border-bottom: 2px dashed #e2e8f0;
+    padding-bottom: 8px;
+    min-height: 45px;
+  }
+  .row:last-child { 
+    border-bottom: none; 
+  }
+  .label {
+    width: 160px;
+    font-weight: bold;
+    text-align: right;
+    margin-right: 20px;
+    font-size: 1.3rem;
+    color: #475569;
+  }
+  .pictures {
+    display: flex;
+    font-size: 2.2rem;
+    gap: 10px;
+    flex-wrap: wrap;
+    user-select: none;
+  }
+  .key {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 3px solid #cbd5e1;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #0f172a;
+  }
+  .question-box {
+    background: #e0f2fe;
+    border-left: 6px solid #0284c7;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #0c4a6e;
+  }
+  .input-area {
+    margin-bottom: 15px;
+  }
+  input[type="number"] {
+    font-size: 1.8rem;
+    padding: 10px;
+    width: 140px;
+    text-align: center;
+    border: 3px solid #94a3b8;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="number"]:focus {
+    border-color: #0284c7;
+  }
+  button {
+    font-size: 1.3rem;
+    padding: 12px 25px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 0 10px;
+    transition: transform 0.1s, background 0.2s;
+  }
+  button:active {
+    transform: scale(0.96);
+  }
+  button:hover { 
+    background: #1d4ed8; 
+  }
+  #next-btn {
+    background: #16a34a;
+    display: none;
+  }
+  #next-btn:hover {
+    background: #15803d;
+  }
+  .feedback {
+    font-size: 1.6rem;
+    font-weight: bold;
+    min-height: 40px;
+    margin-top: 10px;
+  }
+  .correct { color: #16a34a; }
+  .incorrect { color: #dc2626; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Picture Graph Math</h1>
+  <div class="progress-tracker" id="progress-text"></div>
+  
+  <div class="graph-container">
+    <div class="graph-title" id="graph-title">Loading...</div>
+    <div id="graph-body"></div>
+    <div class="key">Key: Each picture = 1 vote</div>
+  </div>
+
+  <div class="question-box" id="question-text">
+    Loading question...
+  </div>
+
+  <div class="input-area">
+    <input type="number" id="answer-input" placeholder="?">
+  </div>
+
+  <div>
+    <button id="check-btn" onclick="checkAnswer()">Check Answer (Enter)</button>
+    <button id="next-btn" onclick="handleNext()">Next</button>
+  </div>
+
+  <div class="feedback" id="feedback-text"></div>
+</div>
+
+<script>
+  const themes = [
+    { title: "Favorite Pets", categories: [{ name: "Dogs", icon: "🐶" }, { name: "Cats", icon: "🐱" }, { name: "Fish", icon: "🐠" }, { name: "Birds", icon: "🐦" }] },
+    { title: "Fruit Snacks", categories: [{ name: "Apples", icon: "🍎" }, { name: "Bananas", icon: "🍌" }, { name: "Grapes", icon: "🍇" }, { name: "Oranges", icon: "🍊" }] },
+    { title: "Recess Games", categories: [{ name: "Soccer", icon: "⚽" }, { name: "Basketball", icon: "🏀" }, { name: "Football", icon: "🏈" }, { name: "Baseball", icon: "⚾" }] },
+    { title: "Spring Bugs", categories: [{ name: "Butterflies", icon: "🦋" }, { name: "Ladybugs", icon: "🐞" }, { name: "Caterpillars", icon: "🐛" }, { name: "Bees", icon: "🐝" }] },
+    { title: "Sweet Treats", categories: [{ name: "Ice Cream", icon: "🍦" }, { name: "Donuts", icon: "🍩" }, { name: "Cookies", icon: "🍪" }, { name: "Cupcakes", icon: "🧁" }] },
+    { title: "How We Get Home", categories: [{ name: "Cars", icon: "🚗" }, { name: "Buses", icon: "🚌" }, { name: "Bikes", icon: "🚲" }, { name: "Walking", icon: "👟" }] },
+    { title: "Farm Animals", categories: [{ name: "Pigs", icon: "🐷" }, { name: "Cows", icon: "🐮" }, { name: "Chickens", icon: "🐔" }, { name: "Horses", icon: "🐴" }] },
+    { title: "School Supplies", categories: [{ name: "Pencils", icon: "✏️" }, { name: "Scissors", icon: "✂️" }, { name: "Backpacks", icon: "🎒" }, { name: "Books", icon: "📚" }] },
+    { title: "Weather Today", categories: [{ name: "Sunny", icon: "☀️" }, { name: "Cloudy", icon: "☁️" }, { name: "Rainy", icon: "🌧️" }, { name: "Snowy", icon: "❄️" }] }
+  ];
+
+  let currentData = [];
+  let currentAnswer = 0;
+  let questionsAsked = 0;
+  const totalQuestionsPerGraph = 5; 
+  let availableQuestionTypes = [];
+
+  document.getElementById('answer-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); 
+      if (document.getElementById('check-btn').style.display !== 'none') {
+        checkAnswer();
+      } else if (document.getElementById('next-btn').style.display !== 'none') {
+        handleNext();
+      }
+    }
+  });
+
+  function generateGraph() {
+    questionsAsked = 0;
+    
+    const currentTheme = themes[Math.floor(Math.random() * themes.length)];
+    document.getElementById('graph-title').innerText = currentTheme.title;
+
+    currentData = currentTheme.categories.map(cat => ({
+      name: cat.name,
+      icon: cat.icon,
+      value: Math.floor(Math.random() * 7) + 2 
+    }));
+
+    availableQuestionTypes = [0, 1, 2, 3, 4].sort(() => Math.random() - 0.5);
+
+    renderGraph();
+    showNextQuestion();
+  }
+
+  function renderGraph() {
+    const graphBody = document.getElementById('graph-body');
+    graphBody.innerHTML = '';
+
+    currentData.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.innerText = item.name;
+
+      const pictures = document.createElement('div');
+      pictures.className = 'pictures';
+      pictures.innerText = item.icon.repeat(item.value);
+
+      row.appendChild(label);
+      row.appendChild(pictures);
+      graphBody.appendChild(row);
+    });
+  }
+
+  function showNextQuestion() {
+    const inputField = document.getElementById('answer-input');
+    inputField.value = '';
+    document.getElementById('feedback-text').innerHTML = '';
+    document.getElementById('check-btn').style.display = 'inline-block';
+    document.getElementById('next-btn').style.display = 'none';
+    
+    inputField.focus(); 
+
+    document.getElementById('progress-text').innerText = `Question ${questionsAsked + 1} of ${totalQuestionsPerGraph}`;
+
+    const qType = availableQuestionTypes[questionsAsked];
+    const qText = document.getElementById('question-text');
+    
+    let idx1 = Math.floor(Math.random() * 4);
+    let idx2 = Math.floor(Math.random() * 4);
+    while (idx1 === idx2) {
+      idx2 = Math.floor(Math.random() * 4);
+    }
+
+    const cat1 = currentData[idx1];
+    const cat2 = currentData[idx2];
+
+    if (qType === 0) {
+      qText.innerText = `How many votes did ${cat1.name} get?`;
+      currentAnswer = cat1.value;
+    } else if (qType === 1) {
+      qText.innerText = `How many votes did ${cat1.name} and ${cat2.name} get altogether?`;
+      currentAnswer = cat1.value + cat2.value;
+    } else if (qType === 2) {
+      let higher = cat1.value >= cat2.value ? cat1 : cat2;
+      let lower = cat1.value < cat2.value ? cat1 : cat2;
+      
+      if(higher.value === lower.value) {
+         higher.value += 1; 
+         renderGraph(); 
+      }
+      qText.innerText = `How many more votes did ${higher.name} get than ${lower.name}?`;
+      currentAnswer = higher.value - lower.value;
+    } else if (qType === 3) {
+      let higher = cat1.value >= cat2.value ? cat1 : cat2;
+      let lower = cat1.value < cat2.value ? cat1 : cat2;
+      
+      if(higher.value === lower.value) {
+         higher.value += 1; 
+         renderGraph(); 
+      }
+      qText.innerText = `How many fewer votes did ${lower.name} get than ${higher.name}?`;
+      currentAnswer = higher.value - lower.value;
+    } else if (qType === 4) {
+      qText.innerText = `How many total votes are shown in the entire graph?`;
+      currentAnswer = currentData.reduce((sum, item) => sum + item.value, 0);
+    }
+  }
+
+  function checkAnswer() {
+    const inputStr = document.getElementById('answer-input').value;
+    if (inputStr === '') return; 
+    
+    const userAns = parseInt(inputStr, 10);
+    const feedback = document.getElementById('feedback-text');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (userAns === currentAnswer) {
+      feedback.innerHTML = '<span class="correct">✓ Correct! Great job.</span>';
+      document.getElementById('check-btn').style.display = 'none';
+      nextBtn.style.display = 'inline-block';
+      
+      if (questionsAsked + 1 < totalQuestionsPerGraph) {
+        nextBtn.innerText = "Next Question (Enter)";
+      } else {
+        nextBtn.innerText = "New Graph (Enter)";
+      }
+      
+      document.getElementById('answer-input').focus();
+    } else {
+      feedback.innerHTML = '<span class="incorrect">✗ Not quite. Look closely at the graph and try again!</span>';
+    }
+  }
+
+  function handleNext() {
+    questionsAsked++;
+    if (questionsAsked < totalQuestionsPerGraph) {
+      showNextQuestion();
+    } else {
+      generateGraph();
+    }
+  }
+
+  window.onload = generateGraph;
+</script>
+</body>
+</html>

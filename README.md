@@ -102,11 +102,16 @@ and asking only for what it returns:
 - [prompt-packs/esl-teacher-starter.md](prompt-packs/esl-teacher-starter.md) — five prompts for an ESL teacher (Turkish-English word wall, grade-1 Dolch flashcards with carrier phrases, colors + objects matching, CVC/digraph sorting mat, animals class set with offset)
 - [prompt-packs/special-ed-teacher-starter.md](prompt-packs/special-ed-teacher-starter.md) — five prompts for a special-ed teacher (IEP reading probe, carrier-phrase reading strip, Elkonin sound boxes, receptive/expressive data sheet, bilingual home-practice cards)
 
+## Classroom app files as MCP resources
+
+The 42 app files themselves are fetchable by agents: `resources/list` serves them at `edu://apps/<identifier>` (text/html, served verbatim via `resources/read`), and plain HTTP at `GET /api/apps?id=<identifier>` (list at `GET /api/apps`). Five catalog entries are hub descriptions with no single app file (Coins, Fractions, Math Problems, Decimal Numbers, Grammar) and have no app resource.
+
 ## Repo layout
 
 - `api/index.py` — the deployed server (Vercel serverless)
 - `public_server.py` — the same server for standalone hosting
 - `catalog.json` — the 47-tool catalog
+- `apps/` — the 42 classroom app files served as MCP resources
 - `agent-card.json`, `server.json` — A2A card and MCP Registry manifest
 - `starter-kit/` — AGENTS.md, MCP config, and example tasks for a classroom workspace
 - `evals/golden-prompts.json` — 20 evaluation prompts with expected tool calls

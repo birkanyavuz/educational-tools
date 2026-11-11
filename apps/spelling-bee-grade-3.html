@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3rd Grade Spelling Bee</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #eef2f5; 
+            text-align: center; 
+            padding: 10px 20px; 
+            color: #2c3e50; 
+        }
+        .container { 
+            background: white; 
+            padding: 20px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            max-width: 700px; 
+            margin: 0 auto; 
+            border-top: 8px solid #f39c12;
+            position: relative;
+        }
+        
+        .score-board {
+            position: absolute;
+            top: 15px; 
+            right: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #27ae60;
+            background: #e8f8f5;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 2px solid #2ecc71;
+        }
+
+        h1 { margin-top: 0; margin-bottom: 5px; color: #f39c12; font-size: 2.2rem; } 
+        p { font-size: 1.1rem; color: #7f8c8d; margin-top: 0; margin-bottom: 15px; }
+        
+        .controls { margin: 10px 0; display: flex; flex-direction: column; align-items: center; gap: 10px; } 
+        
+        .slider-container {
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button { 
+            padding: 12px 20px; 
+            font-size: 16px; 
+            font-weight: bold;
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: transform 0.1s, opacity 0.2s, background-color 0.2s;
+        }
+        button:active:not(:disabled) { transform: scale(0.95); }
+        button:hover:not(:disabled) { opacity: 0.9; }
+        button:disabled { 
+            background-color: #bdc3c7 !important; 
+            cursor: not-allowed; 
+            transform: none; 
+            opacity: 0.6;
+        }
+        
+        .btn-speak { background-color: #3498db; font-size: 18px; padding: 12px 25px; }
+        .btn-check { background-color: #27ae60; padding: 12px 25px; font-size: 18px;}
+        .btn-next { background-color: #9b59b6; display: none; padding: 12px 25px; font-size: 18px;}
+        .btn-skip { background-color: #e74c3c; padding: 12px 25px; font-size: 18px;}
+        
+        /* Lifeline Buttons */
+        .lifeline-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px; 
+        }
+        .btn-lifeline { background-color: #f39c12; color: white; font-size: 13px; padding: 8px 12px;}
+        
+        input[type="text"] { 
+            padding: 12px; 
+            font-size: 22px; 
+            width: 80%; 
+            border: 3px solid #bdc3c7; 
+            border-radius: 8px; 
+            text-align: center; 
+            margin-bottom: 15px; 
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus { border-color: #3498db; }
+        input[type="text"]:disabled { background-color: #f2f2f2; border-color: #ddd; }
+        
+        #clue-box {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            display: none;
+            text-align: left;
+        }
+
+        #feedback { 
+            font-size: 26px; 
+            font-weight: bold; 
+            margin-top: 5px; 
+            min-height: 40px; 
+        }
+        /* Added background highlights to make the feedback extremely obvious */
+        .correct { color: #27ae60; background: #e8f8f5; padding: 5px 20px; border-radius: 8px; display: inline-block; }
+        .incorrect { color: #e74c3c; background: #fdfefe; border: 2px solid #fadbd8; padding: 5px 20px; border-radius: 8px; display: inline-block; }
+        
+        .word-counter {
+            font-size: 0.9rem;
+            color: #95a5a6;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="score-board" id="score-display">Score: 0</div>
+    
+    <h1>🐝 Spelling Bee!</h1>
+    <p>Listen to the word, type it below, and press <strong>Enter</strong>.</p>
+    
+    <div class="controls">
+        <button class="btn-speak" onclick="speakWord()">🔊 Listen to Word</button>
+        
+        <div class="slider-container">
+            <label for="speed-slider">🗣️ Voice Speed: </label>
+            <input type="range" id="speed-slider" min="0.3" max="1" step="0.1" value="0.6">
+        </div>
+    </div>
+
+    <div class="lifeline-row" id="lifeline-controls">
+        <button class="btn-lifeline" onclick="showClue('def')">📖 Definition</button>
+        <button class="btn-lifeline" onclick="showClue('pos')">🎭 Part of Speech</button>
+        <button class="btn-lifeline" onclick="showClue('sen')">📝 Sentence</button>
+    </div>
+
+    <div id="clue-box"></div>
+
+    <input type="text" id="spell-input" placeholder="Type your spelling here..." autocomplete="off">
+    
+    <div class="action-row">
+        <button class="btn-check" id="check-btn" onclick="checkSpelling()">Check Answer</button>
+        <button class="btn-skip" id="skip-btn" onclick="skipWord()">⏭️ Skip Word</button>
+        <button class="btn-next" id="next-btn" onclick="nextWord()">Next Word ➡️</button>
+    </div>
+
+    <div id="feedback"></div>
+    <div class="word-counter" id="counter">Word 1 of 10</div>
+</div>
+
+<script>
+    // Master Word List: 200 Standardized 3rd Grade Words
+    const dictionary = [
+        ["basket", "noun", "a container used to hold or carry things", "She put the fresh apples in the basket."],
+        ["cabin", "noun", "a small, simple house made of wood", "We stayed in a cozy cabin in the woods."],
+        ["planet", "noun", "a large, round object in space that travels around a star", "Earth is the third planet from the sun."],
+        ["cactus", "noun", "a plant with spines instead of leaves that grows in hot, dry places", "Do not touch the sharp cactus in the desert."],
+        ["magnet", "noun", "a piece of metal that can pull other metals toward it", "He used a magnet to pick up the paperclips."],
+        ["actor", "noun", "a person who performs in plays, movies, or television shows", "The actor forgot his lines during the play."],
+        ["chapter", "noun", "one of the main parts of a book", "I read the first chapter of the novel last night."],
+        ["lantern", "noun", "a light that has a covering to protect it and a handle", "We used a lantern to see in the dark tent."],
+        ["vanish", "verb", "to disappear suddenly", "The magician made the rabbit vanish into thin air."],
+        ["hazard", "noun", "something that is dangerous", "The icy stairs are a safety hazard."],
+        ["talent", "noun", "a natural skill or ability to do something well", "She has a real talent for drawing animals."],
+        ["rapid", "adjective", "happening in a short amount of time; fast", "The train made a rapid journey to the city."],
+        ["banner", "noun", "a long piece of cloth with words or a design on it", "They hung a happy birthday banner across the room."],
+        ["saddle", "noun", "a leather seat put on a horse's back", "He placed the saddle on the horse before riding."],
+        ["panic", "noun", "a sudden feeling of great fear", "Do not panic during a fire drill."],
+        ["afraid", "adjective", "feeling fear or worry", "My little brother is afraid of the dark."],
+        ["amaze", "verb", "to surprise someone very much", "The acrobat's flips will amaze the audience."],
+        ["daylight", "noun", "the natural light of the day", "The plants need plenty of daylight to grow."],
+        ["parade", "noun", "a public march to celebrate a special day", "We watched the marching band in the parade."],
+        ["escape", "verb", "to get away from a dangerous place", "The dog tried to escape from the backyard."],
+        ["patience", "noun", "the ability to wait calmly", "Teaching a puppy tricks requires a lot of patience."],
+        ["neighbor", "noun", "a person who lives next to or near you", "Our neighbor baked us a pie when we moved in."],
+        ["obey", "verb", "to do what you are told to do", "You must obey the rules of the classroom."],
+        ["display", "verb", "to put things where people can see them easily", "The store will display the new toys in the window."],
+        ["remain", "verb", "to stay in the same place or condition", "Please remain in your seats until the bell rings."],
+        ["basement", "noun", "a floor of a building that is partly or entirely below ground", "We keep our holiday decorations in the basement."],
+        ["gateway", "noun", "an opening in a wall or fence that can be closed by a gate", "The old castle has a stone gateway."],
+        ["painter", "noun", "a person whose job is painting buildings or creating art", "The painter used bright blue for the ocean."],
+        ["bracelet", "noun", "a piece of jewelry worn around the wrist", "She wore a silver bracelet on her arm."],
+        ["statement", "noun", "something that you say or write in a formal way", "The principal read a statement to the school."],
+        ["feather", "noun", "one of the soft, light parts that cover a bird's body", "I found a blue jay feather on the grass."],
+        ["jelly", "noun", "a sweet, soft food made by boiling fruit juice and sugar", "I like peanut butter and jelly sandwiches."],
+        ["shelter", "noun", "a place that protects from weather or danger", "We built a shelter out of branches in the woods."],
+        ["melon", "noun", "a large, round fruit with sweet, juicy flesh", "We ate a slice of cold melon on a hot day."],
+        ["pebble", "noun", "a small, smooth stone", "He skipped a pebble across the pond."],
+        ["echo", "noun", "a sound that is heard again after it bounces off something", "I heard the echo of my voice in the cave."],
+        ["pretend", "verb", "to act as if something is true when it is not", "The children pretend to be pirates on the playground."],
+        ["freckle", "noun", "a small, brownish spot on the skin", "She has a cute freckle on her nose."],
+        ["better", "adjective", "of a higher quality; improved", "I am feeling better after resting."],
+        ["velvet", "noun", "a soft fabric with a thick layer of short threads", "The royal chair was covered in red velvet."],
+        ["sweater", "noun", "a warm piece of clothing with long sleeves", "Put on your sweater because it is cold outside."],
+        ["tender", "adjective", "easy to cut or chew; soft", "The cooked carrots were very tender."],
+        ["ember", "noun", "a glowing piece of coal or wood from a dying fire", "We roasted marshmallows over the hot ember."],
+        ["sentence", "noun", "a group of words that expresses a complete thought", "Every sentence must end with a punctuation mark."],
+        ["contest", "noun", "an event where people try to win a prize", "He won first place in the spelling contest."],
+        ["beneath", "preposition", "in a lower place; under", "The treasure was buried beneath the sand."],
+        ["increase", "verb", "to make or become larger in amount or size", "The temperature will increase in the afternoon."],
+        ["repeat", "verb", "to say or do something again", "Please repeat the question so everyone can hear."],
+        ["season", "noun", "one of the four periods of the year", "Autumn is my favorite season because of the leaves."],
+        ["eager", "adjective", "wanting to do or have something very much", "The eager student raised his hand quickly."],
+        ["concrete", "noun", "a hard building material made of cement, sand, and gravel", "The sidewalk is made of solid concrete."],
+        ["exceed", "verb", "to be greater than a number or amount", "Do not exceed the speed limit when driving."],
+        ["proceed", "verb", "to move forward or continue doing something", "You may proceed to the next page of the test."],
+        ["agreement", "noun", "a promise between two or more people", "We reached an agreement to share the toys."],
+        ["achievement", "noun", "something done successfully with effort or skill", "Climbing the mountain was a great achievement."],
+        ["feature", "noun", "an important or interesting part of something", "The best feature of the house is the big backyard."],
+        ["decrease", "verb", "to become smaller or less", "The noise level needs to decrease in the library."],
+        ["referee", "noun", "an official who controls a sports game", "The referee blew the whistle to stop the play."],
+        ["complete", "adjective", "having all necessary parts; finished", "My sticker collection is finally complete."],
+        ["squeaky", "adjective", "making a short, high-pitched sound", "The squeaky door needs some oil."],
+        ["chicken", "noun", "a bird that is raised for its eggs and meat", "The farmer fed the chicken in the barn."],
+        ["picnic", "noun", "a meal eaten outdoors", "We had a lovely picnic in the park."],
+        ["village", "noun", "a small town in the country", "My grandparents live in a quiet village."],
+        ["mitten", "noun", "a type of glove with one section for the thumb and one for the fingers", "I lost my left mitten in the snow."],
+        ["kitten", "noun", "a young cat", "The tiny kitten slept in a basket."],
+        ["finish", "verb", "to bring a task to an end", "I need to finish my homework before dinner."],
+        ["rigid", "adjective", "stiff and not moving or bending", "The rigid plastic ruler snapped in half."],
+        ["timid", "adjective", "feeling or showing a lack of courage or confidence", "The timid deer ran away when it heard us."],
+        ["cricket", "noun", "a jumping insect that makes a chirping sound", "I heard a cricket chirping outside my window."],
+        ["visit", "verb", "to go to see someone or a place", "We will visit the museum on Saturday."],
+        ["witness", "noun", "a person who sees an event happen", "She was a witness to the car accident."],
+        ["winter", "noun", "the coldest season of the year", "We love to build snowmen in the winter."],
+        ["vivid", "adjective", "producing powerful feelings or strong, clear images", "I had a vivid dream about flying last night."],
+        ["spirit", "noun", "the part of a person that includes their mind, feelings, and character", "The team showed great school spirit at the game."],
+        ["habit", "noun", "something that you do often and regularly", "Brushing your teeth twice a day is a good habit."],
+        ["arrive", "verb", "to reach a place", "Our flight will arrive at the airport at noon."],
+        ["surprise", "noun", "an unexpected event", "We threw a surprise party for her birthday."],
+        ["twilight", "noun", "the soft glowing light from the sky when the sun is below the horizon", "The sky looked purple during twilight."],
+        ["delight", "noun", "great pleasure", "The child laughed with delight at the clown."],
+        ["invite", "verb", "to ask someone in a friendly way to do something", "I will invite my friends to my house."],
+        ["bicycle", "noun", "a vehicle with two wheels that you ride by pushing pedals", "He learned to ride his bicycle without training wheels."],
+        ["describe", "verb", "to say what someone or something is like", "Can you describe the missing dog?"],
+        ["remind", "verb", "to make someone remember something", "Please remind me to call my grandmother."],
+        ["define", "verb", "to state the exact meaning of a word", "Use the dictionary to define the new word."],
+        ["combine", "verb", "to join together to make a single thing", "Combine the flour and sugar in a large bowl."],
+        ["advise", "verb", "to give a suggestion about what should be done", "I advise you to wear a jacket today."],
+        ["decide", "verb", "to make a choice", "She could not decide which book to read."],
+        ["recite", "verb", "to say a piece of writing aloud from memory", "The student will recite a poem for the class."],
+        ["apply", "verb", "to put something onto a surface", "Apply sunscreen before you go to the beach."],
+        ["survive", "verb", "to continue to live or exist", "Camels can survive a long time without water."],
+        ["octopus", "noun", "a sea animal with a soft body and eight long arms", "The octopus hid behind a rock in the ocean."],
+        ["topic", "noun", "a subject that is discussed, written about, or studied", "The topic of our science project is the solar system."],
+        ["problem", "noun", "a situation that causes difficulty", "We worked together to solve the math problem."],
+        ["rocket", "noun", "a vehicle used for traveling or sending things into space", "The rocket launched into the starry sky."],
+        ["monster", "noun", "a scary, imaginary creature", "The little boy thought there was a monster under his bed."],
+        ["pocket", "noun", "a small bag sewn into clothing for carrying things", "I kept my loose coins in my pocket."],
+        ["tropical", "adjective", "from or relating to the area between the two tropics", "We saw brightly colored fish in the tropical reef."],
+        ["hobby", "noun", "an activity done regularly in one's free time for pleasure", "Collecting stamps is a fun hobby."],
+        ["honest", "adjective", "telling the truth", "It is important to be honest when you make a mistake."],
+        ["object", "noun", "a thing that you can see and touch that is not alive", "What is that shiny object on the floor?"],
+        ["island", "noun", "a piece of land completely surrounded by water", "They took a boat to the small island."],
+        ["puzzle", "noun", "a game or toy that requires thought to solve", "We spent the afternoon doing a jigsaw puzzle."],
+        ["reason", "noun", "a cause or explanation for an action", "What is the reason you are late?"],
+        ["nature", "noun", "all the physical world, including plants, animals, and landscapes", "We went for a hike to enjoy nature."],
+        ["hollow", "adjective", "having a hole or empty space inside", "The squirrel hid its nuts in a hollow tree."],
+        ["forest", "noun", "a large area covered mostly with trees", "Many wild animals live deep in the forest."],
+        ["shadow", "noun", "a dark area made when an object blocks light", "The dog barked at its own shadow."],
+        ["gentle", "adjective", "mild, kind, or careful; not rough", "You must be gentle when holding a baby chick."],
+        ["bundle", "noun", "a group of things tied or wrapped together", "He carried a bundle of firewood to the house."],
+        ["cattle", "noun", "cows and bulls kept on a farm for their meat or milk", "The cattle grazed in the green pasture."],
+        ["stumble", "verb", "to trip or lose one's balance", "Be careful not to stumble over the step."],
+        ["crumble", "verb", "to break into small pieces", "The dry cookie began to crumble in my hands."],
+        ["scramble", "verb", "to move quickly using your hands and feet", "We had to scramble up the rocky hill."],
+        ["grumble", "verb", "to complain in a low, unhappy voice", "I heard him grumble about the rainy weather."],
+        ["whistle", "noun", "a clear, high sound made by forcing breath through a small hole", "The coach blew his whistle to stop the game."],
+        ["thistle", "noun", "a wild plant with prickly leaves and purple flowers", "Don't step on the sharp thistle in the grass."],
+        ["rustle", "verb", "to make a soft, dry sound like paper rubbing together", "We heard the leaves rustle in the wind."],
+        ["jungle", "noun", "a forest in a tropical country with thick plant growth", "Monkeys swing from the trees in the jungle."],
+        ["single", "adjective", "only one; not one of several", "There is not a single cloud in the sky."],
+        ["pebble", "noun", "a small, round stone", "I found a shiny pebble on the beach."],
+        ["tremble", "verb", "to shake from fear or cold", "The loud thunder made the dog tremble."],
+        ["simple", "adjective", "easy to understand or do", "The recipe for the soup is very simple."],
+        ["dimple", "noun", "a small hollow in the cheek or chin when smiling", "She has a cute dimple when she smiles."],
+        ["temple", "noun", "a building for religious practice", "They visited an ancient temple in the mountains."],
+        ["sample", "noun", "a small part of something that shows what the whole is like", "They gave out a free sample of cheese at the store."],
+        ["cable", "noun", "a thick, strong rope made of wires", "The bridge is held up by a strong steel cable."],
+        ["fable", "noun", "a short story that teaches a lesson, often with animal characters", "We read the fable about the tortoise and the hare."],
+        ["stable", "noun", "a building where horses are kept", "The farmer led the horses back into the stable."],
+        ["maple", "noun", "a type of tree with leaves with five points and sap used to make syrup", "We poured maple syrup on our pancakes."],
+        ["staple", "noun", "a small piece of wire used to hold papers together", "She used a staple to attach the pages of her report."],
+        ["beetle", "noun", "an insect with a hard shell-like back", "A shiny green beetle crawled across the leaf."],
+        ["needle", "noun", "a small, thin tool used for sewing", "She threaded the needle to fix the hole in her shirt."],
+        ["title", "noun", "the name of a book, movie, or song", "The title of the book was printed in large letters."],
+        ["bottle", "noun", "a container with a narrow neck, used for storing liquids", "Please drink a whole bottle of water after running."],
+        ["settle", "verb", "to make yourself comfortable or calm down", "The bird will settle on the branch for the night."],
+        ["rattle", "noun", "a toy that makes a shaking sound", "The baby shook the colorful rattle."],
+        ["prattle", "verb", "to talk for a long time about things that are not important", "The children continued to prattle during the movie."],
+        ["little", "adjective", "small in size", "The little dog fit right in my lap."],
+        ["middle", "noun", "the central point or part of something", "He stood right in the middle of the circle."],
+        ["fiddle", "noun", "a musical instrument like a violin", "He played a fast tune on his wooden fiddle."],
+        ["riddle", "noun", "a question or statement that tests your cleverness to solve", "The wizard asked a tricky riddle."],
+        ["giggle", "verb", "to laugh in a light, silly way", "The funny joke made the girls giggle."],
+        ["wiggle", "verb", "to move with quick, short side-to-side movements", "The loose tooth began to wiggle."],
+        ["jiggle", "verb", "to shake lightly up and down or from side to side", "Don't jiggle the table while I am writing."],
+        ["eagle", "noun", "a large bird of prey with a sharp beak and strong claws", "The bald eagle flew high above the mountains."],
+        ["bugle", "noun", "a brass instrument like a small trumpet", "The soldier played the bugle in the morning."],
+        ["angle", "noun", "the space between two intersecting lines", "The roof sloped at a steep angle."],
+        ["tangle", "noun", "a confused mass of something twisted together", "My hair was in a messy tangle after the wind blew."],
+        ["handle", "noun", "the part of an object meant to be held", "The handle of the mug broke off."],
+        ["candle", "noun", "a stick of wax with a wick that is burned to give light", "We lit a candle when the power went out."],
+        ["spindle", "noun", "a slender rounded rod used in spinning thread", "The thread was wrapped tightly around the spindle."],
+        ["dazzle", "verb", "to impress deeply; to shine brightly", "The fireworks will dazzle the crowd."],
+        ["muzzle", "noun", "the nose and mouth of an animal", "The dog pushed its wet muzzle into my hand."],
+        ["drizzle", "noun", "light, fine rain", "We walked to school in a cold drizzle."],
+        ["frizzle", "verb", "to form into tight curls", "The humidity made her hair frizzle."],
+        ["sizzle", "verb", "to make a hissing sound when frying", "The bacon started to sizzle in the pan."],
+        ["bubble", "noun", "a thin ball of liquid enclosing air or gas", "The soap bubble popped in the air."],
+        ["double", "adjective", "twice as much or as many", "I ordered a double scoop of ice cream."],
+        ["trouble", "noun", "difficulty or problems", "He got into trouble for not doing his homework."],
+        ["couple", "noun", "two people or things of the same sort considered together", "I only need a couple of minutes to finish."],
+        ["flavor", "noun", "the specific taste of a food or drink", "My favorite flavor of ice cream is chocolate."],
+        ["tractor", "noun", "a large vehicle used on farms to pull equipment", "The farmer drove the green tractor across the field."],
+        ["motor", "noun", "a machine that produces motion or power", "The boat's motor was very loud."],
+        ["author", "noun", "a writer of a book, article, or document", "The author signed copies of her new book."],
+        ["sailor", "noun", "a person who works on a ship or boat", "The sailor tied a strong knot with the rope."],
+        ["mirror", "noun", "a glass surface that reflects images", "She looked at her reflection in the mirror."],
+        ["error", "noun", "a mistake", "I found an error in my math problem."],
+        ["terror", "noun", "extreme fear", "The haunted house filled them with terror."],
+        ["horror", "noun", "an intense feeling of fear, shock, or disgust", "He gasped in horror when he dropped the cake."],
+        ["humor", "noun", "the quality of being amusing or comic", "The funny teacher has a great sense of humor."],
+        ["rumor", "noun", "a story spreading that may not be true", "There is a rumor that we will get an extra recess today."],
+        ["doctor", "noun", "a person trained to treat ill or injured people", "The doctor gave me medicine for my cough."],
+        ["color", "noun", "the property of an object producing different sensations on the eye", "Red is my favorite color."],
+        ["favor", "noun", "an act of kindness beyond what is due", "Could you do me a favor and hold this box?"],
+        ["major", "adjective", "important, serious, or significant", "Moving to a new city is a major change."],
+        ["mayor", "noun", "the elected head of a city or town", "The mayor cut the ribbon to open the new park."],
+        ["spider", "noun", "an eight-legged insect that spins webs", "The spider spun a web in the corner of the room."],
+        ["tiger", "noun", "a large wild cat with a yellow-orange coat and dark stripes", "We saw a sleeping tiger at the zoo."],
+        ["paper", "noun", "material manufactured in thin sheets used for writing", "Get a piece of paper to write down your notes."],
+        ["water", "noun", "a clear, colorless liquid essential for plant and animal life", "Please drink a glass of water."]
+    ];
+    
+    let activeWords = [];
+    let currentWordObj = [];
+    let currentWordIndex = 0;
+    
+    // Game State
+    let score = 0;
+    
+    // Elements
+    const inputField = document.getElementById("spell-input");
+    const feedbackDiv = document.getElementById("feedback");
+    const clueBox = document.getElementById("clue-box");
+    const checkBtn = document.getElementById("check-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const skipBtn = document.getElementById("skip-btn");
+    const lifelineRow = document.getElementById("lifeline-controls");
+    const counterDiv = document.getElementById("counter");
+    const speedSlider = document.getElementById("speed-slider");
+    const scoreDisplay = document.getElementById("score-display");
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function init() {
+        shuffleArray(dictionary);
+        activeWords = dictionary.slice(0, 10);
+        updateScore();
+        updateCounter();
+        loadWord();
+    }
+
+    function loadWord() {
+        currentWordObj = activeWords[currentWordIndex];
+        setTimeout(speakWord, 500);
+    }
+
+    function speakWord() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const wordToSpeak = currentWordObj[0]; // Index 0 is the word
+            const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+            utterance.rate = parseFloat(speedSlider.value); 
+            window.speechSynthesis.speak(utterance);
+            if(!inputField.disabled) inputField.focus();
+        } else {
+            alert("Sorry, your browser doesn't support text-to-speech!");
+        }
+    }
+
+    function showClue(type) {
+        clueBox.style.display = "block";
+        if (type === 'def') {
+            clueBox.innerHTML = `<strong>📖 Definition:</strong> ${currentWordObj[2]}`;
+        } else if (type === 'pos') {
+            clueBox.innerHTML = `<strong>🎭 Part of Speech:</strong> ${currentWordObj[1]}`;
+        } else if (type === 'sen') {
+            let hiddenSentence = currentWordObj[3].replace(new RegExp(currentWordObj[0], "ig"), "_____");
+            clueBox.innerHTML = `<strong>📝 Sentence:</strong> "${hiddenSentence}"`;
+        }
+        inputField.focus();
+    }
+
+    function skipWord() {
+        const actualWord = currentWordObj[0];
+        feedbackDiv.innerHTML = `<span class='incorrect'>⏭️ Skipped! The word was: <strong>${actualWord}</strong></span>`;
+        lockUI();
+    }
+
+    function checkSpelling() {
+        const guess = inputField.value.trim().toLowerCase();
+        const actualWord = currentWordObj[0].toLowerCase();
+
+        if (guess === "") return;
+
+        if (guess === actualWord) {
+            feedbackDiv.innerHTML = "<span class='correct'>✅ Correct!</span>";
+            score++;
+            updateScore();
+            lockUI();
+        } else {
+            feedbackDiv.innerHTML = "<span class='incorrect'>❌ Incorrect! Try again.</span>";
+            inputField.value = ""; 
+        }
+    }
+
+    function lockUI() {
+        inputField.disabled = true;
+        checkBtn.style.display = "none";
+        skipBtn.style.display = "none";
+        lifelineRow.style.display = "none";
+        clueBox.style.display = "none";
+        nextBtn.style.display = "inline-block";
+        nextBtn.focus();
+    }
+
+    function nextWord() {
+        currentWordIndex++;
+        
+        if (currentWordIndex >= activeWords.length) {
+            feedbackDiv.innerHTML = `<span class='correct'>🎉 You finished the spelling bee! Final Score: ${score}/10. Refresh to play again!</span>`;
+            inputField.style.display = "none";
+            checkBtn.style.display = "none";
+            nextBtn.style.display = "none";
+            skipBtn.style.display = "none";
+            lifelineRow.style.display = "none";
+            clueBox.style.display = "none";
+            document.querySelector('.btn-speak').style.display = "none";
+            speedSlider.parentElement.style.display = "none";
+            return;
+        }
+
+        // Reset UI for the next word
+        inputField.value = "";
+        inputField.disabled = false;
+        feedbackDiv.innerHTML = "";
+        clueBox.style.display = "none";
+        
+        checkBtn.style.display = "inline-block";
+        skipBtn.style.display = "inline-block";
+        lifelineRow.style.display = "flex";
+        nextBtn.style.display = "none";
+        
+        updateCounter();
+        loadWord();
+    }
+    
+    function updateCounter() {
+        counterDiv.innerText = `Word ${currentWordIndex + 1} of ${activeWords.length}`;
+    }
+
+    function updateScore() {
+        scoreDisplay.innerText = `Score: ${score}`;
+    }
+
+    // Keydown explicitly prevents the event from bubbling up to the document
+    inputField.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); 
+            event.stopPropagation(); // BUG FIX: Prevents Enter from instantly clicking "Next Word"
+            checkSpelling();
+        }
+    });
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && nextBtn.style.display === "inline-block") {
+            event.preventDefault();
+            nextWord();
+        }
+    });
+
+    window.onload = init;
+</script>
+
+</body>
+</html>

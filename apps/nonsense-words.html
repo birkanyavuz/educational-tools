@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nonsense Words</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", Verdana, sans-serif;
+    background: #ffffff;
+    color: #1e293b;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+    user-select: none;
+  }
+  h1 {
+    font-size: clamp(1.6rem, 5vw, 2.6rem);
+    color: #0f172a;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .subtitle {
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    color: #475569;
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+  .progress-wrap {
+    width: min(560px, 88vw);
+    height: 16px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #22c55e;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  #card {
+    width: min(560px, 90vw);
+    min-height: 240px;
+    background: #ffffff;
+    border: 4px solid #2563eb;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 20px;
+  }
+  .word {
+    font-size: clamp(3.8rem, 17vw, 9.5rem);
+    font-size: min(17vw, 152px);
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.05;
+    text-align: center;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "clig" 0;
+  }
+  .buttons { display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+  .buttons button {
+    padding: 16px 26px;
+    font-size: clamp(1.2rem, 3.4vw, 1.7rem);
+    font-weight: 800;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-family: inherit;
+    color: #ffffff;
+  }
+  #hear-btn { background: #f59e0b; }
+  #read-btn { background: #22c55e; }
+  #later-btn { background: #64748b; }
+  .stars {
+    font-size: clamp(1.3rem, 3.6vw, 1.9rem);
+    font-weight: 700;
+    margin-top: 16px;
+    min-height: 1.4em;
+  }
+  .done-msg {
+    font-size: clamp(1.6rem, 5vw, 2.6rem);
+    font-weight: 800;
+    color: #16a34a;
+    text-align: center;
+    line-height: 1.3;
+  }
+  #again-btn {
+    margin-top: 20px;
+    padding: 16px 30px;
+    font-size: clamp(1.2rem, 3.4vw, 1.7rem);
+    font-weight: 800;
+    border: none;
+    border-radius: 16px;
+    background: #2563eb;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: inherit;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Nonsense Words</h1>
+<div class="subtitle">Read the made-up word out loud!</div>
+
+<div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+
+<div id="card"><div class="word" id="word"></div></div>
+
+<div class="buttons" id="buttons">
+  <button id="hear-btn">🔊 Hear it</button>
+  <button id="read-btn">✓ I read it!</button>
+  <button id="later-btn">↻ Try later</button>
+</div>
+
+<div class="stars" id="stars"></div>
+<button id="again-btn">▶ Play again</button>
+
+<script>
+// Made-up CVC words (not real words) — like the FastBridge Nonsense Words subtest
+const WORDS = ["vab","zad","zat","kag","jad","pab","wab","nad","cax","gax","beb","ceg","feg","keb","meb","veb","zeg","gep","lep","nem","bep","fim","gim","kib","pib","wib","zib","fip","mip","jid","jod","pob","sog","tob","vob","wob","zob","fom","gom","fub","gub","jub","kub","mub","pum","tud","vub","zub"];
+
+let pile = [];
+let current = null;
+let stars = 0;
+let advancing = false;
+
+const cardEl = document.getElementById('card');
+const wordEl = document.getElementById('word');
+const progressEl = document.getElementById('progress');
+const starsEl = document.getElementById('stars');
+const buttonsEl = document.getElementById('buttons');
+const againBtn = document.getElementById('again-btn');
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function speakWord() {
+  if (!current) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(current);
+  u.rate = 0.8;
+  const voices = speechSynthesis.getVoices();
+  const best = voices.find(v => /google us english/i.test(v.name))
+    || voices.find(v => /^en[-_]US/i.test(v.lang))
+    || voices.find(v => /^en/i.test(v.lang));
+  if (best) u.voice = best;
+  speechSynthesis.speak(u);
+}
+
+function updateProgress() {
+  const done = WORDS.length - pile.length - (current ? 1 : 0);
+  progressEl.style.width = (done / WORDS.length * 100) + '%';
+}
+
+function showNext() {
+  advancing = false;
+  if (pile.length === 0) {
+    current = null;
+    wordEl.innerHTML = '<span class="done-msg">🎉 Great job!<br>You read ' + stars + ' words!</span>';
+    buttonsEl.style.display = 'none';
+    againBtn.style.display = 'block';
+    progressEl.style.width = '100%';
+    return;
+  }
+  current = pile.pop();
+  wordEl.textContent = current;
+  buttonsEl.style.display = 'flex';
+  updateProgress();
+}
+
+function startGame() {
+  pile = shuffle(WORDS.slice());
+  stars = 0;
+  starsEl.textContent = '';
+  againBtn.style.display = 'none';
+  showNext();
+}
+
+document.getElementById('hear-btn').addEventListener('click', (e) => { speakWord(); e.target.blur(); });
+cardEl.addEventListener('click', () => speakWord());
+document.getElementById('read-btn').addEventListener('click', (e) => {
+  if (advancing || !current) return;
+  advancing = true;
+  stars++;
+  starsEl.textContent = '⭐ × ' + stars;
+  speakWord();
+  setTimeout(showNext, 500);
+  e.target.blur();
+});
+document.getElementById('later-btn').addEventListener('click', (e) => {
+  if (advancing || !current) return;
+  advancing = true;
+  pile.splice(Math.min(pile.length, 3), 0, current);
+  current = null;
+  showNext();
+  e.target.blur();
+});
+againBtn.addEventListener('click', (e) => { startGame(); e.target.blur(); });
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') { e.preventDefault(); speakWord(); }
+  if (e.code === 'Enter') { document.getElementById('read-btn').click(); }
+});
+
+startGame();
+</script>
+</body>
+</html>

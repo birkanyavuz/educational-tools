@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Segmenting</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Comic Sans MS", "Comic Neue", "Chalkboard SE", Verdana, sans-serif;
+    background: #ffffff;
+    color: #1e293b;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 14px 14px 14px;
+    overflow: hidden;
+    user-select: none;
+  }
+  h1 {
+    font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+    color: #0f172a;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    color: #475569;
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .photo {
+    width: min(340px, 70vw);
+    height: min(240px, 40vh);
+    object-fit: cover;
+    border-radius: 20px;
+    border: 4px solid #2563eb;
+    background: #ffffff;
+  }
+  .photo-emoji {
+    font-size: 110px;
+    line-height: 1;
+    display: none;
+  }
+  #hear-btn {
+    margin-top: 12px;
+    padding: 12px 24px;
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    background: #f59e0b;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Sound boxes */
+  .boxes { display: flex; gap: 12px; margin-top: 16px; }
+  .sbox {
+    width: clamp(64px, 16vw, 96px);
+    height: clamp(64px, 16vw, 96px);
+    border: 4px dashed #94a3b8;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(2.2rem, 7vw, 3.4rem);
+    font-weight: 800;
+    color: #0f172a;
+    background: #ffffff;
+  }
+  .sbox.filled { border-style: solid; border-color: #16a34a; background: #f0fdf4; color: #16a34a; }
+
+  /* Letter tiles */
+  .tiles { display: flex; gap: 12px; margin-top: 16px; }
+  .tile {
+    width: clamp(64px, 16vw, 96px);
+    height: clamp(64px, 16vw, 96px);
+    border: 4px solid #2563eb;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #2563eb;
+    font-size: clamp(2.2rem, 7vw, 3.4rem);
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .tile.used { visibility: hidden; }
+  .tile.bad { animation: shake 0.35s; border-color: #b91c1c; color: #b91c1c; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-7px); }
+    75% { transform: translateX(7px); }
+  }
+
+  .message {
+    font-size: clamp(1.25rem, 3.4vw, 1.8rem);
+    font-weight: 800;
+    text-align: center;
+    margin-top: 14px;
+    min-height: 1.4em;
+  }
+  .message.good { color: #16a34a; }
+  .stars { font-size: clamp(1.3rem, 3.4vw, 1.8rem); font-weight: 700; margin-top: 6px; min-height: 1.4em; }
+</style>
+</head>
+<body>
+
+<h1>Word Segmenting</h1>
+<div class="subtitle">Listen to the word. Tap the sounds in order.</div>
+
+<img class="photo" id="photo" alt="">
+<div class="photo-emoji" id="photo-emoji"></div>
+<button id="hear-btn">🔊 Hear it</button>
+
+<div class="boxes" id="boxes"></div>
+<div class="tiles" id="tiles"></div>
+
+<div class="message" id="message"></div>
+<div class="stars" id="stars"></div>
+
+<script>
+const DATA = {"bat":["https://media.baamboozle.com/uploads/images/672767/1648071656_199859.jpeg","🦇"],"cat":["https://cdn.omlet.com/images/originals/Cat-Cat_Guide-A_lazy_tabby_cat_lolling_on_the_sofa.jpg","🐱"],"fat":["https://cats.com/wp-content/uploads/2022/08/fat-cat-7-compressed.jpg","🧈"],"hat":["https://public.readdy.ai/ai/img_res/9c5ca508e6c587f2dd2fb3c18a439a61.webp","🎩"],"mat":["https://cdn.prod.website-files.com/621e7ba1d9afced01ad8654a/621e801c7b6f05d5e69a3cbb_Yogamat.jpg","🧘"],"pat":["https://i.pinimg.com/originals/45/fe/e7/45fee7f3579b9154fbaeb09799922be9.jpg","🐕"],"rat":["https://nobugz.au/wp-content/uploads/2025/02/rat-pic.jpg","🐀"],"sat":["https://static-eu.insales.ru/files/1/3738/5893786/original/Как_повысить_усидчивость_у_ребенка_.jpg","🪑"],"ban":["https://cdn.crowdpic.net/list-thumb/thumb_l_ED55D52AAEB33BC886AF8380F1C64AF7.png?","🚫"],"can":["https://static.vecteezy.com/system/resources/thumbnails/060/034/509/small/empty-silver-tin-can-isolated-metal-food-can-with-transparent-alpha-png.png","🥫"],"fan":["https://assets.knowt.com/user-attachments/924be652-8e4f-4112-a7ec-6ccd978f0cdf.jpg","🌀"],"man":["https://i.pinimg.com/236x/8a/00/fd/8a00fddeecaf16b7ee6824303adc5d90.jpg","👨"],"pan":["https://prudentreviews.com/wp-content/uploads/de-Buyer-Affinity-fry-pan.jpg","🍳"],"ran":["https://imgproxy.gamma.app/resize/quality:80/resizing_type:fit/width:2000/https://cdn.gamma.app/tqxsze6t8dhpj0u/generated-images/MI7bzbc1QD8RTlQYCw9F5.jpg","🏃"],"tan":["https://www.decentapparel.com/cdn/shop/files/decentapparel-productsilo-lwfp-pants-13_762ea048-bd5c-4c1c-a73f-7a00623c8f6f.jpg?crop=center&height=600&v=1684783283&width=600","🏖️"],"van":["https://www.hippoleasing.co.uk/wp-content/uploads/Sprinter-2-min.webp","🚐"],"den":["https://static.vecteezy.com/system/resources/thumbnails/079/943/417/small/brown-bear-sleeping-in-a-cave-with-mossy-rocks-and-forest-background-free-photo.jpg","🦁"],"hen":["https://foodtruckempire.com/how-to/poultry-farm-names/attachment/hen/","🐔"],"men":["https://www.lionsroar.com/wp-content/uploads/2023/11/JM_SOUTHWEST_S05_001_final.png","👥"],"pen":["https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/file-uploads/themes/2160098405/settings_images/fce5ab-121d-daf6-b7dd-dc03224e5b1_8d28e6-ca-3dc8-3e72-aef82832f53_25-01-30_-_pen_name.png","🖊️"],"ten":["https://attic.sh/sovzaob8ttlyso27klncbdk5isy3","🔟"],"jet":["https://carmed.co.ke/wp-content/uploads/2015/06/home_jet_aircraft_2.png","✈️"],"net":["https://ideogram.ai/assets/image/balanced/response/7tt5URfbTK--QxP3IFSruQ@2k","🥅"],"pet":["https://static.vecteezy.com/system/resources/thumbnails/071/841/232/small/a-happy-dog-with-a-joyful-expression-showcasing-a-rich-reddish-brown-coat-and-bright-white-markings-against-a-plain-white-background-photo.jpg","🐶"],"vet":["https://vetfamily.com/wp-content/uploads/2026/03/male-vet-with-female-dog-owner2-1600x1067.jpg","🩺"],"wet":["https://www.meme-arsenal.com/memes/3864f181ddaf9cb3f2b4b65483d3208f.jpg","💧"],"big":["https://media.baamboozle.com/uploads/images/376926/1622294752_133024.jpeg","🐘"],"dig":["https://8kkiymgmvkzly01w.public.blob.vercel-storage.com/articles/how-to-stop-a-dog-from-digging.webp","⛏️"],"fig":["https://oliveoilandlemons.com/app/uploads/2015/08/Fig.jpg","🌰"],"jig":["https://cdn-blog.superprof.com/blog_nl/wp-content/uploads/2021/08/irish-jig-1946x1553.jpg.webp","💃"],"pig":["https://media.baamboozle.com/uploads/images/30983/1634201024_29958.jpeg","🐷"],"rig":["https://static.vecteezy.com/system/resources/thumbnails/072/312/328/small/sleek-black-and-chrome-semi-truck-rig-commercial-transportation-concept-photo.jpg","🚛"],"wig":["https://m.media-amazon.com/images/I/71SqcK7+Z7L.jpg","💇"],"bin":["https://cdn.prod.website-files.com/640769b45732a5c68fc3a971/663760c42422f75481e2fbd0_bin.png","🗑️"],"fin":["https://www.surfer.com/.image/w_1080,q_auto:good,c_fill,ar_4:3/MjowMDAwMDAwMDAwMTM4MDY4/shark-fin-above-water-closeup-fin-of-a-great-white-shark-carcharodon-carcharias-swimming-at-surface-south-africa-atlantic-ocean-138068.jpg","🦈"],"pin":["https://static.vecteezy.com/system/resources/thumbnails/000/147/650/small/bowling-lane-pin-vector.jpg","🎳"],"tin":["https://www.manmadediy.com/wp-content/uploads/sites/52/2022/08/Stack-of-Tin-Cans-12520-2048x1262.jpg","🥫"],"win":["https://static.vecteezy.com/system/resources/thumbnails/014/829/865/small/cute-happy-boy-holding-golden-trophy-vector.jpg","🏆"],"dip":["https://www.tasteofhome.com/wp-content/uploads/2018/06/shutterstock_667674043-696x696.jpg","🥣"],"lip":["https://nailsbyrosa.nl/wp-content/uploads/2021/05/1122156047-huge-768x611.jpg","👄"],"rip":["https://www.seekpng.com/png/full/7-77295_ripped-paper-png.png","📄"],"sip":["https://lh7-rt.googleusercontent.com/docsz/AD_4nXdbUnFM4MFPIW4RB7BwW_LIF3vvqmVgxD3KXDVuz6p1caHE1zl7WFNmxBdcHVSA4foACjoW1njcXUFeOjxMzb-SeAaZtUqfhcWsKBQC4IhDFS_JwvBcjNMup2iiZ-h8La-QvNa2uXGahCbE8JmRXw?key=4v3mcCqteQOMUCOcXuAabbbC","🧃"],"zip":["https://www.mh-chine.com/images/blog/hot/two_way_zip-5.webp","🤐"],"cog":["https://static.vecteezy.com/system/resources/thumbnails/055/142/926/small_2x/close-up-of-a-single-metallic-gear-with-teeth-visible-isolated-on-a-transparent-background-essential-engineering-component-in-machinery-png.png","⚙️"],"dog":["https://site-547756.mozfiles.com/files/547756/medium/Dog2.jpg","🐶"],"fog":["https://angelynum.com/wp-content/uploads/2022/06/fog-woods-dark-520x293.jpg","🌫️"],"hog":["https://cdn.prod-carehubs.net/n7-mcnn/7bcc9724adf7b803/uploads/2016/10/a-hog-pen-full-of-pigs-and-swine-on-a-farm-16x9.jpg","🐖"],"jog":["https://my.youbster.com/wp-content/uploads/2020/07/1-1.jpg","🏃"],"log":["https://static.vecteezy.com/system/resources/thumbnails/018/898/098/small/texture-of-chopped-dry-wood-logs-photo.jpg","🪵"],"cop":["https://www.evil.news/wp-content/uploads/sites/35/2015/11/Police-Cop.jpg","👮"],"hop":["https://api.eurosky.network/img/feed_thumbnail/plain/did:plc:3eatnvb2dim4l7fiwln5wow6/bafkreih7lhx6apwikdwj2wlctbqoxj526agohv3enbvjgrc5i3a6tkpo7m","🐇"],"mop":["https://www.story.pl/media/cache/big/uploads/media/default/0001/57/mop.jpg","🧹"],"pop":["https://in.hu/site/assets/files/28693/popcorn.1010x0-srcset.webp","🍿"],"top":["https://cms-assets.illustrativemathematics.org/1hslrlgh3dltjuyjoldoki5f8jr3-cp-55327-cp-80834","🌀"],"bot":["https://i5.walmartimages.com/asr/821bb014-9056-4eaa-8abb-0f9a1fad01b8.6a25f7ab18ebe0341edadea6605298f2.jpeg","🤖"],"cot":["https://m.media-amazon.com/images/I/71gABWJtvjL.jpg_BO30,255,255,255_UF900,850_SR1910,1000,0,C_QL100_.jpg","🛏️"],"dot":["https://images.creativefabrica.com/products/previews/2024/04/12/KZnM36lUH/2fWzI6LSo1LAj4tCtaaHxFmpZEZ-desktop.jpg","🔴"],"hot":["https://beautytruth.com.au/wp-content/uploads/2025/08/21/hot-bowl-of-soup-stk-750x516.jpg","🍲"],"pot":["https://i5.walmartimages.com/seo/Cooks-Standard-Multi-Ply-Clad-Stainless-Steel-Stock-Pot-4-Quart-Pasta-Cooking-Soup-Pot-with-Lid-Deep-Stockpot-Induction-Cookware_501bdbcf-46ed-4ad4-9e8b-b13f9a3fb960.395540cb31b59d4d38a3524f60fc548f.jpeg","🍯"],"cub":["https://i.pinimg.com/474x/0a/ec/46/0aec465e7cb0c70c38069607ef11b93f.jpg","🦁"],"rub":["https://www.hayleyhandcare.com/wp-content/uploads/2024/10/hand-massage-beauty-salon-scaled-1.jpg","🙌"],"sub":["https://news.usni.org/wp-content/uploads/2023/08/230804-N-SR275-9002.jpeg","🚢"],"tub":["https://s7d1.scene7.com/is/image/kohlergbhcloudprod/Thumbnail-Images-21000-P5-0_PartialRoomView_d2c0072776_rgb","🛁"],"bug":["https://www.medialab.org/content/images/ladybug-1.jpg","🐞"],"hug":["https://i.pinimg.com/originals/c0/c6/4c/c0c64ceec90df49827934468f3c469bd.jpg","🤗"],"jug":["https://static.vecteezy.com/system/resources/thumbnails/069/893/633/small/white-ceramic-milk-jug-blue-background-mockup-free-photo.jpg","🏺"],"mug":["https://ueeshop.ly200-cdn.com/u_file/UPAW/UPAW875/2212/photo/a39ce2b4a3.jpg","☕"],"rug":["https://i.pinimg.com/originals/7b/c3/33/7bc3337f2ffa56ea3f65a2a9a4bec7f8.png","🟫"],"tug":["https://play-lh.googleusercontent.com/UJD8tUk2cKUs2xtVBSUnKKHPUf7_bylUY312idxIb3H1SMZQi4LzauzuUMT_BWniG23R","🪢"],"bun":["https://www.joyofbaking.com/images/facebook/softdinnerrolls.jpg","🍞"],"fun":["https://pbs.twimg.com/media/F8jlx7EW0AAqHyG.jpg","🎉"],"gun":["https://moreaudistribution.be/wp-content/uploads/2023/03/42250.jpg","🔫"],"nun":["https://i.etsystatic.com/62137574/r/il/bfcd7a/7885185359/il_1080xN.7885185359_32gs.jpg","🙏"],"run":["https://primary.jwwb.nl/public/u/e/i/temp-glmiyftdbihdrxzlrwkk/sprinten-high.webp","🏃"],"sun":["https://xras.ru/files/Image/the_sun_sky.jpg","☀️"]};
+
+let bag = [];
+let cur = null;      // current word
+let pos = 0;         // next sound position to fill
+let stars = 0;
+let locked = false;
+
+const photoEl = document.getElementById('photo');
+const emojiEl = document.getElementById('photo-emoji');
+const boxesEl = document.getElementById('boxes');
+const tilesEl = document.getElementById('tiles');
+const messageEl = document.getElementById('message');
+const starsEl = document.getElementById('stars');
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function speak(text) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.8;
+  const voices = speechSynthesis.getVoices();
+  const best = voices.find(v => /google us english/i.test(v.name))
+    || voices.find(v => /^en[-_]US/i.test(v.lang))
+    || voices.find(v => /^en/i.test(v.lang));
+  if (best) u.voice = best;
+  speechSynthesis.speak(u);
+}
+
+function nextWord() {
+  if (bag.length === 0) bag = shuffle(Object.keys(DATA));
+  return bag.pop();
+}
+
+function showWord() {
+  locked = false;
+  pos = 0;
+  cur = nextWord();
+  const entry = DATA[cur];
+  photoEl.style.display = 'block';
+  emojiEl.style.display = 'none';
+  photoEl.onerror = () => {
+    photoEl.style.display = 'none';
+    emojiEl.textContent = entry[1];
+    emojiEl.style.display = 'block';
+  };
+  photoEl.src = entry[0];
+  photoEl.alt = cur;
+  messageEl.textContent = '';
+  messageEl.classList.remove('good');
+
+  boxesEl.innerHTML = '';
+  for (let i = 0; i < cur.length; i++) {
+    const d = document.createElement('div');
+    d.className = 'sbox';
+    d.id = 'sbox-' + i;
+    boxesEl.appendChild(d);
+  }
+
+  tilesEl.innerHTML = '';
+  shuffle(cur.split('')).forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.textContent = ch;
+    btn.addEventListener('click', (e) => { tapTile(ch, btn); e.target.blur(); });
+    tilesEl.appendChild(btn);
+  });
+
+  speak(cur);
+}
+
+function tapTile(ch, btn) {
+  if (locked || btn.classList.contains('used')) return;
+  if (ch === cur[pos]) {
+    const box = document.getElementById('sbox-' + pos);
+    box.textContent = ch;
+    box.classList.add('filled');
+    btn.classList.add('used');
+    pos++;
+    if (pos === cur.length) {
+      locked = true;
+      stars++;
+      starsEl.textContent = '⭐ × ' + stars;
+      messageEl.textContent = '⭐ Yes! ' + cur.split('').join(' – ') + ' … ' + cur + '!';
+      messageEl.classList.add('good');
+      speak(cur);
+      setTimeout(showWord, 2000);
+    }
+  } else {
+    btn.classList.remove('bad');
+    void btn.offsetWidth; // restart the shake animation
+    btn.classList.add('bad');
+  }
+}
+
+document.getElementById('hear-btn').addEventListener('click', (e) => {
+  if (cur) speak(cur);
+  e.target.blur();
+});
+
+showWord();
+</script>
+</body>
+</html>
