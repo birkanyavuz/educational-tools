@@ -72,8 +72,8 @@ def main():
         print("search_classroom_tools {subject: math} ->", p["count"], "tools OK")
 
         p = call("list_classroom_tools", {})
-        assert p["count"] == 42 and len(p["results"]) == 42, p
-        print("list_classroom_tools -> 42 tools OK")
+        assert p["count"] == 50 and len(p["results"]) == 50, p
+        print("list_classroom_tools -> 50 tools OK")
 
         p = call("get_classroom_tool", {"id": "sight-words-first-grade"})
         assert p["id"] == "sight-words-first-grade", p
