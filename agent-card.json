@@ -2,7 +2,7 @@
   "name": "Birkan Educational Tools Agent",
   "description": "Zero-auth, read-only agent that finds Birkan Yavuz's real K-12 classroom tools (math visualizers, reading and sight-words activities, Spanish syllables, art) by grade, subject, and learning objective, and returns them with verifiable creator attribution.",
   "url": "https://educational-tools.vercel.app/a2a",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "protocolVersion": "1.0",
   "capabilities": {
     "streaming": false,
