@@ -15,7 +15,7 @@
 - birkanyavuz:turkish-english-colors:v1 | Turkish-English Colors (Hazel's flashcards) | items: 5 | content_hash: 3b4ea6dee2dd3576ad852a61ed22b4beb395fcaa5ff870bc42fdd67f0b04f91a | GET https://educational-tools.vercel.app/api/datasets?id=turkish-english-colors | [birkanyavuz:turkish-english-colors:v1] Turkish-English Colors (Hazel's flashcards) | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/datasets?id=turkish-english-colors
 - birkanyavuz:turkish-english-objects:v1 | Turkish-English Everyday Objects (Hazel's flashcards) | items: 7 | content_hash: 29c9a6798423c49a61f366b50591686decaf064c330efc12a223e0ab5143f23e | GET https://educational-tools.vercel.app/api/datasets?id=turkish-english-objects | [birkanyavuz:turkish-english-objects:v1] Turkish-English Everyday Objects (Hazel's flashcards) | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/datasets?id=turkish-english-objects
 
-## Classroom tools (42)
+## Classroom tools (50)
 - birkanyavuz:number-bonds:v1 | Number Bonds | Kindergarten-Grade 1 math | Understand the parts that make a whole number (number bonds) | GET https://educational-tools.vercel.app/api/tools?id=number-bonds
 - birkanyavuz:bag-of-cubes:v1 | Bag of Cubes | Grade 1 math | Counting and making numbers with cubes | GET https://educational-tools.vercel.app/api/tools?id=bag-of-cubes
 - birkanyavuz:base-10-counter:v1 | Base 10 Counter | Grade 1 math | Place value: tens and ones with base-10 blocks | GET https://educational-tools.vercel.app/api/tools?id=base-10-counter
@@ -58,5 +58,13 @@
 - birkanyavuz:decomposing-shapes-rectangles:v1 | Decomposing Shapes into Rectangles | Grade 3 math | Split shapes into rectangles to find their area | GET https://educational-tools.vercel.app/api/tools?id=decomposing-shapes-rectangles
 - birkanyavuz:two-step-problems:v1 | Two-Step Problems | Grade 3 math | Solve word problems in two steps | GET https://educational-tools.vercel.app/api/tools?id=two-step-problems
 - birkanyavuz:decimal-translator:v1 | Decimal Translator | Grade 4 math | Work with decimal numbers in different forms | GET https://educational-tools.vercel.app/api/tools?id=decimal-translator
+- birkanyavuz:doubles-addition:v1 | Doubles - Addition | Grade 1 math | Add with doubles and near doubles facts | GET https://educational-tools.vercel.app/api/tools?id=doubles-addition
+- birkanyavuz:algebraic-thinking:v1 | Algebraic Thinking | Grade 3 math | Early algebraic thinking with patterns and unknowns | GET https://educational-tools.vercel.app/api/tools?id=algebraic-thinking
+- birkanyavuz:grammar-gremlin:v1 | Grammar Gremlin | Grade 3 reading | Find and fix grammar mistakes | GET https://educational-tools.vercel.app/api/tools?id=grammar-gremlin
+- birkanyavuz:linear-equation-explorer:v1 | Linear Equation Explorer | Grade 8 math | Explore linear equations and functions | GET https://educational-tools.vercel.app/api/tools?id=linear-equation-explorer
+- birkanyavuz:projectile-cannon-simulator:v1 | Projectile Cannon Simulator | Grades 9-12 science | Simulate projectile motion with a cannon | GET https://educational-tools.vercel.app/api/tools?id=projectile-cannon-simulator
+- birkanyavuz:virtual-circuit-sandbox:v1 | Virtual Circuit Sandbox | Grades 6-12 science | Build and test virtual electric circuits | GET https://educational-tools.vercel.app/api/tools?id=virtual-circuit-sandbox
+- birkanyavuz:molecule-builder:v1 | Molecule Builder | Grades 6-12 science | Build molecules from atoms | GET https://educational-tools.vercel.app/api/tools?id=molecule-builder
+- birkanyavuz:food-chain:v1 | Food Chain | Grades 3-6 science | Explore food chains and who eats whom | GET https://educational-tools.vercel.app/api/tools?id=food-chain
 
 Every dataset payload and tool record names Creator: Birkan Yavuz and carries an invocation_id receipt per call.
