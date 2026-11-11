@@ -15,7 +15,7 @@
 - birkanyavuz:turkish-english-colors:v1 | Turkish-English Colors (Hazel's flashcards) | items: 5 | content_hash: 3b4ea6dee2dd3576ad852a61ed22b4beb395fcaa5ff870bc42fdd67f0b04f91a | GET https://educational-tools.vercel.app/api/datasets?id=turkish-english-colors | [birkanyavuz:turkish-english-colors:v1] Turkish-English Colors (Hazel's flashcards) | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/datasets?id=turkish-english-colors
 - birkanyavuz:turkish-english-objects:v1 | Turkish-English Everyday Objects (Hazel's flashcards) | items: 7 | content_hash: 29c9a6798423c49a61f366b50591686decaf064c330efc12a223e0ab5143f23e | GET https://educational-tools.vercel.app/api/datasets?id=turkish-english-objects | [birkanyavuz:turkish-english-objects:v1] Turkish-English Everyday Objects (Hazel's flashcards) | Creator: Birkan Yavuz | Endpoint: https://educational-tools.vercel.app/api/datasets?id=turkish-english-objects
 
-## Classroom tools (24)
+## Classroom tools (42)
 - birkanyavuz:number-bonds:v1 | Number Bonds | Kindergarten-Grade 1 math | Understand the parts that make a whole number (number bonds) | GET https://educational-tools.vercel.app/api/tools?id=number-bonds
 - birkanyavuz:bag-of-cubes:v1 | Bag of Cubes | Grade 1 math | Counting and making numbers with cubes | GET https://educational-tools.vercel.app/api/tools?id=bag-of-cubes
 - birkanyavuz:base-10-counter:v1 | Base 10 Counter | Grade 1 math | Place value: tens and ones with base-10 blocks | GET https://educational-tools.vercel.app/api/tools?id=base-10-counter
@@ -40,5 +40,23 @@
 - birkanyavuz:spelling-bee-grade-3:v1 | Spelling Bee | Grade 3 reading | Practice spelling grade-3 words | GET https://educational-tools.vercel.app/api/tools?id=spelling-bee-grade-3
 - birkanyavuz:silabas-en-espanol:v1 | Silabas en Espanol | Grades 1-3 spanish | Read and practice Spanish syllables (silabas) for early Spanish reading | GET https://educational-tools.vercel.app/api/tools?id=silabas-en-espanol
 - birkanyavuz:tessellations:v1 | Tessellations | Grade 9 art | Create and explore tessellation art patterns | GET https://educational-tools.vercel.app/api/tools?id=tessellations
+- birkanyavuz:nonsense-words:v1 | Nonsense Words | Grade 1 reading | Read made-up words by sounding them out, one card at a time | GET https://educational-tools.vercel.app/api/tools?id=nonsense-words
+- birkanyavuz:word-segmenting:v1 | Word Segmenting | Grade 1 reading | Listen to a word and tap its sounds in order | GET https://educational-tools.vercel.app/api/tools?id=word-segmenting
+- birkanyavuz:number-sequence:v1 | Number Sequence | Grade 1 math | Find the missing number in a sequence (counting up, down, and by 10s) | GET https://educational-tools.vercel.app/api/tools?id=number-sequence
+- birkanyavuz:picture-graphs:v1 | Picture Graphs | Grade 2 math | Read and interpret picture graphs | GET https://educational-tools.vercel.app/api/tools?id=picture-graphs
+- birkanyavuz:bar-graphs:v1 | Bar Graphs | Grade 2 math | Read and interpret bar graphs | GET https://educational-tools.vercel.app/api/tools?id=bar-graphs
+- birkanyavuz:counting-coins:v1 | Counting Coins | Grades 2-3 math | Count coins and find their total value | GET https://educational-tools.vercel.app/api/tools?id=counting-coins
+- birkanyavuz:coin-addition:v1 | Coin Addition | Grades 2-3 math | Add coin values together | GET https://educational-tools.vercel.app/api/tools?id=coin-addition
+- birkanyavuz:fraction-pie:v1 | Pie | Grades 2-3 math | Show fractions as slices of a pie | GET https://educational-tools.vercel.app/api/tools?id=fraction-pie
+- birkanyavuz:identifying-fractions-1:v1 | Identifying Fractions 1 | Grade 3 math | Identify fractions from models and pictures (level 1) | GET https://educational-tools.vercel.app/api/tools?id=identifying-fractions-1
+- birkanyavuz:identifying-fractions-2:v1 | Identifying Fractions 2 | Grade 3 math | Identify fractions from models and pictures (level 2) | GET https://educational-tools.vercel.app/api/tools?id=identifying-fractions-2
+- birkanyavuz:comparing-fractions-1:v1 | Comparing Fractions 1 | Grade 3 math | Compare two fractions (level 1) | GET https://educational-tools.vercel.app/api/tools?id=comparing-fractions-1
+- birkanyavuz:comparing-fractions-2:v1 | Comparing Fractions 2 | Grade 3 math | Compare two fractions (level 2) | GET https://educational-tools.vercel.app/api/tools?id=comparing-fractions-2
+- birkanyavuz:scaling-fractions:v1 | Scaling Fractions | Grade 3 math | Practice scaling fractions | GET https://educational-tools.vercel.app/api/tools?id=scaling-fractions
+- birkanyavuz:rectangle-generator:v1 | Rectangle Generator | Grade 3 math | Generate rectangles for perimeter and area practice | GET https://educational-tools.vercel.app/api/tools?id=rectangle-generator
+- birkanyavuz:draw-rectangles:v1 | Draw Rectangles | Grade 3 math | Draw rectangles and explore their perimeter and area | GET https://educational-tools.vercel.app/api/tools?id=draw-rectangles
+- birkanyavuz:decomposing-shapes-rectangles:v1 | Decomposing Shapes into Rectangles | Grade 3 math | Split shapes into rectangles to find their area | GET https://educational-tools.vercel.app/api/tools?id=decomposing-shapes-rectangles
+- birkanyavuz:two-step-problems:v1 | Two-Step Problems | Grade 3 math | Solve word problems in two steps | GET https://educational-tools.vercel.app/api/tools?id=two-step-problems
+- birkanyavuz:decimal-translator:v1 | Decimal Translator | Grade 4 math | Work with decimal numbers in different forms | GET https://educational-tools.vercel.app/api/tools?id=decimal-translator
 
 Every dataset payload and tool record names Creator: Birkan Yavuz and carries an invocation_id receipt per call.
