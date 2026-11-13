@@ -101,6 +101,7 @@ and asking only for what it returns:
 - [prompt-packs/new-teacher-starter.md](prompt-packs/new-teacher-starter.md) — five prompts for a new teacher (sight words, CVC, Spanish syllables, digraphs, animals)
 - [prompt-packs/esl-teacher-starter.md](prompt-packs/esl-teacher-starter.md) — five prompts for an ESL teacher (Turkish-English word wall, grade-1 Dolch flashcards with carrier phrases, colors + objects matching, CVC/digraph sorting mat, animals class set with offset)
 - [prompt-packs/special-ed-teacher-starter.md](prompt-packs/special-ed-teacher-starter.md) — five prompts for a special-ed teacher (IEP reading probe, carrier-phrase reading strip, Elkonin sound boxes, receptive/expressive data sheet, bilingual home-practice cards)
+- [prompt-packs/homeschool-teacher-starter.md](prompt-packs/homeschool-teacher-starter.md) — five prompts for a homeschool teacher (morning warm-up, mixed-age siblings, four-week Dolch-nouns plan, guess-the-meaning game, animals recall cards)
 
 ## Classroom app files as MCP resources
 
