@@ -2,9 +2,9 @@
 """
 Test every MCP tool by name via tools/call, the way a real outside client would.
 
-M8ven's audit (Nov 9, 2026) found 0/5 tools referenced in tests: the repo's only
+M8ven's audit (Nov 9, 2026) found 0/5 tools referenced in tests (that file has since grown with the tools): the repo's only
 test file called tools/call once, with the legacy alias "get_tool". This file
-calls each of the five real tools by name and checks a real result, creator
+calls each of the six real tools by name and checks a real result, creator
 attribution, and an invocation receipt on every call.
 
 Run locally:  python3 test_tools_call.py   (starts public_server.py on port 8132)
@@ -19,7 +19,7 @@ PORT = 8132
 BASE = f"http://127.0.0.1:{PORT}"
 
 TOOLS = ["search_classroom_tools", "list_classroom_tools", "get_classroom_tool",
-         "get_curriculum_dataset", "get_word_list"]
+         "get_curriculum_dataset", "get_word_list", "list_datasets"]
 
 def post(path, payload):
     req = urllib.request.Request(BASE + path, data=json.dumps(payload).encode(),
@@ -65,7 +65,7 @@ def main():
         lst = post("/mcp", {"jsonrpc": "2.0", "id": 3, "method": "tools/list", "params": {}})
         names = [t["name"] for t in lst["result"]["tools"]]
         assert names == TOOLS, names
-        print("tools/list: all 5 tools present, in order")
+        print("tools/list: all 6 tools present, in order")
 
         p = call("search_classroom_tools", {"subject": "math"})
         assert p["count"] > 0 and p["results"], p
@@ -87,7 +87,38 @@ def main():
         assert p["items"] == ["apple", "baby", "back"] and p["total_count"] == 94, p
         print("get_word_list 'Dolch nouns' count 3 -> apple, baby, back OK")
 
-        print("ALL 5 TOOLS CALLED BY NAME — PASS")
+
+        # list_datasets manifest: the v1.8.1 enumeration tool. Verified
+        # against the real datasets, not against the tool's own claims.
+        m = call("list_datasets", {})
+        assert m["dataset_count"] == 9, m
+        assert len(m["datasets"]) == 9, m
+        by_id = {e["id"]: e for e in m["datasets"]}
+        assert set(by_id) == {"dolch-sight-words-220", "dolch-nouns-94", "cvc-word-families-75",
+                              "digraph-words-21", "spanish-syllables-core", "turkish-english-early-words",
+                              "turkish-english-animals", "turkish-english-colors", "turkish-english-objects"}, by_id
+        assert by_id["dolch-sight-words-220"]["topic"] == "sight words"
+        assert by_id["dolch-sight-words-220"]["count"] == 220
+        assert by_id["dolch-sight-words-220"]["levels"] == ["pre-primer", "primer", "grade-1", "grade-2", "grade-3"]
+        assert by_id["cvc-word-families-75"]["levels"] == ["-an", "-at", "-en", "-et", "-ig", "-in", "-ip", "-og", "-op", "-ot", "-ub", "-ug", "-un"]
+        assert by_id["digraph-words-21"]["levels"] == ["sh", "ch", "th", "wh"]
+        assert by_id["spanish-syllables-core"]["levels"] == ["syllables", "words"]
+        for single in ("dolch-nouns-94", "turkish-english-early-words", "turkish-english-animals",
+                       "turkish-english-colors", "turkish-english-objects"):
+            assert "levels" not in by_id[single], single
+        assert by_id["turkish-english-colors"]["language"] == "tr-en"
+        assert by_id["dolch-nouns-94"]["language"] == "en"
+        assert by_id["turkish-english-colors"]["items_sample"] == "objects with tr, en, example_en, example_tr fields"
+        assert by_id["turkish-english-animals"]["items_sample"] == "objects with tr, en fields"
+        assert by_id["dolch-nouns-94"]["items_sample"] == "single-word strings"
+        assert by_id["spanish-syllables-core"]["items_sample"] == "syllable strings and word strings"
+        for e in m["datasets"]:
+            assert "items" not in e, e["id"]  # manifest carries no words
+            assert "content_hash" not in e, e["id"]
+            assert e["source_note"], e["id"]
+        print("list_datasets manifest OK: 9 entries, topics/levels verified")
+
+        print("ALL 6 TOOLS CALLED BY NAME — PASS")
     finally:
         proc.terminate()
         try:

@@ -19,7 +19,7 @@ See `llms-install.md` for the copy-paste MCP config, or drop this repo's root
 `.mcp.json` / `gemini-extension.json` into a workspace — installer agents read them
 automatically. Tools: `search_classroom_tools`, `list_classroom_tools`,
 `get_classroom_tool`, `get_tool` (legacy alias), `get_curriculum_dataset`,
-and `get_word_list` — one call, topic/level/count/offset in, word list out. All tools carry read-only annotations
+and `get_word_list` — one call, topic/level/count/offset in, word list out — plus `list_datasets`, which lists all 9 datasets (id, topic, count, levels) with no arguments, so a caller can discover the lists before fetching one. All tools carry read-only annotations
 (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`,
 `openWorldHint: false`).
 
@@ -44,6 +44,10 @@ target word) in a `carrier_phrases` map — e.g. `after` → "Run after the cat.
 - "Give me 20 Spanish syllables" → `get_word_list(topic="Spanish syllables", count=20)` → 20 of 212, starting ma, me, mi, mo, mu, pa
 - "Give me the next 10 grade-1 sight words" → `get_word_list(topic="sight words", level="grade-1", count=10, offset=10)` → 10 of 41, starting from, give, going, had, has
 
+## List the datasets first (`list_datasets`, v1.8.1)
+
+`list_datasets` takes no arguments and returns one manifest entry per dataset — `id`, `title`, `topic` (the plain phrase `get_word_list` takes), `count`, `levels` only where the dataset has subsets (Dolch grades, CVC rimes, digraphs, Spanish syllables/words), `language` (`en` or `tr-en`), `items_sample` (the shape of the items, e.g. `single-word strings` — never actual words), `source_note`, and `uri`. It closes Glama's Completeness gap: a calling agent no longer has to learn the dataset ids and valid levels from error messages. The same manifest is served over plain HTTP at `GET /api/datasets`.
+
 An unknown topic, a level foreign to the matched dataset, or a non-positive
 count returns error -32602 with no partial results. A negative offset also
 returns error -32602; an offset past the end of the list returns an empty
@@ -53,7 +57,7 @@ list with `has_more: false`, never an error.
 
 Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `4e8d2939606ac1e193d93d1eecc1b7c9603af1c4` — check out this commit to see the exact code that serves v1.8.0.
 
-Expected hashes (v1.8.0):
+Expected hashes (v1.8.1):
 
 - `birkanyavuz:dolch-sight-words-220:v1` — Dolch Sight Words (220, by level) — `content_hash: 4b1b92ee1d3e7e774ecbb8ef4c5e4715c9626824e143d0d35502b5b69d3b37be`
 - `birkanyavuz:dolch-nouns-94:v1` — Dolch Nouns (94) — `content_hash: 92fd7e572cd2b6d435fbcf0b3f55e48696b8769806ce2bd94a5179baa819ae67`

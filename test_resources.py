@@ -102,12 +102,12 @@ def main():
         assert raw == (HERE / "apps" / "cvc-word-builder.html").read_bytes(), "api/apps file mismatch"
         print("GET /api/apps: list 42 + single file verbatim OK")
 
-        # tools/list unchanged: still 5 tools
+        # tools/list: now 6 tools (list_datasets added in v1.8.1)
         tools = rpc("tools/list", {}, rid=7)
         assert [t["name"] for t in tools["result"]["tools"]] == [
             "search_classroom_tools", "list_classroom_tools", "get_classroom_tool",
-            "get_curriculum_dataset", "get_word_list"], tools
-        print("tools/list: still 5 tools OK")
+            "get_curriculum_dataset", "get_word_list", "list_datasets"], tools
+        print("tools/list: 6 tools OK")
 
         print("ALL RESOURCE CHECKS — PASS")
     finally:
