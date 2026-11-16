@@ -55,7 +55,7 @@ list with `has_more: false`, never an error.
 
 ## Verify the data
 
-Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `4e8d2939606ac1e193d93d1eecc1b7c9603af1c4` — check out this commit to see the exact code that serves v1.8.0.
+Every dataset carries a SHA-256 `content_hash` of the full dataset. How it is computed (Python): `hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()`, where `payload` is the dataset's level map — and, for datasets with carrier phrases (Dolch sight words), `{"levels": ..., "carrier_phrases": ...}` instead. Keys sorted, UTF-8, no added whitespace. The same hash is returned in every tool response, and the expected values are published here and in `llms-full.txt` — compare them to verify a response. Release commit: `18570432598b18ef397b8c49d4b0468e1911d66e` — check out this commit to see the exact code that serves v1.8.1.
 
 Expected hashes (v1.8.1):
 
@@ -90,12 +90,13 @@ One-line citation for the Dolch list, ready to copy:
 ## Example tool-call traces
 
 Real calls against the live server, captured verbatim:
-[examples/tool_call_traces.jsonl](examples/tool_call_traces.jsonl) — six
+[examples/tool_call_traces.jsonl](examples/tool_call_traces.jsonl) — seven
 records marked `"is_example": true` covering bilingual pairs with example
 sentences, offset pagination, a leveled plain-word list, pairs without
 sentences, an error (-32602) followed by a successful retry using the
 valid topics named in the error message itself, and a Dolch-nouns call
-proving the v1.6.3 routing fix.
+proving the v1.6.3 routing fix, and a dataset inventory listing
+(`list_datasets`, no words).
 
 ## Prompt packs
 
